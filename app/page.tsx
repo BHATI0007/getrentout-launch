@@ -3,192 +3,164 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 
-const TOTAL_SPOTS = 100000;
+const TOTAL = 100000;
 
 function useSpots() {
-  const [spots, setSpots] = useState<number>(TOTAL_SPOTS);
+  const [spots, setSpots] = useState(TOTAL);
   useEffect(() => {
-    const load = () => fetch("/api/spots").then(r => r.json()).then(d => setSpots(d.remaining)).catch(() => {});
-    load();
-    const id = setInterval(load, 30000);
+    const go = () => fetch("/api/spots").then(r => r.json()).then(d => setSpots(d.remaining)).catch(() => {});
+    go();
+    const id = setInterval(go, 30000);
     return () => clearInterval(id);
   }, []);
   return { spots, setSpots };
 }
 
-function useScrollReveal() {
+function useReveal() {
   useEffect(() => {
-    const obs = new IntersectionObserver((entries) => {
-      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add("visible"); });
-    }, { threshold: 0.1 });
-    document.querySelectorAll(".fade-in").forEach(el => obs.observe(el));
-    return () => obs.disconnect();
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add("in"); });
+    }, { threshold: 0.12 });
+    document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+    return () => io.disconnect();
   }, []);
 }
 
-function AnimatedCounter({ target, duration = 1200 }: { target: number; duration?: number }) {
-  const [count, setCount] = useState(0);
+function CountUp({ to, suffix = "" }: { to: number; suffix?: string }) {
+  const [v, setV] = useState(0);
   const ref = useRef<HTMLSpanElement>(null);
   useEffect(() => {
-    const obs = new IntersectionObserver(([e]) => {
+    const io = new IntersectionObserver(([e]) => {
       if (!e.isIntersecting) return;
-      obs.disconnect();
-      const start = Date.now();
+      io.disconnect();
+      const t0 = Date.now();
+      const dur = 1400;
       const tick = () => {
-        const p = Math.min((Date.now() - start) / duration, 1);
-        const ease = 1 - Math.pow(1 - p, 4);
-        setCount(Math.round(ease * target));
+        const p = Math.min((Date.now() - t0) / dur, 1);
+        const ease = 1 - Math.pow(1 - p, 3);
+        setV(Math.round(ease * to));
         if (p < 1) requestAnimationFrame(tick);
       };
       requestAnimationFrame(tick);
     }, { threshold: 0.5 });
-    if (ref.current) obs.observe(ref.current);
-    return () => obs.disconnect();
-  }, [target, duration]);
-  return <span ref={ref}>{count.toLocaleString()}</span>;
+    if (ref.current) io.observe(ref.current);
+    return () => io.disconnect();
+  }, [to]);
+  return <span ref={ref}>{v.toLocaleString()}{suffix}</span>;
 }
 
-function LiveCounter({ value }: { value: number }) {
-  const [display, setDisplay] = useState(value);
-  const prev = useRef(value);
+function Ticker({ value }: { value: number }) {
+  const [d, setD] = useState(value);
+  const p = useRef(value);
   useEffect(() => {
-    if (value === prev.current) return;
-    const diff = prev.current - value;
-    const steps = 40;
+    if (value === p.current) return;
+    const diff = p.current - value;
     let i = 0;
     const id = setInterval(() => {
       i++;
-      const ease = 1 - Math.pow(1 - i / steps, 3);
-      setDisplay(Math.round(prev.current - diff * ease));
-      if (i >= steps) { clearInterval(id); prev.current = value; }
+      const e = 1 - Math.pow(1 - i / 40, 3);
+      setD(Math.round(p.current - diff * e));
+      if (i >= 40) { clearInterval(id); p.current = value; }
     }, 16);
     return () => clearInterval(id);
   }, [value]);
-  return <>{display.toLocaleString()}</>;
+  return <>{d.toLocaleString()}</>;
 }
 
-function Card3D({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const onMove = useCallback((e: React.MouseEvent) => {
-    if (!ref.current) return;
-    const r = ref.current.getBoundingClientRect();
-    const x = (e.clientX - r.left) / r.width - 0.5;
-    const y = (e.clientY - r.top) / r.height - 0.5;
-    ref.current.style.transform = `perspective(800px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg) translateZ(8px)`;
-  }, []);
-  const onLeave = useCallback(() => {
-    if (!ref.current) return;
-    ref.current.style.transform = "perspective(800px) rotateY(0deg) rotateX(0deg) translateZ(0px)";
-  }, []);
-  return (
-    <div ref={ref} onMouseMove={onMove} onMouseLeave={onLeave}
-      style={{ transition: "transform 0.4s ease", transformStyle: "preserve-3d", ...style }}>
-      {children}
-    </div>
-  );
-}
-
-type View = "home" | "provider" | "customer" | "done-provider" | "done-customer";
+type V = "home" | "provider" | "customer" | "done-p" | "done-c";
 
 export default function Page() {
-  const [view, setView] = useState<View>("home");
+  const [view, setView] = useState<V>("home");
   const [loading, setLoading] = useState(false);
-  const [refCode, setRefCode] = useState("");
-  const [providerSpot, setProviderSpot] = useState(0);
-  const [waitlistResult, setWaitlistResult] = useState<{ position: number; referralCode: string } | null>(null);
+  const [ref, setRef] = useState("");
+  const [pSpot, setPSpot] = useState(0);
+  const [wl, setWl] = useState<{ position: number; referralCode: string } | null>(null);
   const [copied, setCopied] = useState(false);
-  const [pForm, setPForm] = useState({ name: "", email: "", city: "", category: "" });
-  const [cForm, setCForm] = useState({ name: "", email: "", city: "" });
+  const [pf, setPf] = useState({ name: "", email: "", city: "", what: "" });
+  const [cf, setCf] = useState({ name: "", email: "", city: "" });
   const { spots, setSpots } = useSpots();
-  useScrollReveal();
+  useReveal();
 
   useEffect(() => {
-    const p = new URLSearchParams(window.location.search).get("ref");
-    if (p) setRefCode(p);
+    const r = new URLSearchParams(window.location.search).get("ref");
+    if (r) setRef(r);
   }, []);
 
-  async function submitProvider(e: React.FormEvent) {
+  const submitP = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true);
     try {
-      await fetch("/api/provider", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(pForm) });
+      await fetch("/api/provider", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: pf.name, email: pf.email, city: pf.city, category: pf.what }) });
       const d = await fetch("/api/spots").then(r => r.json());
       setSpots(d.remaining);
-      setProviderSpot(TOTAL_SPOTS - d.remaining);
-      setView("done-provider");
+      setPSpot(TOTAL - d.remaining);
+      setView("done-p");
     } finally { setLoading(false); }
-  }
-
-  async function submitCustomer(e: React.FormEvent) {
-    e.preventDefault(); setLoading(true);
-    try {
-      const res = await fetch("/api/waitlist", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...cForm, referralCode: refCode }) });
-      const data = await res.json();
-      setWaitlistResult({ position: data.position, referralCode: data.referralCode });
-      setView("done-customer");
-    } finally { setLoading(false); }
-  }
-
-  function copyLink() {
-    navigator.clipboard.writeText(`https://getrentout.me?ref=${waitlistResult?.referralCode}`);
-    setCopied(true); setTimeout(() => setCopied(false), 2000);
-  }
-
-  const inp: React.CSSProperties = {
-    width: "100%", padding: "14px 16px",
-    background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: "12px", color: "#fff", fontSize: "15px",
-    outline: "none", fontFamily: "inherit", transition: "border-color 0.2s",
   };
 
-  const Logo = ({ size = 32 }: { size?: number }) => (
+  const submitC = async (e: React.FormEvent) => {
+    e.preventDefault(); setLoading(true);
+    try {
+      const res = await fetch("/api/waitlist", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...cf, referralCode: ref }) });
+      const d = await res.json();
+      setWl({ position: d.position, referralCode: d.referralCode });
+      setView("done-c");
+    } finally { setLoading(false); }
+  };
+
+  const copy = () => {
+    navigator.clipboard.writeText(`https://getrentout.me?ref=${wl?.referralCode}`);
+    setCopied(true); setTimeout(() => setCopied(false), 2000);
+  };
+
+  const Logo = () => (
     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-      <div style={{ width: size, height: size, borderRadius: size * 0.28, overflow: "hidden", boxShadow: "0 0 20px #9333ea44", flexShrink: 0 }}>
-        <Image src="/logo.png" alt="RentOut" width={size} height={size} style={{ display: "block" }} />
+      <div style={{ width: 34, height: 34, borderRadius: 9, overflow: "hidden", flexShrink: 0 }}>
+        <Image src="/logo.png" alt="RentOut" width={34} height={34} />
       </div>
-      <span style={{ fontSize: size * 0.53, fontWeight: 700, letterSpacing: "-0.3px" }}>RentOut</span>
+      <span style={{ fontSize: 17, fontWeight: 700, letterSpacing: "-0.3px" }}>RentOut</span>
     </div>
   );
 
-  // ── Done: Provider ──────────────────────────────────────────
-  if (view === "done-provider") return (
-    <div style={{ minHeight: "100vh", background: "#05000f", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px" }}>
-      <div className="noise" />
-      <div style={{ maxWidth: "400px", width: "100%", textAlign: "center" }}>
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: "40px" }}><Logo /></div>
-        <Card3D style={{ marginBottom: "16px" }}>
-          <div className="glass" style={{ borderRadius: "24px", padding: "44px 32px", position: "relative", overflow: "hidden" }}>
-            <div style={{ position: "absolute", top: "-40px", right: "-40px", width: "120px", height: "120px", borderRadius: "50%", background: "radial-gradient(circle, #9333ea44, transparent)" }} />
-            <div style={{ position: "absolute", bottom: "-30px", left: "-30px", width: "100px", height: "100px", borderRadius: "50%", background: "radial-gradient(circle, #ec489933, transparent)" }} />
-            <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.14em", color: "#555", textTransform: "uppercase", marginBottom: "12px" }}>Founding Provider</div>
-            <div style={{ fontSize: "76px", fontWeight: 900, lineHeight: 1, marginBottom: "4px", letterSpacing: "-3px" }}>
-              <span className="gradient-text">#{providerSpot.toLocaleString()}</span>
-            </div>
-            <div style={{ fontSize: "14px", color: "#444", marginBottom: "28px" }}>of 100,000 worldwide</div>
-            <div style={{ height: "1px", background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent)", marginBottom: "20px" }} />
-            <div style={{ fontSize: "15px", color: "#888", lineHeight: 1.7 }}>
-              Zero commission on every booking.<br />
-              <span style={{ color: "#c084fc", fontWeight: 600 }}>This spot is yours. Forever.</span>
-            </div>
-          </div>
-        </Card3D>
+  const inp: React.CSSProperties = {
+    display: "block", width: "100%", padding: "13px 15px",
+    background: "#0a0a0a", border: "1px solid #1c1c1c",
+    borderRadius: 11, color: "#fff", fontSize: 15, outline: "none",
+  };
 
-        <div className="glass" style={{ borderRadius: "16px", padding: "18px 20px", marginBottom: "12px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-            <span className="live-dot" />
-            <span style={{ fontSize: "14px", fontWeight: 600 }}><LiveCounter value={spots} /> spots remaining</span>
+  // DONE PROVIDER
+  if (view === "done-p") return (
+    <div style={{ minHeight: "100vh", background: "#000", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+      <div style={{ maxWidth: 400, width: "100%", textAlign: "center" }}>
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 40 }}><Logo /></div>
+        <div style={{ background: "#0a0a0a", border: "1px solid #1c1c1c", borderRadius: 20, padding: "40px 32px", marginBottom: 12 }}>
+          <div style={{ width: 64, height: 64, borderRadius: 18, overflow: "hidden", margin: "0 auto 20px" }}>
+            <Image src="/logo.png" alt="RentOut" width={64} height={64} />
           </div>
-          <p style={{ fontSize: "13px", color: "#555" }}>Share before they&apos;re gone. Closes when 100,000 is reached.</p>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", color: "#444", textTransform: "uppercase", marginBottom: 10 }}>Founding Provider</div>
+          <div style={{ fontSize: 72, fontWeight: 900, letterSpacing: "-3px", lineHeight: 1, marginBottom: 6 }}>
+            <span className="g">#{pSpot.toLocaleString()}</span>
+          </div>
+          <div style={{ fontSize: 14, color: "#444", marginBottom: 28 }}>of 100,000 worldwide</div>
+          <div style={{ borderTop: "1px solid #1c1c1c", paddingTop: 20, fontSize: 15, color: "#666", lineHeight: 1.7 }}>
+            Zero commission on every booking.<br />
+            <span style={{ color: "#a855f7" }}>Yours. Forever.</span>
+          </div>
         </div>
-
-        <div style={{ display: "flex", gap: "8px" }}>
-          <a href={`https://wa.me/?text=I just claimed founding provider spot %23${providerSpot.toLocaleString()} on RentOut. Sell ANY service. Set YOUR price. Zero commission for life. Only ${spots.toLocaleString()} of 100,000 left: https://getrentout.me`}
+        <div style={{ background: "#0a0a0a", border: "1px solid #1c1c1c", borderRadius: 14, padding: "16px 20px", marginBottom: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+            <span className="dot" /><span style={{ fontSize: 14, fontWeight: 600 }}><Ticker value={spots} /> spots left</span>
+          </div>
+          <div style={{ fontSize: 13, color: "#444" }}>Share before they're gone. Closes at 100,000.</div>
+        </div>
+        <div style={{ display: "flex", gap: 8 }}>
+          <a href={`https://wa.me/?text=I claimed founding provider spot %23${pSpot.toLocaleString()} on RentOut. Sell ANY service. Your price. Zero commission for life. Only ${spots.toLocaleString()} of 100,000 left: https://getrentout.me`}
             target="_blank" rel="noopener"
-            style={{ flex: 1, background: "#128C7E", borderRadius: "12px", padding: "13px", fontSize: "13px", fontWeight: 700, color: "#fff", textDecoration: "none", textAlign: "center" }}>
-            Share on WhatsApp
+            style={{ flex: 1, background: "#128C7E", borderRadius: 12, padding: 13, fontSize: 13, fontWeight: 700, color: "#fff", textDecoration: "none", textAlign: "center" as const }}>
+            WhatsApp
           </a>
-          <a href={`https://twitter.com/intent/tweet?text=Just claimed founding spot %23${providerSpot.toLocaleString()} on RentOut — sell any service%2C set your price%2C zero commission for life. ${spots.toLocaleString()} left: https://getrentout.me`}
+          <a href={`https://twitter.com/intent/tweet?text=Just claimed founding spot %23${pSpot.toLocaleString()} on RentOut — sell any service%2C your price%2C zero commission. ${spots.toLocaleString()} left: https://getrentout.me`}
             target="_blank" rel="noopener"
-            style={{ flex: 1, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px", padding: "13px", fontSize: "13px", fontWeight: 700, color: "#fff", textDecoration: "none", textAlign: "center" }}>
+            style={{ flex: 1, background: "#0a0a0a", border: "1px solid #1c1c1c", borderRadius: 12, padding: 13, fontSize: 13, fontWeight: 700, color: "#fff", textDecoration: "none", textAlign: "center" as const }}>
             Post on X
           </a>
         </div>
@@ -196,101 +168,94 @@ export default function Page() {
     </div>
   );
 
-  // ── Done: Customer ──────────────────────────────────────────
-  if (view === "done-customer") return (
-    <div style={{ minHeight: "100vh", background: "#05000f", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px" }}>
-      <div className="noise" />
-      <div style={{ maxWidth: "400px", width: "100%", textAlign: "center" }}>
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: "40px" }}><Logo /></div>
-        <Card3D style={{ marginBottom: "16px" }}>
-          <div className="glass" style={{ borderRadius: "24px", padding: "44px 32px" }}>
-            <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.14em", color: "#555", textTransform: "uppercase", marginBottom: "12px" }}>You&apos;re on the list</div>
-            <div style={{ fontSize: "80px", fontWeight: 900, lineHeight: 1, marginBottom: "4px", letterSpacing: "-3px" }}>
-              <span className="gradient-text">#{waitlistResult?.position}</span>
-            </div>
-            <div style={{ fontSize: "14px", color: "#444" }}>{cForm.city}</div>
+  // DONE CUSTOMER
+  if (view === "done-c") return (
+    <div style={{ minHeight: "100vh", background: "#000", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+      <div style={{ maxWidth: 400, width: "100%", textAlign: "center" }}>
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 40 }}><Logo /></div>
+        <div style={{ background: "#0a0a0a", border: "1px solid #1c1c1c", borderRadius: 20, padding: "40px 32px", marginBottom: 12 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", color: "#444", textTransform: "uppercase", marginBottom: 10 }}>Your position</div>
+          <div style={{ fontSize: 80, fontWeight: 900, letterSpacing: "-3px", lineHeight: 1, marginBottom: 6 }}>
+            <span className="g">#{wl?.position}</span>
           </div>
-        </Card3D>
-
-        <div className="glass" style={{ borderRadius: "16px", padding: "18px 20px", marginBottom: "12px" }}>
-          <div style={{ fontSize: "14px", fontWeight: 600, marginBottom: "6px" }}>Move up the list</div>
-          <p style={{ fontSize: "13px", color: "#555", marginBottom: "14px" }}>Every friend who signs up with your link moves you ahead.</p>
-          <div style={{ background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "10px", padding: "10px 14px", fontSize: "12px", color: "#666", fontFamily: "monospace", wordBreak: "break-all", marginBottom: "10px" }}>
-            getrentout.me?ref={waitlistResult?.referralCode}
+          <div style={{ fontSize: 14, color: "#444" }}>{cf.city}</div>
+        </div>
+        <div style={{ background: "#0a0a0a", border: "1px solid #1c1c1c", borderRadius: 14, padding: "18px 20px", marginBottom: 12, textAlign: "left" as const }}>
+          <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 6 }}>Move up the list</div>
+          <div style={{ fontSize: 13, color: "#555", marginBottom: 14 }}>Every friend who signs up with your link moves you ahead.</div>
+          <div style={{ background: "#060606", border: "1px solid #1c1c1c", borderRadius: 8, padding: "9px 13px", fontSize: 12, color: "#555", fontFamily: "monospace", wordBreak: "break-all" as const, marginBottom: 10 }}>
+            getrentout.me?ref={wl?.referralCode}
           </div>
-          <button onClick={copyLink} style={{ width: "100%", padding: "13px", background: "linear-gradient(135deg, #9333ea, #ec4899)", border: "none", borderRadius: "10px", color: "#fff", fontSize: "14px", fontWeight: 700, cursor: "pointer" }}>
-            {copied ? "✓ Copied to clipboard" : "Copy your referral link"}
+          <button onClick={copy} style={{ width: "100%", padding: 13, background: "linear-gradient(135deg,#9333ea,#ec4899)", border: "none", borderRadius: 10, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+            {copied ? "✓ Copied" : "Copy referral link"}
           </button>
         </div>
-
-        <div style={{ display: "flex", gap: "8px" }}>
-          <a href={`https://wa.me/?text=I joined RentOut — hire anyone for anything. Get your spot: https://getrentout.me?ref=${waitlistResult?.referralCode}`}
+        <div style={{ display: "flex", gap: 8 }}>
+          <a href={`https://wa.me/?text=I joined RentOut — hire anyone for anything. https://getrentout.me?ref=${wl?.referralCode}`}
             target="_blank" rel="noopener"
-            style={{ flex: 1, background: "#128C7E", borderRadius: "12px", padding: "12px", fontSize: "13px", fontWeight: 700, color: "#fff", textDecoration: "none", textAlign: "center" }}>
+            style={{ flex: 1, background: "#128C7E", borderRadius: 12, padding: 12, fontSize: 13, fontWeight: 700, color: "#fff", textDecoration: "none", textAlign: "center" as const }}>
             WhatsApp
           </a>
-          <a href={`https://twitter.com/intent/tweet?text=Just joined RentOut — hire anyone for anything. https://getrentout.me?ref=${waitlistResult?.referralCode}`}
+          <a href={`https://twitter.com/intent/tweet?text=Just joined RentOut — hire anyone for anything. https://getrentout.me?ref=${wl?.referralCode}`}
             target="_blank" rel="noopener"
-            style={{ flex: 1, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px", padding: "12px", fontSize: "13px", fontWeight: 700, color: "#fff", textDecoration: "none", textAlign: "center" }}>
-            X (Twitter)
+            style={{ flex: 1, background: "#0a0a0a", border: "1px solid #1c1c1c", borderRadius: 12, padding: 12, fontSize: 13, fontWeight: 700, color: "#fff", textDecoration: "none", textAlign: "center" as const }}>
+            Post on X
           </a>
         </div>
       </div>
     </div>
   );
 
-  // ── Forms ───────────────────────────────────────────────────
+  // FORM
   if (view === "provider" || view === "customer") {
-    const isProvider = view === "provider";
+    const isP = view === "provider";
     return (
-      <div style={{ minHeight: "100vh", background: "#05000f", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px" }}>
-        <div className="noise" />
-        <div style={{ position: "absolute", top: "20%", left: "50%", transform: "translateX(-50%)", width: "500px", height: "500px", borderRadius: "50%", background: "radial-gradient(circle, #9333ea18 0%, transparent 70%)", pointerEvents: "none" }} />
+      <div style={{ minHeight: "100vh", background: "#000", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+        <div style={{ maxWidth: 420, width: "100%" }}>
+          <button onClick={() => setView("home")} style={{ background: "none", border: "none", color: "#444", cursor: "pointer", fontSize: 14, padding: 0, marginBottom: 32 }}>← Back</button>
+          <div style={{ marginBottom: 28 }}><Logo /></div>
 
-        <div style={{ maxWidth: "420px", width: "100%", position: "relative", zIndex: 1 }}>
-          <button onClick={() => setView("home")} style={{ background: "none", border: "none", color: "#444", cursor: "pointer", fontSize: "14px", padding: 0, marginBottom: "32px" }}>← Back</button>
-          <div style={{ marginBottom: "32px" }}><Logo /></div>
-
-          {isProvider && (
-            <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(147,51,234,0.12)", border: "1px solid rgba(147,51,234,0.25)", borderRadius: "100px", padding: "6px 14px", marginBottom: "20px" }}>
-              <span className="live-dot" style={{ background: "#c084fc", boxShadow: "0 0 8px #c084fc" }} />
-              <span style={{ fontSize: "13px", fontWeight: 600, color: "#c084fc" }}>
-                <LiveCounter value={spots} /> of 100,000 spots left
-              </span>
+          {isP && (
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "#140a20", border: "1px solid #2d1654", borderRadius: 100, padding: "6px 14px", marginBottom: 20 }}>
+              <span className="dot" style={{ background: "#a855f7" }} />
+              <span style={{ fontSize: 13, fontWeight: 600, color: "#a855f7" }}><Ticker value={spots} /> of 100,000 spots left</span>
             </div>
           )}
 
-          <h1 style={{ fontSize: "30px", fontWeight: 800, letterSpacing: "-1px", marginBottom: "8px", lineHeight: 1.2 }}>
-            {isProvider ? "Become a founding provider" : "Join the waitlist"}
+          {!isP && ref && (
+            <div style={{ background: "#0a180a", border: "1px solid #1a3a1a", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: "#4ade80", marginBottom: 20 }}>
+              ✓ Referred — you're ahead of the line.
+            </div>
+          )}
+
+          <h1 style={{ fontSize: 30, fontWeight: 800, letterSpacing: "-1px", marginBottom: 6, lineHeight: 1.2 }}>
+            {isP ? "Become a founding provider" : "Join the waitlist"}
           </h1>
-          <p style={{ fontSize: "15px", color: "#555", marginBottom: "28px", lineHeight: 1.6 }}>
-            {isProvider ? "Any service. Your price. Zero commission — forever." : "First access when we launch in your city."}
+          <p style={{ fontSize: 15, color: "#555", marginBottom: 28, lineHeight: 1.6 }}>
+            {isP ? "Any service. Your price. Zero commission — forever." : "First access when we launch in your city."}
           </p>
 
-          {!isProvider && refCode && (
-            <div style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.2)", borderRadius: "10px", padding: "10px 14px", fontSize: "13px", color: "#4ade80", marginBottom: "20px" }}>
-              ✓ Referred — you&apos;re ahead of most people.
-            </div>
-          )}
-
-          <form onSubmit={isProvider ? submitProvider : submitCustomer} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            <input required placeholder="Full name" value={isProvider ? pForm.name : cForm.name}
-              onChange={e => isProvider ? setPForm(p => ({ ...p, name: e.target.value })) : setCForm(p => ({ ...p, name: e.target.value }))} style={inp} />
-            <input required type="email" placeholder="Email address" value={isProvider ? pForm.email : cForm.email}
-              onChange={e => isProvider ? setPForm(p => ({ ...p, email: e.target.value })) : setCForm(p => ({ ...p, email: e.target.value }))} style={inp} />
-            <input required placeholder="Your city" value={isProvider ? pForm.city : cForm.city}
-              onChange={e => isProvider ? setPForm(p => ({ ...p, city: e.target.value })) : setCForm(p => ({ ...p, city: e.target.value }))} style={inp} />
-            {isProvider && (
-              <input required placeholder="What will you offer? (e.g. Gaming, Photography, Tutoring)" value={pForm.category}
-                onChange={e => setPForm(p => ({ ...p, category: e.target.value }))} style={inp} />
+          <form onSubmit={isP ? submitP : submitC} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <input required placeholder="Full name" style={inp}
+              value={isP ? pf.name : cf.name}
+              onChange={e => isP ? setPf(p => ({ ...p, name: e.target.value })) : setCf(p => ({ ...p, name: e.target.value }))} />
+            <input required type="email" placeholder="Email address" style={inp}
+              value={isP ? pf.email : cf.email}
+              onChange={e => isP ? setPf(p => ({ ...p, email: e.target.value })) : setCf(p => ({ ...p, email: e.target.value }))} />
+            <input required placeholder="Your city" style={inp}
+              value={isP ? pf.city : cf.city}
+              onChange={e => isP ? setPf(p => ({ ...p, city: e.target.value })) : setCf(p => ({ ...p, city: e.target.value }))} />
+            {isP && (
+              <input required placeholder="What will you offer? (e.g. Gaming, Tutoring)" style={inp}
+                value={pf.what} onChange={e => setPf(p => ({ ...p, what: e.target.value }))} />
             )}
-            <div style={{ height: "6px" }} />
-            <button type="submit" disabled={loading} className="btn-glow"
-              style={{ width: "100%", padding: "15px", background: "linear-gradient(135deg, #9333ea, #ec4899)", border: "none", borderRadius: "12px", color: "#fff", fontSize: "15px", fontWeight: 700, cursor: "pointer", opacity: loading ? 0.6 : 1 }}>
-              {loading ? "Just a moment..." : isProvider ? "Claim founding spot →" : "Reserve my spot →"}
+            <div style={{ height: 4 }} />
+            <button type="submit" disabled={loading}
+              style={{ width: "100%", padding: 15, background: "linear-gradient(135deg,#9333ea,#ec4899)", border: "none", borderRadius: 12, color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer", opacity: loading ? 0.6 : 1, transition: "opacity 0.2s, transform 0.15s" }}>
+              {loading ? "Just a moment..." : isP ? "Claim founding spot →" : "Reserve my spot →"}
             </button>
-            <p style={{ textAlign: "center", fontSize: "12px", color: "#333" }}>
-              {isProvider ? "Free forever. No credit card." : "Free. No spam. Unsubscribe anytime."}
+            <p style={{ textAlign: "center", fontSize: 12, color: "#333" }}>
+              {isP ? "Free. No credit card needed." : "Free. No spam. Ever."}
             </p>
           </form>
         </div>
@@ -298,182 +263,191 @@ export default function Page() {
     );
   }
 
-  // ── HOME ────────────────────────────────────────────────────
+  // HOME
   return (
-    <div style={{ minHeight: "100vh", background: "#05000f", overflowX: "hidden" }}>
-      <div className="noise" />
+    <div style={{ background: "#000", minHeight: "100vh" }}>
 
-      {/* Aurora background */}
-      <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0, overflow: "hidden" }}>
-        <div style={{ position: "absolute", top: "-20%", left: "-10%", width: "60vw", height: "60vw", borderRadius: "50%", background: "radial-gradient(circle, #7c3aed22 0%, transparent 70%)", animation: "aurora 20s ease-in-out infinite" }} />
-        <div style={{ position: "absolute", bottom: "-20%", right: "-10%", width: "50vw", height: "50vw", borderRadius: "50%", background: "radial-gradient(circle, #ec489918 0%, transparent 70%)", animation: "aurora 25s ease-in-out infinite reverse" }} />
-        <div style={{ position: "absolute", top: "40%", left: "30%", width: "40vw", height: "40vw", borderRadius: "50%", background: "radial-gradient(circle, #9333ea12 0%, transparent 70%)", animation: "aurora 18s ease-in-out infinite 5s" }} />
-      </div>
-
-      {/* Grid */}
-      <div className="grid-bg" style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0 }} />
-
-      {/* Nav */}
-      <nav style={{ position: "sticky", top: 0, zIndex: 100, padding: "16px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(5,0,15,0.7)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-        <Logo size={32} />
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <button onClick={() => setView("customer")} style={{ background: "none", border: "none", color: "#444", fontSize: "14px", cursor: "pointer", fontFamily: "inherit", padding: "8px 14px" }}>
+      {/* NAV */}
+      <nav style={{ position: "sticky", top: 0, zIndex: 99, background: "#000000f0", borderBottom: "1px solid #111", padding: "0 32px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <Logo />
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <button onClick={() => setView("customer")}
+            style={{ background: "none", border: "none", color: "#555", fontSize: 14, cursor: "pointer", padding: "8px 12px" }}>
             Find someone
           </button>
-          <button onClick={() => setView("provider")} className="btn-glow"
-            style={{ background: "linear-gradient(135deg, #9333ea, #ec4899)", border: "none", borderRadius: "100px", color: "#fff", padding: "10px 20px", fontSize: "14px", fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+          <button onClick={() => setView("provider")}
+            style={{ background: "linear-gradient(135deg,#9333ea,#ec4899)", border: "none", borderRadius: 100, color: "#fff", padding: "9px 20px", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>
             Start earning
           </button>
         </div>
       </nav>
 
-      {/* Hero */}
-      <div style={{ position: "relative", zIndex: 1, maxWidth: "800px", margin: "0 auto", padding: "120px 24px 100px", textAlign: "center" }}>
+      {/* HERO */}
+      <div style={{ maxWidth: 860, margin: "0 auto", padding: "100px 24px 80px", textAlign: "center" }}>
 
-        {/* Live badge */}
-        <div style={{ marginBottom: "32px" }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "100px", padding: "8px 18px", backdropFilter: "blur(10px)" }}>
-            <span className="live-dot" />
-            <span style={{ fontSize: "13px", color: "#888" }}>
-              <span style={{ color: "#fff", fontWeight: 700 }}><LiveCounter value={spots} /></span> founding provider spots remaining
-            </span>
+        {/* Badge */}
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#0a0a0a", border: "1px solid #1c1c1c", borderRadius: 100, padding: "7px 16px", marginBottom: 36 }}>
+          <span className="dot" />
+          <span style={{ fontSize: 13, color: "#555" }}>
+            <span style={{ color: "#fff", fontWeight: 700 }}><Ticker value={spots} /></span> founding spots remaining
+          </span>
+        </div>
+
+        {/* App icon — hero */}
+        <div style={{ marginBottom: 32, animation: "float 5s ease-in-out infinite" }}>
+          <div style={{ width: 96, height: 96, borderRadius: 26, overflow: "hidden", margin: "0 auto", boxShadow: "0 0 0 1px #1c1c1c, 0 32px 64px #9333ea33" }}>
+            <Image src="/logo.png" alt="RentOut" width={96} height={96} />
           </div>
         </div>
 
         {/* Headline */}
-        <h1 style={{ fontSize: "clamp(52px, 9vw, 96px)", fontWeight: 900, lineHeight: 0.95, letterSpacing: "-4px", marginBottom: "28px" }}>
+        <h1 style={{ fontSize: "clamp(48px,8.5vw,96px)", fontWeight: 900, lineHeight: 0.96, letterSpacing: "-4px", marginBottom: 24 }}>
           Hire anyone.<br />
-          <span className="gradient-text">For anything.</span>
+          <span className="g">For anything.</span>
         </h1>
 
-        <p style={{ fontSize: "clamp(16px, 2.5vw, 20px)", color: "#555", lineHeight: 1.7, marginBottom: "48px", maxWidth: "520px", margin: "0 auto 48px" }}>
-          The first marketplace where anyone can monetize any skill — on their own terms, at their own price.
+        <p style={{ fontSize: "clamp(16px,2vw,20px)", color: "#555", lineHeight: 1.7, maxWidth: 500, margin: "0 auto 44px" }}>
+          The first marketplace where anyone monetizes any skill — on their own terms, at their own price.
         </p>
 
         {/* CTAs */}
-        <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap", marginBottom: "80px" }}>
-          <button onClick={() => setView("provider")} className="btn-glow"
-            style={{ background: "linear-gradient(135deg, #9333ea, #ec4899)", border: "none", borderRadius: "14px", color: "#fff", padding: "18px 36px", fontSize: "17px", fontWeight: 700, cursor: "pointer", letterSpacing: "-0.3px" }}>
-            Start earning — it&apos;s free
+        <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap", marginBottom: 64 }}>
+          <button onClick={() => setView("provider")}
+            style={{ background: "linear-gradient(135deg,#9333ea,#ec4899)", border: "none", borderRadius: 14, color: "#fff", padding: "16px 32px", fontSize: 16, fontWeight: 700, cursor: "pointer", boxShadow: "0 8px 32px #9333ea44" }}>
+            Start earning — it's free
           </button>
           <button onClick={() => setView("customer")}
-            style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "14px", color: "#888", padding: "18px 36px", fontSize: "17px", fontWeight: 500, cursor: "pointer", backdropFilter: "blur(10px)" }}>
+            style={{ background: "#0a0a0a", border: "1px solid #1c1c1c", borderRadius: 14, color: "#888", padding: "16px 32px", fontSize: 16, fontWeight: 500, cursor: "pointer" }}>
             Find someone
           </button>
         </div>
 
-        {/* Stats */}
-        <div style={{ display: "flex", gap: "0", justifyContent: "center", flexWrap: "wrap" }}>
+        {/* Stats row */}
+        <div style={{ display: "flex", justifyContent: "center", gap: 0, flexWrap: "wrap" }}>
           {[
-            { n: 100000, l: "Founding spots", prefix: "" },
-            { n: 160, l: "Countries", prefix: "" },
-            { n: 0, l: "Commission for founders", prefix: "" },
-          ].map(({ n, l, prefix }, i) => (
-            <div key={l} style={{ padding: "0 40px", borderLeft: i > 0 ? "1px solid rgba(255,255,255,0.06)" : "none", textAlign: "center" }}>
-              <div style={{ fontSize: "clamp(28px,4vw,40px)", fontWeight: 800, letterSpacing: "-1.5px", marginBottom: "2px" }}>
-                {n === 0 ? "0%" : <><AnimatedCounter target={n} />{prefix}</>}
+            { n: 100000, s: "", l: "Founding spots" },
+            { n: 160, s: "+", l: "Countries" },
+            { n: 0, s: "%", l: "Commission for founders" },
+          ].map(({ n, s, l }, i) => (
+            <div key={l} style={{ padding: "0 36px", borderLeft: i ? "1px solid #111" : "none", textAlign: "center" }}>
+              <div style={{ fontSize: "clamp(26px,3.5vw,38px)", fontWeight: 800, letterSpacing: "-1.5px", lineHeight: 1.1 }}>
+                {n === 0 ? "0%" : <><CountUp to={n} />{s}</>}
               </div>
-              <div style={{ fontSize: "13px", color: "#444" }}>{l}</div>
+              <div style={{ fontSize: 13, color: "#444", marginTop: 2 }}>{l}</div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Divider */}
-      <div style={{ height: "1px", background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent)", position: "relative", zIndex: 1 }} />
+      {/* DIVIDER */}
+      <div style={{ height: 1, background: "#111", margin: "0 24px" }} />
 
-      {/* Floating logo section */}
-      <div style={{ position: "relative", zIndex: 1, padding: "100px 24px", textAlign: "center" }}>
-        <div className="fade-in" style={{ display: "inline-block", marginBottom: "40px", animation: "float 6s ease-in-out infinite", position: "relative" }}>
-          <div style={{ position: "absolute", inset: "-20px", borderRadius: "50%", border: "1px solid rgba(147,51,234,0.15)", animation: "pulse-ring 3s ease-out infinite" }} />
-          <div style={{ position: "absolute", inset: "-40px", borderRadius: "50%", border: "1px solid rgba(147,51,234,0.08)", animation: "pulse-ring 3s ease-out infinite 1s" }} />
-          <div style={{ width: "96px", height: "96px", borderRadius: "26px", overflow: "hidden", boxShadow: "0 0 60px #9333ea44, 0 0 120px #9333ea22" }}>
-            <Image src="/logo.png" alt="RentOut" width={96} height={96} style={{ display: "block" }} />
+      {/* BENTO GRID */}
+      <div style={{ maxWidth: 860, margin: "0 auto", padding: "80px 24px" }}>
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", color: "#333", textTransform: "uppercase", marginBottom: 40, textAlign: "center" }}>How it works</div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(12, 1fr)", gridTemplateRows: "auto", gap: 12 }}>
+
+          {/* Big card — list */}
+          <div className="reveal" style={{ gridColumn: "1 / 8", gridRow: "1", background: "#0a0a0a", border: "1px solid #1c1c1c", borderRadius: 20, padding: "36px 32px", overflow: "hidden", position: "relative" }}>
+            <div style={{ position: "absolute", top: -40, right: -40, width: 160, height: 160, borderRadius: "50%", background: "radial-gradient(circle, #9333ea18, transparent)" }} />
+            <div style={{ fontSize: 32, marginBottom: 16 }}>⚡</div>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "#9333ea", textTransform: "uppercase", marginBottom: 10 }}>01</div>
+            <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-0.5px", marginBottom: 10 }}>List any service</div>
+            <div style={{ fontSize: 15, color: "#555", lineHeight: 1.7 }}>Gaming. Photography. Tutoring. Cooking. Travel. Companionship. Whatever you can offer — list it in minutes.</div>
           </div>
-        </div>
 
-        <h2 className="fade-in" style={{ fontSize: "clamp(32px,5vw,52px)", fontWeight: 800, letterSpacing: "-2px", marginBottom: "16px", lineHeight: 1.1 }}>
-          Any skill.<br /><span className="gradient-text">Any price. Your rules.</span>
-        </h2>
-        <p className="fade-in" style={{ fontSize: "16px", color: "#444", maxWidth: "400px", margin: "0 auto", lineHeight: 1.7 }}>
-          Gaming. Photography. Tutoring. Cooking. Travel guide. Whatever you&apos;re good at — someone needs it.
-        </p>
+          {/* Tall card — terms */}
+          <div className="reveal" style={{ gridColumn: "8 / 13", gridRow: "1 / 3", background: "#0a0a0a", border: "1px solid #1c1c1c", borderRadius: 20, padding: "36px 28px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+            <div>
+              <div style={{ fontSize: 32, marginBottom: 16 }}>🎯</div>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "#ec4899", textTransform: "uppercase", marginBottom: 10 }}>02</div>
+              <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-0.5px", marginBottom: 10 }}>Set your terms</div>
+              <div style={{ fontSize: 15, color: "#555", lineHeight: 1.7 }}>Your price. Your hours. Your rules. No platform telling you what to charge.</div>
+            </div>
+            <div style={{ marginTop: 32 }}>
+              {["Any price you want", "Any hours you choose", "Any service you offer", "Any city you're in"].map(t => (
+                <div key={t} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 0", borderTop: "1px solid #111" }}>
+                  <span style={{ color: "#9333ea", fontSize: 14, fontWeight: 700 }}>✓</span>
+                  <span style={{ fontSize: 14, color: "#666" }}>{t}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Card — get paid */}
+          <div className="reveal" style={{ gridColumn: "1 / 5", gridRow: "2", background: "linear-gradient(135deg, #1a0a2e, #2a0a3e)", border: "1px solid #2d1654", borderRadius: 20, padding: "28px 24px" }}>
+            <div style={{ fontSize: 28, marginBottom: 14 }}>💸</div>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "#a855f7", textTransform: "uppercase", marginBottom: 8 }}>03</div>
+            <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: "-0.3px", marginBottom: 8 }}>Get paid</div>
+            <div style={{ fontSize: 14, color: "#7c3aed", lineHeight: 1.6 }}>Customer books. You show up. Money in your account.</div>
+          </div>
+
+          {/* Counter card */}
+          <div className="reveal" style={{ gridColumn: "5 / 8", gridRow: "2", background: "#0a0a0a", border: "1px solid #1c1c1c", borderRadius: 20, padding: "28px 24px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "#333", textTransform: "uppercase" }}>Spots remaining</div>
+            <div>
+              <div style={{ fontSize: 40, fontWeight: 900, letterSpacing: "-2px", lineHeight: 1 }} className="g">
+                <Ticker value={spots} />
+              </div>
+              <div style={{ fontSize: 13, color: "#333", marginTop: 4 }}>of 100,000</div>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span className="dot" />
+              <span style={{ fontSize: 12, color: "#444" }}>Updating live</span>
+            </div>
+          </div>
+
+        </div>
       </div>
 
-      {/* 3 cards */}
-      <div style={{ position: "relative", zIndex: 1, maxWidth: "900px", margin: "0 auto", padding: "0 24px 100px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "12px" }}>
-          {[
-            { n: "01", t: "List any service", b: "Gaming. Photography. Tutoring. Cooking. Companionship. Whatever you can offer — list it.", icon: "⚡" },
-            { n: "02", t: "Set your terms", b: "Your price. Your hours. Your rules. No platform telling you what to charge or how to work.", icon: "🎯" },
-            { n: "03", t: "Get paid", b: "Customer books you. You show up. Money hits your account. That simple.", icon: "💸" },
-          ].map(({ n, t, b, icon }) => (
-            <Card3D key={n}>
-              <div className="fade-in glass" style={{ borderRadius: "20px", padding: "32px 24px", height: "100%" }}>
-                <div style={{ fontSize: "28px", marginBottom: "16px" }}>{icon}</div>
-                <div style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.12em", color: "#9333ea", marginBottom: "10px" }}>{n}</div>
-                <div style={{ fontSize: "18px", fontWeight: 700, marginBottom: "8px", letterSpacing: "-0.3px" }}>{t}</div>
-                <div style={{ fontSize: "14px", color: "#555", lineHeight: 1.7 }}>{b}</div>
-              </div>
-            </Card3D>
+      {/* DIVIDER */}
+      <div style={{ height: 1, background: "#111", margin: "0 24px" }} />
+
+      {/* TRUST */}
+      <div style={{ maxWidth: 860, margin: "0 auto", padding: "60px 24px" }}>
+        <div className="reveal" style={{ display: "flex", flexWrap: "wrap", gap: 32, justifyContent: "center", alignItems: "center" }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", color: "#222", textTransform: "uppercase" }}>Trusted infrastructure</div>
+          {["Razorpay Secured", "Firebase", "256-bit SSL", "GDPR Compliant", "Payoneer"].map(t => (
+            <div key={t} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "#333", fontWeight: 500 }}>
+              <span style={{ color: "#22c55e", fontWeight: 700, fontSize: 11 }}>✓</span>{t}
+            </div>
           ))}
         </div>
       </div>
 
-      {/* Trust section */}
-      <div style={{ position: "relative", zIndex: 1, borderTop: "1px solid rgba(255,255,255,0.04)", padding: "60px 24px" }}>
-        <div style={{ maxWidth: "700px", margin: "0 auto", textAlign: "center" }}>
-          <div className="fade-in shimmer-text" style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "32px" }}>
-            Trusted infrastructure
+      {/* DIVIDER */}
+      <div style={{ height: 1, background: "#111", margin: "0 24px" }} />
+
+      {/* BOTTOM CTA */}
+      <div style={{ maxWidth: 860, margin: "0 auto", padding: "80px 24px 100px", textAlign: "center" }}>
+        <div className="reveal" style={{ background: "#0a0a0a", border: "1px solid #1c1c1c", borderRadius: 24, padding: "64px 40px", position: "relative", overflow: "hidden" }}>
+          <div style={{ position: "absolute", top: -80, left: "50%", transform: "translateX(-50%)", width: 300, height: 300, borderRadius: "50%", background: "radial-gradient(circle, #9333ea18, transparent)", pointerEvents: "none" }} />
+          <div style={{ width: 64, height: 64, borderRadius: 18, overflow: "hidden", margin: "0 auto 24px", boxShadow: "0 0 48px #9333ea44, 0 0 0 1px #1c1c1c" }}>
+            <Image src="/logo.png" alt="RentOut" width={64} height={64} />
           </div>
-          <div style={{ display: "flex", gap: "32px", justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
-            {["Razorpay Secured", "Firebase", "256-bit SSL", "GDPR Compliant"].map(t => (
-              <div key={t} className="fade-in" style={{ fontSize: "13px", color: "#333", fontWeight: 500, display: "flex", alignItems: "center", gap: "6px" }}>
-                <span style={{ color: "#22c55e", fontSize: "10px" }}>✓</span> {t}
-              </div>
-            ))}
-          </div>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", color: "#333", textTransform: "uppercase", marginBottom: 16 }}>Limited time offer</div>
+          <h2 style={{ fontSize: "clamp(28px,4.5vw,48px)", fontWeight: 900, letterSpacing: "-2px", lineHeight: 1.05, marginBottom: 12 }}>
+            First 100,000 providers.<br /><span className="g">Zero commission. Forever.</span>
+          </h2>
+          <p style={{ fontSize: 16, color: "#444", marginBottom: 36 }}>
+            <span style={{ color: "#fff", fontWeight: 600 }}><Ticker value={spots} /></span> spots remaining. Closes when they're gone.
+          </p>
+          <button onClick={() => setView("provider")}
+            style={{ background: "linear-gradient(135deg,#9333ea,#ec4899)", border: "none", borderRadius: 14, color: "#fff", padding: "16px 44px", fontSize: 16, fontWeight: 700, cursor: "pointer", boxShadow: "0 8px 32px #9333ea44" }}>
+            Claim my founding spot
+          </button>
         </div>
       </div>
 
-      {/* Bottom CTA */}
-      <div style={{ position: "relative", zIndex: 1, padding: "80px 24px 100px" }}>
-        <Card3D style={{ maxWidth: "700px", margin: "0 auto" }}>
-          <div className="glass-purple fade-in" style={{ borderRadius: "28px", padding: "64px 48px", textAlign: "center", position: "relative", overflow: "hidden" }}>
-            <div style={{ position: "absolute", top: "-60px", right: "-60px", width: "200px", height: "200px", borderRadius: "50%", background: "radial-gradient(circle, #9333ea33, transparent)" }} />
-            <div style={{ position: "absolute", bottom: "-40px", left: "-40px", width: "160px", height: "160px", borderRadius: "50%", background: "radial-gradient(circle, #ec489922, transparent)" }} />
-
-            <div style={{ width: "64px", height: "64px", borderRadius: "18px", overflow: "hidden", margin: "0 auto 24px", boxShadow: "0 0 40px #9333ea66" }}>
-              <Image src="/logo.png" alt="RentOut" width={64} height={64} style={{ display: "block" }} />
-            </div>
-
-            <div style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.12em", color: "#9333ea", textTransform: "uppercase", marginBottom: "16px" }}>
-              Limited time
-            </div>
-            <h2 style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 900, letterSpacing: "-1.5px", marginBottom: "12px", lineHeight: 1.1 }}>
-              First 100,000 providers.<br />
-              <span className="gradient-text">Zero commission. Forever.</span>
-            </h2>
-            <p style={{ fontSize: "16px", color: "#555", marginBottom: "36px" }}>
-              <span style={{ color: "#fff", fontWeight: 600 }}><LiveCounter value={spots} /></span> spots remaining. Closes when they&apos;re gone.
-            </p>
-            <button onClick={() => setView("provider")} className="btn-glow"
-              style={{ background: "linear-gradient(135deg, #9333ea, #ec4899)", border: "none", borderRadius: "14px", color: "#fff", padding: "18px 48px", fontSize: "17px", fontWeight: 700, cursor: "pointer", letterSpacing: "-0.3px" }}>
-              Claim my founding spot
-            </button>
-          </div>
-        </Card3D>
-      </div>
-
-      {/* Footer */}
-      <div style={{ position: "relative", zIndex: 1, borderTop: "1px solid rgba(255,255,255,0.04)", padding: "24px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
-        <Logo size={28} />
-        <div style={{ display: "flex", gap: "24px" }}>
-          {["Privacy", "Terms"].map(t => (
-            <a key={t} href={`/${t.toLowerCase()}`} style={{ fontSize: "13px", color: "#333", textDecoration: "none" }}>{t}</a>
-          ))}
+      {/* FOOTER */}
+      <div style={{ borderTop: "1px solid #111", padding: "24px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
+        <Logo />
+        <div style={{ display: "flex", gap: 24 }}>
+          <a href="/privacy" style={{ fontSize: 13, color: "#333", textDecoration: "none" }}>Privacy</a>
+          <a href="/terms" style={{ fontSize: 13, color: "#333", textDecoration: "none" }}>Terms</a>
         </div>
-        <span style={{ fontSize: "13px", color: "#2a2a2a" }}>© 2025 RentOut</span>
+        <span style={{ fontSize: 13, color: "#222" }}>© 2025 RentOut</span>
       </div>
     </div>
   );
