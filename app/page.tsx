@@ -5,25 +5,18 @@ import { useState, useEffect } from "react";
 const TOTAL_SPOTS = 100000;
 const LAUNCH_DATE = new Date("2025-07-08T00:00:00");
 
-function Logo() {
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-      <div style={{ width: "34px", height: "34px", borderRadius: "50%", background: "linear-gradient(135deg,#FF8FAB,#FF6B6B)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-          <path d="M13 3L5 13h7l-1 8 8-10h-7l1-8z" fill="white" />
-        </svg>
-      </div>
-      <div>
-        <div style={{ fontSize: "18px", fontWeight: 800, letterSpacing: "-0.5px", lineHeight: 1 }}>
-          Rent<span style={{ color: "#FF8FAB" }}>Out</span>
-        </div>
-        <div style={{ fontSize: "7px", letterSpacing: "3px", color: "#FF8FAB", opacity: 0.6 }}>RENT ANYTHING · ANYTIME</div>
-      </div>
-    </div>
-  );
+function useSpots() {
+  const [spots, setSpots] = useState<number | null>(null);
+  useEffect(() => {
+    const load = () => fetch("/api/spots").then(r => r.json()).then(d => setSpots(d.remaining)).catch(() => {});
+    load();
+    const id = setInterval(load, 30000);
+    return () => clearInterval(id);
+  }, []);
+  return { spots, setSpots };
 }
 
-function Countdown() {
+function useCountdown() {
   const [time, setTime] = useState({ d: 0, h: 0, m: 0, s: 0 });
   useEffect(() => {
     const tick = () => {
@@ -33,15 +26,19 @@ function Countdown() {
     };
     tick(); const id = setInterval(tick, 1000); return () => clearInterval(id);
   }, []);
-  const pad = (n: number) => String(n).padStart(2, "0");
+  return time;
+}
+
+function Logo({ dark = false }: { dark?: boolean }) {
+  const c = dark ? "#fff" : "#0a0a0a";
   return (
-    <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
-      {[{ v: time.d, l: "Days" }, { v: time.h, l: "Hours" }, { v: time.m, l: "Min" }, { v: time.s, l: "Sec" }].map(({ v, l }) => (
-        <div key={l} style={{ textAlign: "center" }}>
-          <div style={{ background: "#0d0d0d", border: "1px solid #1a1a1a", borderRadius: "8px", padding: "8px 12px", minWidth: "52px", fontSize: "22px", fontWeight: 700, fontVariantNumeric: "tabular-nums", color: "#fff", lineHeight: 1 }}>{pad(v)}</div>
-          <div style={{ fontSize: "9px", color: "#444", marginTop: "4px", letterSpacing: "0.08em", textTransform: "uppercase" }}>{l}</div>
-        </div>
-      ))}
+    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+      <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "#FF385C", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M13 3L5 13h7l-1 8 8-10h-7l1-8z" fill="white" />
+        </svg>
+      </div>
+      <span style={{ fontSize: "18px", fontWeight: 700, color: c, letterSpacing: "-0.3px" }}>RentOut</span>
     </div>
   );
 }
@@ -51,42 +48,28 @@ type View = "home" | "provider" | "customer" | "done-provider" | "done-customer"
 export default function Page() {
   const [view, setView] = useState<View>("home");
   const [loading, setLoading] = useState(false);
-  const [spots, setSpots] = useState(TOTAL_SPOTS);
-  const [pForm, setPForm] = useState({ name: "", email: "", city: "", category: "", about: "" });
-  const [cForm, setCForm] = useState({ name: "", email: "", city: "" });
+  const [refCode, setRefCode] = useState("");
   const [providerSpot, setProviderSpot] = useState(0);
   const [waitlistResult, setWaitlistResult] = useState<{ position: number; referralCode: string } | null>(null);
   const [copied, setCopied] = useState(false);
-  const [refCode, setRefCode] = useState("");
+  const [pForm, setPForm] = useState({ name: "", email: "", city: "", category: "" });
+  const [cForm, setCForm] = useState({ name: "", email: "", city: "" });
+  const { spots, setSpots } = useSpots();
+  const time = useCountdown();
+  const pad = (n: number) => String(n).padStart(2, "0");
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const ref = params.get("ref");
-    if (ref) setRefCode(ref);
-
-    // Fetch real spot count from Supabase
-    fetch("/api/spots")
-      .then(r => r.json())
-      .then(d => setSpots(d.remaining))
-      .catch(() => {});
-
-    // Refresh every 30 seconds
-    const id = setInterval(() => {
-      fetch("/api/spots")
-        .then(r => r.json())
-        .then(d => setSpots(d.remaining))
-        .catch(() => {});
-    }, 30000);
-    return () => clearInterval(id);
+    const p = new URLSearchParams(window.location.search).get("ref");
+    if (p) setRefCode(p);
   }, []);
 
   async function submitProvider(e: React.FormEvent) {
     e.preventDefault(); setLoading(true);
     try {
       await fetch("/api/provider", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(pForm) });
-      const freshSpots = await fetch("/api/spots").then(r => r.json());
-      setSpots(freshSpots.remaining);
-      setProviderSpot(TOTAL_SPOTS - freshSpots.remaining);
+      const d = await fetch("/api/spots").then(r => r.json());
+      setSpots(d.remaining);
+      setProviderSpot(TOTAL_SPOTS - d.remaining);
       setView("done-provider");
     } finally { setLoading(false); }
   }
@@ -106,200 +89,287 @@ export default function Page() {
     setCopied(true); setTimeout(() => setCopied(false), 2000);
   }
 
-  // Done — provider
+  const inputStyle = {
+    width: "100%", padding: "14px 16px", border: "1.5px solid #e5e5e5",
+    borderRadius: "12px", background: "#fff", color: "#0a0a0a",
+    fontSize: "15px", outline: "none", fontFamily: "inherit",
+    WebkitAppearance: "none" as const,
+  };
+
+  const btnPrimary = {
+    width: "100%", padding: "15px", background: "#FF385C",
+    border: "none", borderRadius: "12px", color: "#fff",
+    fontSize: "15px", fontWeight: 700, cursor: "pointer",
+    letterSpacing: "-0.2px",
+  };
+
+  const btnSecondary = {
+    width: "100%", padding: "14px", background: "#fff",
+    border: "1.5px solid #e5e5e5", borderRadius: "12px", color: "#0a0a0a",
+    fontSize: "15px", fontWeight: 600, cursor: "pointer",
+  };
+
+  // ── Done: Provider ──────────────────────────────────────────────
   if (view === "done-provider") return (
-    <main style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px", background: "#000" }}>
-      <div style={{ maxWidth: "400px", width: "100%", textAlign: "center" }}>
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: "32px" }}><Logo /></div>
+    <div style={{ minHeight: "100vh", background: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px" }}>
+      <div style={{ maxWidth: "420px", width: "100%" }}>
+        <div style={{ marginBottom: "40px" }}><Logo /></div>
 
-        <div style={{ background: "#0d0d0d", border: "1px solid #1a1a1a", borderRadius: "16px", padding: "32px 24px", marginBottom: "16px" }}>
-          <div style={{ fontSize: "11px", color: "#444", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "8px" }}>Your founding spot</div>
-          <div style={{ fontSize: "64px", fontWeight: 800, lineHeight: 1, color: "#FF8FAB" }}>#{providerSpot.toLocaleString()}</div>
-          <div style={{ fontSize: "13px", color: "#444", marginTop: "8px" }}>of 100,000 worldwide</div>
-        </div>
-
-        <div style={{ background: "#0d0d0d", border: "1px solid #1a1a1a", borderRadius: "12px", padding: "16px", marginBottom: "16px" }}>
-          <div style={{ fontSize: "13px", color: "#888", lineHeight: 1.7 }}>
-            <span style={{ color: "#FF8FAB", fontWeight: 600 }}>{spots.toLocaleString()} spots remaining.</span><br />
-            Share with other providers before they're gone.
+        <div style={{ background: "#0a0a0a", borderRadius: "20px", padding: "36px 28px", marginBottom: "16px", textAlign: "center" }}>
+          <div style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.1em", color: "#666", textTransform: "uppercase", marginBottom: "12px" }}>Your founding spot</div>
+          <div style={{ fontSize: "72px", fontWeight: 800, color: "#fff", lineHeight: 1, marginBottom: "8px", fontVariantNumeric: "tabular-nums" }}>
+            #{providerSpot.toLocaleString()}
+          </div>
+          <div style={{ fontSize: "14px", color: "#555" }}>of 100,000 worldwide</div>
+          <div style={{ height: "1px", background: "#1a1a1a", margin: "24px 0" }} />
+          <div style={{ fontSize: "14px", color: "#888", lineHeight: 1.6 }}>
+            Zero commission.<br />
+            <span style={{ color: "#FF385C" }}>For life.</span>
           </div>
         </div>
 
-        <div style={{ display: "flex", gap: "8px", marginBottom: "16px" }}>
-          <a href={`https://wa.me/?text=I just claimed founding provider spot on RentOut — sell ANY service, set YOUR price. Only ${spots.toLocaleString()} spots left out of 100,000 worldwide. Zero commission for founding providers: https://getrentout.me`}
+        <div style={{ background: "#f9f9f9", border: "1.5px solid #f0f0f0", borderRadius: "16px", padding: "20px", marginBottom: "12px" }}>
+          <div style={{ fontSize: "14px", fontWeight: 600, marginBottom: "6px" }}>
+            {spots !== null ? spots.toLocaleString() : "—"} spots remaining
+          </div>
+          <div style={{ fontSize: "13px", color: "#666", lineHeight: 1.6 }}>
+            Share with other providers. Every spot that fills is gone forever after July 19.
+          </div>
+        </div>
+
+        <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
+          <a href={`https://wa.me/?text=I just claimed founding provider spot %23${providerSpot.toLocaleString()} on RentOut. Sell ANY service. Set YOUR price. Zero commission for life. Only ${spots?.toLocaleString()} spots left: https://getrentout.me`}
             target="_blank" rel="noopener"
-            style={{ flex: 1, background: "#0d0d0d", border: "1px solid #1a1a1a", borderRadius: "10px", padding: "10px", fontSize: "12px", color: "#fff", textDecoration: "none", textAlign: "center" as const }}>
+            style={{ flex: 1, background: "#25D366", borderRadius: "12px", padding: "12px", fontSize: "13px", fontWeight: 600, color: "#fff", textDecoration: "none", textAlign: "center" as const }}>
             Share on WhatsApp
           </a>
-          <a href={`https://twitter.com/intent/tweet?text=Just claimed founding provider spot %23${providerSpot.toLocaleString()} on RentOut — sell any service, set your own price. Only ${spots.toLocaleString()} spots left globally. https://getrentout.me`}
+          <a href={`https://twitter.com/intent/tweet?text=Just claimed founding provider spot %23${providerSpot.toLocaleString()} on RentOut — sell any service, set your own price, zero commission for life. ${spots?.toLocaleString()} spots left: https://getrentout.me`}
             target="_blank" rel="noopener"
-            style={{ flex: 1, background: "#0d0d0d", border: "1px solid #1a1a1a", borderRadius: "10px", padding: "10px", fontSize: "12px", color: "#fff", textDecoration: "none", textAlign: "center" as const }}>
+            style={{ flex: 1, background: "#0a0a0a", borderRadius: "12px", padding: "12px", fontSize: "13px", fontWeight: 600, color: "#fff", textDecoration: "none", textAlign: "center" as const }}>
             Share on X
           </a>
         </div>
 
-        <p style={{ color: "#333", fontSize: "12px" }}>We'll email you when the app is ready.</p>
+        <p style={{ textAlign: "center", fontSize: "12px", color: "#aaa" }}>Check your email — we'll be in touch.</p>
       </div>
-    </main>
+    </div>
   );
 
-  // Done — customer
+  // ── Done: Customer ──────────────────────────────────────────────
   if (view === "done-customer") return (
-    <main style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px", background: "#000" }}>
-      <div style={{ maxWidth: "400px", width: "100%", textAlign: "center" }}>
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: "32px" }}><Logo /></div>
+    <div style={{ minHeight: "100vh", background: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px" }}>
+      <div style={{ maxWidth: "420px", width: "100%" }}>
+        <div style={{ marginBottom: "40px" }}><Logo /></div>
 
-        <div style={{ background: "#0d0d0d", border: "1px solid #1a1a1a", borderRadius: "16px", padding: "32px 24px", marginBottom: "16px" }}>
-          <div style={{ fontSize: "11px", color: "#444", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "8px" }}>Your position</div>
-          <div style={{ fontSize: "64px", fontWeight: 800, lineHeight: 1, color: "#FF8FAB" }}>#{waitlistResult?.position}</div>
-          <div style={{ fontSize: "13px", color: "#444", marginTop: "8px" }}>{cForm.city}</div>
+        <div style={{ background: "#0a0a0a", borderRadius: "20px", padding: "36px 28px", marginBottom: "16px", textAlign: "center" }}>
+          <div style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.1em", color: "#666", textTransform: "uppercase", marginBottom: "12px" }}>You're on the list</div>
+          <div style={{ fontSize: "72px", fontWeight: 800, color: "#fff", lineHeight: 1, marginBottom: "8px", fontVariantNumeric: "tabular-nums" }}>
+            #{waitlistResult?.position}
+          </div>
+          <div style={{ fontSize: "14px", color: "#555" }}>{cForm.city}</div>
         </div>
 
-        <div style={{ background: "#0d0d0d", border: "1px solid #1a1a1a", borderRadius: "12px", padding: "16px", marginBottom: "16px" }}>
-          <div style={{ fontSize: "13px", color: "#888", lineHeight: 1.7, marginBottom: "12px" }}>
-            Refer friends → move up the list.
-          </div>
-          <div style={{ background: "#111", border: "1px solid #1a1a1a", borderRadius: "8px", padding: "8px 12px", fontFamily: "monospace", fontSize: "11px", color: "#FF8FAB", marginBottom: "10px", wordBreak: "break-all" as const }}>
+        <div style={{ background: "#f9f9f9", border: "1.5px solid #f0f0f0", borderRadius: "16px", padding: "20px", marginBottom: "12px" }}>
+          <div style={{ fontSize: "14px", fontWeight: 600, marginBottom: "6px" }}>Move up the list</div>
+          <div style={{ fontSize: "13px", color: "#666", marginBottom: "14px" }}>Every friend who signs up with your link moves you ahead.</div>
+          <div style={{ background: "#fff", border: "1.5px solid #e5e5e5", borderRadius: "10px", padding: "10px 14px", fontSize: "12px", color: "#0a0a0a", fontFamily: "monospace", wordBreak: "break-all" as const, marginBottom: "10px" }}>
             getrentout.me?ref={waitlistResult?.referralCode}
           </div>
-          <button onClick={copyLink} style={{ width: "100%", background: "linear-gradient(135deg,#FF8FAB,#FF6B6B)", border: "none", borderRadius: "8px", color: "#fff", padding: "10px", fontSize: "13px", fontWeight: 700, cursor: "pointer" }}>
-            {copied ? "✓ Copied!" : "Copy my link"}
+          <button onClick={copyLink} style={{ ...btnPrimary, padding: "12px" }}>
+            {copied ? "✓ Copied to clipboard" : "Copy your link"}
           </button>
         </div>
 
         <div style={{ display: "flex", gap: "8px" }}>
-          <a href={`https://wa.me/?text=I joined RentOut waitlist — the app where you can hire anyone for anything. Get your spot: https://getrentout.me?ref=${waitlistResult?.referralCode}`}
+          <a href={`https://wa.me/?text=I'm on the RentOut waitlist — the app where you hire anyone for anything. Get your spot: https://getrentout.me?ref=${waitlistResult?.referralCode}`}
             target="_blank" rel="noopener"
-            style={{ flex: 1, background: "#0d0d0d", border: "1px solid #1a1a1a", borderRadius: "10px", padding: "10px", fontSize: "12px", color: "#fff", textDecoration: "none", textAlign: "center" as const }}>
+            style={{ flex: 1, background: "#25D366", borderRadius: "12px", padding: "12px", fontSize: "13px", fontWeight: 600, color: "#fff", textDecoration: "none", textAlign: "center" as const }}>
             WhatsApp
           </a>
-          <a href={`https://twitter.com/intent/tweet?text=Just joined RentOut — hire anyone for anything. Launching during FIFA World Cup. https://getrentout.me?ref=${waitlistResult?.referralCode}`}
+          <a href={`https://twitter.com/intent/tweet?text=Just joined RentOut — hire anyone for anything, launching during FIFA World Cup 2026. https://getrentout.me?ref=${waitlistResult?.referralCode}`}
             target="_blank" rel="noopener"
-            style={{ flex: 1, background: "#0d0d0d", border: "1px solid #1a1a1a", borderRadius: "10px", padding: "10px", fontSize: "12px", color: "#fff", textDecoration: "none", textAlign: "center" as const }}>
-            X (Twitter)
+            style={{ flex: 1, background: "#0a0a0a", borderRadius: "12px", padding: "12px", fontSize: "13px", fontWeight: 600, color: "#fff", textDecoration: "none", textAlign: "center" as const }}>
+            X
           </a>
         </div>
       </div>
-    </main>
+    </div>
   );
 
-  // Provider form
+  // ── Provider form ───────────────────────────────────────────────
   if (view === "provider") return (
-    <main style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px", background: "#000" }}>
+    <div style={{ minHeight: "100vh", background: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px" }}>
       <div style={{ maxWidth: "400px", width: "100%" }}>
-        <button onClick={() => setView("home")} style={{ background: "none", border: "none", color: "#444", cursor: "pointer", fontSize: "13px", padding: 0, marginBottom: "24px" }}>← Back</button>
-        <div style={{ marginBottom: "24px" }}><Logo /></div>
+        <button onClick={() => setView("home")} style={{ background: "none", border: "none", color: "#aaa", cursor: "pointer", fontSize: "14px", padding: 0, marginBottom: "32px", display: "flex", alignItems: "center", gap: "4px" }}>
+          ← Back
+        </button>
+        <div style={{ marginBottom: "32px" }}><Logo /></div>
 
-        <div style={{ background: "#FF8FAB12", border: "1px solid #FF8FAB22", borderRadius: "10px", padding: "10px 14px", fontSize: "12px", color: "#FF8FAB", marginBottom: "20px" }}>
-          {spots.toLocaleString()} founding spots left out of 100,000 worldwide
-        </div>
-
-        <h2 style={{ fontSize: "22px", fontWeight: 800, marginBottom: "4px" }}>Claim your founding spot</h2>
-        <p style={{ color: "#444", fontSize: "13px", marginBottom: "20px" }}>Sell any service. Set your own price. Your rules.</p>
-
-        <form onSubmit={submitProvider} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-          <input required placeholder="Your name" value={pForm.name} onChange={e => setPForm(p => ({ ...p, name: e.target.value }))}
-            style={{ background: "#0d0d0d", border: "1px solid #1a1a1a", borderRadius: "10px", color: "#fff", padding: "12px 14px", fontSize: "14px", width: "100%", outline: "none", fontFamily: "inherit" }} />
-          <input required type="email" placeholder="Email address" value={pForm.email} onChange={e => setPForm(p => ({ ...p, email: e.target.value }))}
-            style={{ background: "#0d0d0d", border: "1px solid #1a1a1a", borderRadius: "10px", color: "#fff", padding: "12px 14px", fontSize: "14px", width: "100%", outline: "none", fontFamily: "inherit" }} />
-          <input required placeholder="Your city" value={pForm.city} onChange={e => setPForm(p => ({ ...p, city: e.target.value }))}
-            style={{ background: "#0d0d0d", border: "1px solid #1a1a1a", borderRadius: "10px", color: "#fff", padding: "12px 14px", fontSize: "14px", width: "100%", outline: "none", fontFamily: "inherit" }} />
-          <input required placeholder="What service do you offer?" value={pForm.category} onChange={e => setPForm(p => ({ ...p, category: e.target.value }))}
-            style={{ background: "#0d0d0d", border: "1px solid #1a1a1a", borderRadius: "10px", color: "#fff", padding: "12px 14px", fontSize: "14px", width: "100%", outline: "none", fontFamily: "inherit" }} />
-          <button type="submit" disabled={loading}
-            style={{ background: "linear-gradient(135deg,#FF8FAB,#FF6B6B)", border: "none", borderRadius: "10px", color: "#fff", padding: "13px", fontSize: "14px", fontWeight: 700, cursor: "pointer", opacity: loading ? 0.5 : 1 }}>
-            {loading ? "Claiming..." : "Claim founding spot →"}
-          </button>
-        </form>
-      </div>
-    </main>
-  );
-
-  // Customer form
-  if (view === "customer") return (
-    <main style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px", background: "#000" }}>
-      <div style={{ maxWidth: "400px", width: "100%" }}>
-        <button onClick={() => setView("home")} style={{ background: "none", border: "none", color: "#444", cursor: "pointer", fontSize: "13px", padding: 0, marginBottom: "24px" }}>← Back</button>
-        <div style={{ marginBottom: "24px" }}><Logo /></div>
-        <h2 style={{ fontSize: "22px", fontWeight: 800, marginBottom: "4px" }}>Join the waitlist</h2>
-        <p style={{ color: "#444", fontSize: "13px", marginBottom: "20px" }}>Get early access when we launch in your city.</p>
-        {refCode && <div style={{ background: "#FF8FAB12", border: "1px solid #FF8FAB22", borderRadius: "8px", padding: "10px 14px", fontSize: "12px", color: "#FF8FAB", marginBottom: "16px" }}>✓ Referred — you're ahead of the line.</div>}
-        <form onSubmit={submitCustomer} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-          <input required placeholder="Your name" value={cForm.name} onChange={e => setCForm(p => ({ ...p, name: e.target.value }))}
-            style={{ background: "#0d0d0d", border: "1px solid #1a1a1a", borderRadius: "10px", color: "#fff", padding: "12px 14px", fontSize: "14px", width: "100%", outline: "none", fontFamily: "inherit" }} />
-          <input required type="email" placeholder="Email address" value={cForm.email} onChange={e => setCForm(p => ({ ...p, email: e.target.value }))}
-            style={{ background: "#0d0d0d", border: "1px solid #1a1a1a", borderRadius: "10px", color: "#fff", padding: "12px 14px", fontSize: "14px", width: "100%", outline: "none", fontFamily: "inherit" }} />
-          <input required placeholder="Your city" value={cForm.city} onChange={e => setCForm(p => ({ ...p, city: e.target.value }))}
-            style={{ background: "#0d0d0d", border: "1px solid #1a1a1a", borderRadius: "10px", color: "#fff", padding: "12px 14px", fontSize: "14px", width: "100%", outline: "none", fontFamily: "inherit" }} />
-          <button type="submit" disabled={loading}
-            style={{ background: "linear-gradient(135deg,#FF8FAB,#FF6B6B)", border: "none", borderRadius: "10px", color: "#fff", padding: "13px", fontSize: "14px", fontWeight: 700, cursor: "pointer", opacity: loading ? 0.5 : 1 }}>
-            {loading ? "Saving..." : "Reserve my spot →"}
-          </button>
-        </form>
-      </div>
-    </main>
-  );
-
-  // Home
-  return (
-    <main style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 20px", background: "#000" }}>
-      <div style={{ maxWidth: "480px", width: "100%" }}>
-
-        {/* Logo */}
-        <div style={{ marginBottom: "40px" }}><Logo /></div>
-
-        {/* Badge */}
-        <div style={{ marginBottom: "20px" }}>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "#FF8FAB12", border: "1px solid #FF8FAB22", borderRadius: "100px", padding: "4px 12px", fontSize: "11px", color: "#FF8FAB", fontWeight: 600, letterSpacing: "0.05em" }}>
-            <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#FF8FAB", display: "inline-block" }} />
-            FIFA WORLD CUP 2026 · LAUNCHING IN
+        <div style={{ marginBottom: "8px" }}>
+          <span style={{ display: "inline-block", background: "#fff0f2", color: "#FF385C", fontSize: "12px", fontWeight: 600, padding: "4px 10px", borderRadius: "100px", border: "1px solid #ffd0d7", marginBottom: "16px" }}>
+            {spots !== null ? `${spots.toLocaleString()} founding spots left` : "Limited spots remaining"}
           </span>
         </div>
 
-        {/* Countdown */}
-        <div style={{ marginBottom: "28px" }}><Countdown /></div>
-
-        {/* Headline */}
-        <h1 style={{ fontSize: "clamp(32px,7vw,52px)", fontWeight: 800, lineHeight: 1.1, letterSpacing: "-1.5px", marginBottom: "12px" }}>
-          Sell anything.<br />
-          <span style={{ color: "#FF8FAB" }}>Earn on your terms.</span>
-        </h1>
-
-        <p style={{ color: "#444", fontSize: "15px", lineHeight: 1.7, marginBottom: "28px" }}>
-          The first platform where you sell any service, set any price, and make your own rules.
+        <h1 style={{ fontSize: "28px", fontWeight: 800, marginBottom: "6px", letterSpacing: "-0.5px" }}>Become a founding provider</h1>
+        <p style={{ fontSize: "15px", color: "#666", marginBottom: "28px", lineHeight: 1.6 }}>
+          Sell any service. Set your own price.<br />Zero commission — forever.
         </p>
 
-        {/* Spots counter */}
-        <div style={{ background: "#0d0d0d", border: "1px solid #1a1a1a", borderRadius: "12px", padding: "16px 20px", marginBottom: "20px" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-            <span style={{ fontSize: "13px", color: "#666" }}>Founding provider spots</span>
-            <span style={{ fontSize: "13px", color: "#FF8FAB", fontWeight: 700 }}>{spots.toLocaleString()} left</span>
+        <form onSubmit={submitProvider} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          <input required placeholder="Full name" value={pForm.name} onChange={e => setPForm(p => ({ ...p, name: e.target.value }))} style={inputStyle} />
+          <input required type="email" placeholder="Email address" value={pForm.email} onChange={e => setPForm(p => ({ ...p, email: e.target.value }))} style={inputStyle} />
+          <input required placeholder="Your city" value={pForm.city} onChange={e => setPForm(p => ({ ...p, city: e.target.value }))} style={inputStyle} />
+          <input required placeholder="What will you offer? (e.g. Gaming, Photography, Tutoring)" value={pForm.category} onChange={e => setPForm(p => ({ ...p, category: e.target.value }))} style={inputStyle} />
+          <div style={{ height: "4px" }} />
+          <button type="submit" disabled={loading} style={{ ...btnPrimary, opacity: loading ? 0.6 : 1 }}>
+            {loading ? "Claiming your spot..." : "Claim founding spot"}
+          </button>
+          <p style={{ textAlign: "center", fontSize: "12px", color: "#aaa" }}>
+            Free to join. Zero commission for life if you're in the first 100,000.
+          </p>
+        </form>
+      </div>
+    </div>
+  );
+
+  // ── Customer form ───────────────────────────────────────────────
+  if (view === "customer") return (
+    <div style={{ minHeight: "100vh", background: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px" }}>
+      <div style={{ maxWidth: "400px", width: "100%" }}>
+        <button onClick={() => setView("home")} style={{ background: "none", border: "none", color: "#aaa", cursor: "pointer", fontSize: "14px", padding: 0, marginBottom: "32px" }}>
+          ← Back
+        </button>
+        <div style={{ marginBottom: "32px" }}><Logo /></div>
+
+        {refCode && (
+          <div style={{ background: "#f0fff4", border: "1px solid #bbf7d0", borderRadius: "10px", padding: "10px 14px", fontSize: "13px", color: "#166534", marginBottom: "20px" }}>
+            ✓ Referred by a friend — you're already ahead.
           </div>
-          <div style={{ height: "4px", background: "#1a1a1a", borderRadius: "100px", overflow: "hidden" }}>
-            <div style={{ height: "100%", width: `${(spots / TOTAL_SPOTS) * 100}%`, background: "linear-gradient(90deg,#FF8FAB,#FF6B6B)", borderRadius: "100px" }} />
-          </div>
-          <div style={{ fontSize: "11px", color: "#333", marginTop: "6px" }}>100,000 total · Zero commission for life · Closes July 19</div>
+        )}
+
+        <h1 style={{ fontSize: "28px", fontWeight: 800, marginBottom: "6px", letterSpacing: "-0.5px" }}>Join the waitlist</h1>
+        <p style={{ fontSize: "15px", color: "#666", marginBottom: "28px" }}>
+          Get early access when we launch in your city.
+        </p>
+
+        <form onSubmit={submitCustomer} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          <input required placeholder="Full name" value={cForm.name} onChange={e => setCForm(p => ({ ...p, name: e.target.value }))} style={inputStyle} />
+          <input required type="email" placeholder="Email address" value={cForm.email} onChange={e => setCForm(p => ({ ...p, email: e.target.value }))} style={inputStyle} />
+          <input required placeholder="Your city" value={cForm.city} onChange={e => setCForm(p => ({ ...p, city: e.target.value }))} style={inputStyle} />
+          <div style={{ height: "4px" }} />
+          <button type="submit" disabled={loading} style={{ ...btnPrimary, opacity: loading ? 0.6 : 1 }}>
+            {loading ? "Joining..." : "Reserve my spot"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+
+  // ── Home ────────────────────────────────────────────────────────
+  return (
+    <div style={{ minHeight: "100vh", background: "#fff" }}>
+
+      {/* Nav */}
+      <nav style={{ padding: "20px 24px", display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #f0f0f0" }}>
+        <Logo />
+        <button onClick={() => setView("provider")}
+          style={{ background: "#0a0a0a", border: "none", borderRadius: "100px", color: "#fff", padding: "10px 20px", fontSize: "14px", fontWeight: 600, cursor: "pointer" }}>
+          Become a provider
+        </button>
+      </nav>
+
+      {/* Hero */}
+      <div style={{ maxWidth: "640px", margin: "0 auto", padding: "80px 24px 60px", textAlign: "center" }}>
+
+        {/* FIFA badge */}
+        <div className="fade" style={{ marginBottom: "24px" }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "#fff0f2", color: "#FF385C", fontSize: "13px", fontWeight: 600, padding: "6px 14px", borderRadius: "100px", border: "1px solid #ffd0d7" }}>
+            <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#FF385C", display: "inline-block", animation: "pulse 2s infinite" }} />
+            FIFA World Cup 2026 · Launching in {pad(time.d)}d {pad(time.h)}h {pad(time.m)}m
+          </span>
         </div>
+
+        {/* Headline */}
+        <h1 className="fade-2" style={{ fontSize: "clamp(40px, 7vw, 64px)", fontWeight: 800, lineHeight: 1.05, letterSpacing: "-2px", marginBottom: "20px", color: "#0a0a0a" }}>
+          Hire anyone.<br />For anything.
+        </h1>
+
+        <p className="fade-2" style={{ fontSize: "18px", color: "#666", lineHeight: 1.6, marginBottom: "40px", maxWidth: "480px", margin: "0 auto 40px" }}>
+          The first platform where anyone can offer any service — gaming, companionship, tutoring, photography — and get paid on their own terms.
+        </p>
 
         {/* CTAs */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "32px" }}>
+        <div className="fade-3" style={{ display: "flex", gap: "10px", justifyContent: "center", flexWrap: "wrap", marginBottom: "40px" }}>
           <button onClick={() => setView("provider")}
-            style={{ background: "linear-gradient(135deg,#FF8FAB,#FF6B6B)", border: "none", borderRadius: "12px", color: "#fff", padding: "15px", fontSize: "15px", fontWeight: 700, cursor: "pointer", textAlign: "center" as const }}>
-            Claim my founding spot →
+            style={{ background: "#FF385C", border: "none", borderRadius: "12px", color: "#fff", padding: "16px 32px", fontSize: "16px", fontWeight: 700, cursor: "pointer", letterSpacing: "-0.2px" }}>
+            Start earning — it's free
           </button>
           <button onClick={() => setView("customer")}
-            style={{ background: "#0d0d0d", border: "1px solid #1a1a1a", borderRadius: "12px", color: "#888", padding: "13px", fontSize: "14px", fontWeight: 500, cursor: "pointer" }}>
-            I want to hire someone
+            style={{ background: "#fff", border: "1.5px solid #e5e5e5", borderRadius: "12px", color: "#0a0a0a", padding: "16px 32px", fontSize: "16px", fontWeight: 600, cursor: "pointer" }}>
+            Find someone
           </button>
         </div>
 
-        {/* Footer */}
-        <div style={{ color: "#222", fontSize: "11px", display: "flex", gap: "16px" }}>
-          <a href="/privacy" style={{ color: "#222", textDecoration: "none" }}>Privacy</a>
-          <a href="/terms" style={{ color: "#222", textDecoration: "none" }}>Terms</a>
-          <span>© 2025 RentOut</span>
+        {/* Spots counter */}
+        <div className="fade-3" style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "#f9f9f9", border: "1px solid #f0f0f0", borderRadius: "100px", padding: "8px 16px" }}>
+          <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#22c55e", flexShrink: 0 }} />
+          <span style={{ fontSize: "13px", color: "#666" }}>
+            <span style={{ fontWeight: 700, color: "#0a0a0a" }}>{spots !== null ? spots.toLocaleString() : "100,000"}</span> founding provider spots remaining
+          </span>
         </div>
       </div>
-    </main>
+
+      {/* How it works */}
+      <div style={{ borderTop: "1px solid #f0f0f0", padding: "60px 24px" }}>
+        <div style={{ maxWidth: "640px", margin: "0 auto" }}>
+          <h2 style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.1em", color: "#aaa", textTransform: "uppercase", marginBottom: "40px", textAlign: "center" }}>How it works</h2>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "32px" }}>
+            {[
+              { n: "01", t: "Offer anything", b: "Gaming, photography, tutoring, companionship — any skill you have." },
+              { n: "02", t: "Set your terms", b: "Your price. Your hours. Your rules. Nobody tells you what to charge." },
+              { n: "03", t: "Get paid", b: "Customers book you directly. Money hits your account instantly." },
+            ].map(({ n, t, b }) => (
+              <div key={n}>
+                <div style={{ fontSize: "13px", fontWeight: 700, color: "#FF385C", marginBottom: "8px" }}>{n}</div>
+                <div style={{ fontSize: "16px", fontWeight: 700, marginBottom: "6px", color: "#0a0a0a" }}>{t}</div>
+                <div style={{ fontSize: "14px", color: "#888", lineHeight: 1.6 }}>{b}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom CTA */}
+      <div style={{ background: "#0a0a0a", padding: "60px 24px", textAlign: "center" }}>
+        <div style={{ maxWidth: "480px", margin: "0 auto" }}>
+          <div style={{ fontSize: "13px", fontWeight: 600, color: "#555", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "16px" }}>
+            Transfer window closes July 19
+          </div>
+          <h2 style={{ fontSize: "32px", fontWeight: 800, color: "#fff", marginBottom: "8px", letterSpacing: "-0.5px", lineHeight: 1.2 }}>
+            First 100,000 providers.<br />Zero commission. Forever.
+          </h2>
+          <p style={{ fontSize: "15px", color: "#555", marginBottom: "28px" }}>
+            {spots !== null ? `${spots.toLocaleString()} spots remaining.` : ""} After July 19 — this offer is gone.
+          </p>
+          <button onClick={() => setView("provider")}
+            style={{ background: "#fff", border: "none", borderRadius: "12px", color: "#0a0a0a", padding: "16px 40px", fontSize: "16px", fontWeight: 700, cursor: "pointer" }}>
+            Claim my founding spot
+          </button>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div style={{ padding: "24px", borderTop: "1px solid #f0f0f0", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
+        <Logo />
+        <div style={{ display: "flex", gap: "20px" }}>
+          <a href="/privacy" style={{ fontSize: "13px", color: "#aaa", textDecoration: "none" }}>Privacy</a>
+          <a href="/terms" style={{ fontSize: "13px", color: "#aaa", textDecoration: "none" }}>Terms</a>
+        </div>
+        <span style={{ fontSize: "13px", color: "#ccc" }}>© 2025 RentOut</span>
+      </div>
+
+    </div>
   );
 }
