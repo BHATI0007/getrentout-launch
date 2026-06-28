@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
 
     // Auto-reply to user
     await resend.emails.send({
-      from: "RentOut <hello@getrentout.me>",
+      from: "RentOut <onboarding@resend.dev>",
       to: email,
       subject: `You're #${position} on the list 🎉`,
       html: `
@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
 
     // Notify admin
     await resend.emails.send({
-      from: "RentOut <hello@getrentout.me>",
+      from: "RentOut <onboarding@resend.dev>",
       to: "vineet.bhati.ug24@nsut.ac.in",
       subject: `#${position} — ${name} joined from ${city}`,
       html: `<div style="font-family:sans-serif;padding:20px;">

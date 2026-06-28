@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
 
     // Auto-reply to provider
     await resend.emails.send({
-      from: "RentOut <hello@getrentout.me>",
+      from: "RentOut <onboarding@resend.dev>",
       to: email,
       subject: "Application received — we'll be in touch ⚡",
       html: `
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
 
     // Notify admin
     await resend.emails.send({
-      from: "RentOut <hello@getrentout.me>",
+      from: "RentOut <onboarding@resend.dev>",
       to: "vineet.bhati.ug24@nsut.ac.in",
       subject: `New provider application — ${name} (${category}) from ${city}`,
       html: `
