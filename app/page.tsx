@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 
 const TOTAL_SPOTS = 100000;
-const TAKEN = 99412; // simulate real urgency
 const LAUNCH_DATE = new Date("2025-07-08T00:00:00");
 
 function Logo() {
@@ -52,7 +51,7 @@ type View = "home" | "provider" | "customer" | "done-provider" | "done-customer"
 export default function Page() {
   const [view, setView] = useState<View>("home");
   const [loading, setLoading] = useState(false);
-  const [spots, setSpots] = useState(TOTAL_SPOTS - TAKEN);
+  const [spots, setSpots] = useState(TOTAL_SPOTS);
   const [pForm, setPForm] = useState({ name: "", email: "", city: "", category: "", about: "" });
   const [cForm, setCForm] = useState({ name: "", email: "", city: "" });
   const [providerSpot, setProviderSpot] = useState(0);
@@ -64,10 +63,20 @@ export default function Page() {
     const params = new URLSearchParams(window.location.search);
     const ref = params.get("ref");
     if (ref) setRefCode(ref);
-    // Simulate counter slowly dropping
+
+    // Fetch real spot count from Supabase
+    fetch("/api/spots")
+      .then(r => r.json())
+      .then(d => setSpots(d.remaining))
+      .catch(() => {});
+
+    // Refresh every 30 seconds
     const id = setInterval(() => {
-      setSpots(s => s > 1 ? s - 1 : s);
-    }, 8000);
+      fetch("/api/spots")
+        .then(r => r.json())
+        .then(d => setSpots(d.remaining))
+        .catch(() => {});
+    }, 30000);
     return () => clearInterval(id);
   }, []);
 
@@ -75,9 +84,9 @@ export default function Page() {
     e.preventDefault(); setLoading(true);
     try {
       await fetch("/api/provider", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(pForm) });
-      const spot = TOTAL_SPOTS - spots + 1;
-      setProviderSpot(spot);
-      setSpots(s => Math.max(0, s - 1));
+      const freshSpots = await fetch("/api/spots").then(r => r.json());
+      setSpots(freshSpots.remaining);
+      setProviderSpot(TOTAL_SPOTS - freshSpots.remaining);
       setView("done-provider");
     } finally { setLoading(false); }
   }
