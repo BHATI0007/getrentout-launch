@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 
 const TOTAL = 100000;
-const CLOSE_DATE = new Date("2025-07-19T23:59:59");
+const CLOSE_DATE = new Date("2026-07-19T23:59:59");
 
 function useSpots() {
   const [spots, setSpots] = useState(TOTAL);
@@ -338,10 +338,14 @@ export default function Page() {
             <p style={{ fontSize: 15, color: "var(--text-body)", lineHeight: 1.7 }}>Customer books. You show up. Money in your account.</p>
           </div>
           <div className="card reveal d2" style={{ padding: "28px 24px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "var(--text-faint)", textTransform: "uppercase", marginBottom: 16 }}>Founders so far</p>
-            <div style={{ fontSize: 44, fontWeight: 900, letterSpacing: "-2px", lineHeight: 1, marginBottom: 6 }} className="g"><Ticker value={taken} /></div>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 12 }}>
-              <span className="dot" /><span style={{ fontSize: 12, color: "var(--text-faint)" }}>Updating live</span>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "var(--text-faint)", textTransform: "uppercase", marginBottom: 16 }}>You keep</p>
+            <div>
+              <div style={{ fontSize: 52, fontWeight: 900, letterSpacing: "-2.5px", lineHeight: 1, marginBottom: 4 }} className="g">100%</div>
+              <p style={{ fontSize: 13, color: "var(--text-dim)" }}>of every booking, for life</p>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 14 }}>
+              <span className="dot" style={{ background: "var(--accent)" }} />
+              <span style={{ fontSize: 12, color: "var(--text-faint)" }}><Ticker value={taken} /> founders joined</span>
             </div>
           </div>
         </div>
@@ -388,7 +392,7 @@ export default function Page() {
         <div style={{ display: "flex", gap: 20 }}>
           {["Privacy", "Terms"].map(t => <a key={t} href={`/${t.toLowerCase()}`} style={{ fontSize: 13, color: "var(--text-faint)", textDecoration: "none" }}>{t}</a>)}
         </div>
-        <span style={{ fontSize: 13, color: "var(--text-faint)" }}>© 2025 RentOut</span>
+        <span style={{ fontSize: 13, color: "var(--text-faint)" }}>© 2026 RentOut</span>
       </div>
     </div>
   );
