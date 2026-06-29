@@ -154,66 +154,69 @@ export default function Page() {
 
   /* ── DONE ── */
   if (view === "done") return (
-    <div style={{ background: "var(--bg)", minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "60px 24px", position: "relative", overflow: "hidden" }}>
+    <div style={{ background: "var(--bg)", minHeight: "100vh", display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
       <div id="cursor-glow" className="cursor-glow" />
-      <div style={{ position: "absolute", top: "-10%", left: "50%", transform: "translateX(-50%)", width: 900, height: 700, background: "radial-gradient(ellipse, rgba(155,109,255,0.15), transparent 60%)", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", bottom: "-5%", right: "-5%", width: 600, height: 500, background: "radial-gradient(ellipse, rgba(242,139,130,0.07), transparent 60%)", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", top: "-20%", left: "50%", transform: "translateX(-50%)", width: 1000, height: 800, background: "radial-gradient(ellipse, rgba(155,109,255,0.12), transparent 55%)", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", bottom: "-10%", right: "-10%", width: 700, height: 600, background: "radial-gradient(ellipse, rgba(242,139,130,0.06), transparent 55%)", pointerEvents: "none" }} />
 
-      <div style={{ width: "100%", maxWidth: 640, textAlign: "center", position: "relative" }} className="page-in">
+      {/* Top nav */}
+      <div style={{ padding: "24px 32px", display: "flex", justifyContent: "center", position: "relative" }}>
+        <Logo />
+      </div>
 
-        {/* Nav logo */}
-        <div style={{ marginBottom: 64 }}>
-          <Logo />
-        </div>
+      {/* Main content */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px 24px 0", position: "relative" }} className="page-in">
 
-        {/* Label */}
-        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", color: "var(--text-faint)", textTransform: "uppercase", marginBottom: 16 }}>
+        {/* Robinhood-style: number IS the hero */}
+        <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.18em", color: "var(--accent)", textTransform: "uppercase", marginBottom: 20 }}>
           Early access confirmed
         </p>
 
-        {/* Giant number */}
-        <div style={{ fontSize: "clamp(100px, 22vw, 200px)", fontWeight: 900, letterSpacing: "-0.06em", lineHeight: 0.85, marginBottom: 32 }}>
+        <div style={{ fontSize: "clamp(120px, 28vw, 280px)", fontWeight: 900, letterSpacing: "-0.06em", lineHeight: 0.82, marginBottom: 40, textAlign: "center" }}>
           <span className="g">#{position.toLocaleString()}</span>
         </div>
 
-        {/* Message */}
-        <p style={{ fontSize: "clamp(18px, 2.5vw, 24px)", color: "var(--text-body)", lineHeight: 1.65, maxWidth: 420, margin: "0 auto 16px", fontWeight: 400 }}>
+        <p style={{ fontSize: "clamp(20px, 2.5vw, 28px)", fontWeight: 600, color: "var(--text)", marginBottom: 12, letterSpacing: "-0.02em" }}>
           You&apos;re one of the first.
         </p>
-        <p style={{ fontSize: 15, color: "var(--text-faint)", marginBottom: 64 }}>
-          We&apos;ll email you when it&apos;s time. Watch your inbox.
+        <p style={{ fontSize: 16, color: "var(--text-faint)", maxWidth: 360, textAlign: "center", lineHeight: 1.6 }}>
+          We&apos;ll email you when it&apos;s time.<br />Watch your inbox.
         </p>
+      </div>
 
-        {/* Divider */}
-        <div style={{ height: 1, background: "var(--border)", marginBottom: 40 }} />
-
-        {/* Share label */}
-        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", color: "var(--text-faint)", textTransform: "uppercase", marginBottom: 24 }}>
-          Share with the world
+      {/* Bottom share section — pinned to bottom like Robinhood */}
+      <div style={{ padding: "40px 24px 48px", maxWidth: 560, width: "100%", margin: "0 auto", position: "relative" }}>
+        <div style={{ height: 1, background: "var(--border)", marginBottom: 32 }} />
+        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", color: "var(--text-faint)", textTransform: "uppercase", marginBottom: 20, textAlign: "center" }}>
+          Spread the word
         </p>
-
-        {/* Share buttons — 2 rows */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginBottom: 10 }}>
-          <a href="https://wa.me/?text=Just got early access to RentOut — something big is coming. Join here: https://getrentout.me"
-            target="_blank" rel="noopener" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "#128C7E", borderRadius: 12, padding: "13px 8px", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none" }}>
-            WhatsApp
-          </a>
-          <a href="https://www.facebook.com/sharer/sharer.php?u=https://getrentout.me"
-            target="_blank" rel="noopener" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "#1877F2", borderRadius: 12, padding: "13px 8px", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none" }}>
-            Facebook
-          </a>
-          <a href="https://twitter.com/intent/tweet?text=Just got early access to RentOut — something big is coming: https://getrentout.me"
-            target="_blank" rel="noopener" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "#0f0f0f", border: "1px solid #2a2a2a", borderRadius: 12, padding: "13px 8px", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none" }}>
-            X / Twitter
-          </a>
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10 }}>
-          <a href="https://t.me/share/url?url=https://getrentout.me&text=Just got early access to RentOut — something big is coming"
-            target="_blank" rel="noopener" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "#229ED9", borderRadius: 12, padding: "13px 8px", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none" }}>
-            Telegram
-          </a>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            <a href="https://wa.me/?text=Just got early access to RentOut — something big is coming. Get yours: https://getrentout.me"
+              target="_blank" rel="noopener"
+              style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#128C7E", borderRadius: 14, padding: "16px", fontSize: 15, fontWeight: 700, color: "#fff", textDecoration: "none", letterSpacing: "-0.01em" }}>
+              WhatsApp
+            </a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=https://getrentout.me"
+              target="_blank" rel="noopener"
+              style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#1877F2", borderRadius: 14, padding: "16px", fontSize: 15, fontWeight: 700, color: "#fff", textDecoration: "none", letterSpacing: "-0.01em" }}>
+              Facebook
+            </a>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            <a href="https://twitter.com/intent/tweet?text=Just got early access to RentOut — something big is coming: https://getrentout.me"
+              target="_blank" rel="noopener"
+              style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#0f0f0f", border: "1px solid #2a2a2a", borderRadius: 14, padding: "16px", fontSize: 15, fontWeight: 700, color: "#fff", textDecoration: "none", letterSpacing: "-0.01em" }}>
+              X / Twitter
+            </a>
+            <a href="https://t.me/share/url?url=https://getrentout.me&text=Just got early access to RentOut — something big is coming"
+              target="_blank" rel="noopener"
+              style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#229ED9", borderRadius: 14, padding: "16px", fontSize: 15, fontWeight: 700, color: "#fff", textDecoration: "none", letterSpacing: "-0.01em" }}>
+              Telegram
+            </a>
+          </div>
           <button onClick={() => { navigator.clipboard.writeText("https://getrentout.me"); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
-            style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "13px 8px", fontSize: 14, fontWeight: 700, color: copied ? "var(--accent)" : "var(--text-dim)", cursor: "pointer", width: "100%" }}>
+            style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: "16px", fontSize: 15, fontWeight: 700, color: copied ? "var(--accent)" : "var(--text-dim)", cursor: "pointer", width: "100%", letterSpacing: "-0.01em" }}>
             {copied ? "✓ Link copied" : "Copy link"}
           </button>
         </div>
