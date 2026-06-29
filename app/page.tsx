@@ -115,7 +115,7 @@ export default function Page() {
   const [view, setView] = useState<V>("home");
   const [loading, setLoading] = useState(false);
   const [position, setPosition] = useState(0);
-  const [form, setForm] = useState({ name: "", email: "", city: "" });
+  const [fields, setFields] = useState({ name: "", email: "", city: "" });
   const [errors, setErrors] = useState({ name: "", email: "", city: "" });
   const spots = useSpots();
   const cd = useCountdown();
@@ -125,11 +125,11 @@ export default function Page() {
 
   const validate = () => {
     const e = { name: "", email: "", city: "" };
-    if (!form.name.trim()) e.name = "Please enter your name";
-    else if (form.name.trim().length < 2) e.name = "Name is too short";
-    if (!form.email.trim()) e.email = "Please enter your email";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) e.email = "That doesn't look like a valid email";
-    if (!form.city.trim()) e.city = "Please enter your city";
+    if (!fields.name.trim()) e.name = "Please enter your name";
+    else if (fields.name.trim().length < 2) e.name = "Name is too short";
+    if (!fields.email.trim()) e.email = "Please enter your email";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email.trim())) e.email = "That doesn't look like a valid email";
+    if (!fields.city.trim()) e.city = "Please enter your city";
     setErrors(e);
     return !e.name && !e.email && !e.city;
   };
@@ -142,7 +142,7 @@ export default function Page() {
       const res = await fetch("/api/provider", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(fields),
       });
       const data = await res.json();
       setPosition(data.position ?? taken + 1);
@@ -280,14 +280,14 @@ export default function Page() {
               60 seconds. We&apos;ll email you when we&apos;re ready.
             </p>
 
-            <form onSubmit={submit} autoComplete="off" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <div>
                 <label style={{ fontSize: 12, fontWeight: 600, color: errors.name ? "var(--text-danger, #F28B82)" : "var(--text-dim)", letterSpacing: "0.04em", display: "block", marginBottom: 7 }}>Full name</label>
                 <input
-                  type="text" placeholder="Your name" className="field"
-                  value={form.name}
+                  name="fullname" type="text" placeholder="Your name" className="field"
+                  value={fields.name}
                   style={{ borderColor: errors.name ? "#F28B82" : undefined }}
-                  onChange={e => { setForm(p => ({ ...p, name: e.target.value })); setErrors(p => ({ ...p, name: "" })); }}
+                  onChange={e => { setFields(p => ({ ...p, name: e.target.value })); setErrors(p => ({ ...p, name: "" })); }}
                 />
                 {errors.name && <p style={{ fontSize: 12, color: "#F28B82", marginTop: 6 }}>{errors.name}</p>}
               </div>
@@ -295,10 +295,10 @@ export default function Page() {
                 <label style={{ fontSize: 12, fontWeight: 600, color: errors.email ? "#F28B82" : "var(--text-dim)", letterSpacing: "0.04em", display: "block", marginBottom: 7 }}>Email address</label>
                 <input
                   type="email" placeholder="you@email.com" className="field"
-                  autoComplete="off" inputMode="email"
-                  value={form.email}
+                  inputMode="email" name="useremail"
+                  value={fields.email}
                   style={{ borderColor: errors.email ? "#F28B82" : undefined }}
-                  onChange={e => { setForm(p => ({ ...p, email: e.target.value })); setErrors(p => ({ ...p, email: "" })); }}
+                  onChange={e => { setFields(p => ({ ...p, email: e.target.value })); setErrors(p => ({ ...p, email: "" })); }}
                 />
                 {errors.email && <p style={{ fontSize: 12, color: "#F28B82", marginTop: 6 }}>{errors.email}</p>}
               </div>
@@ -306,10 +306,10 @@ export default function Page() {
                 <label style={{ fontSize: 12, fontWeight: 600, color: errors.city ? "#F28B82" : "var(--text-dim)", letterSpacing: "0.04em", display: "block", marginBottom: 7 }}>Your city</label>
                 <input
                   type="text" placeholder="City" className="field"
-                  autoComplete="off" autoCorrect="off"
-                  value={form.city}
+                  name="usercity"
+                  value={fields.city}
                   style={{ borderColor: errors.city ? "#F28B82" : undefined }}
-                  onChange={e => { setForm(p => ({ ...p, city: e.target.value })); setErrors(p => ({ ...p, city: "" })); }}
+                  onChange={e => { setFields(p => ({ ...p, city: e.target.value })); setErrors(p => ({ ...p, city: "" })); }}
                 />
                 {errors.city && <p style={{ fontSize: 12, color: "#F28B82", marginTop: 6 }}>{errors.city}</p>}
               </div>
