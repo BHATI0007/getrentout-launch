@@ -253,7 +253,7 @@ export default function Page() {
           <div style={{ position: "relative", maxWidth: 420 }}>
             <p className="section-label" style={{ marginBottom: 20 }}>Early access</p>
             <h2 style={{ fontSize: "clamp(32px, 4vw, 52px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.05, marginBottom: 20 }}>
-              Something big<br />is coming.<br /><span className="g">Get in early.</span>
+              Something new<br />is coming.<br /><span className="g">Start earning early.</span>
             </h2>
             <p style={{ fontSize: 16, color: "var(--text-body)", lineHeight: 1.75, marginBottom: 40 }}>
               We&apos;re not ready to reveal everything yet. Sign up and be among the first to know when we launch.
@@ -263,7 +263,7 @@ export default function Page() {
               {[
                 "Early access before anyone else",
                 "First in line on launch day",
-                "Exclusive early member benefits",
+                "Exclusive earner benefits",
                 "Direct line to the team",
               ].map(text => (
                 <div key={text} style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -281,11 +281,11 @@ export default function Page() {
           <div style={{ maxWidth: 400, width: "100%" }} className="page-in">
             <div style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(155,109,255,0.08)", border: "1px solid rgba(155,109,255,0.18)", borderRadius: 100, padding: "6px 14px", marginBottom: 28 }}>
               <span className="dot" style={{ background: "var(--accent)" }} />
-              <span style={{ fontSize: 13, color: "var(--accent)", fontWeight: 600 }}>Early access open now</span>
+              <span style={{ fontSize: 13, color: "var(--accent)", fontWeight: 600 }}>For early earners</span>
             </div>
 
             <h3 style={{ fontSize: 24, fontWeight: 800, letterSpacing: "-0.03em", marginBottom: 6 }}>
-              Get early access
+              Start earning early
             </h3>
             <p style={{ fontSize: 14, color: "var(--text-dim)", marginBottom: 28, lineHeight: 1.6 }}>
               60 seconds. We&apos;ll email you when we&apos;re ready.
@@ -326,7 +326,7 @@ export default function Page() {
               </div>
               <div style={{ height: 4 }} />
               <button type="submit" disabled={loading} className="btn-primary" style={{ width: "100%", fontSize: 15, padding: "17px", borderRadius: 13 }}>
-                {loading ? "Just a moment…" : "Get early access"}
+                {loading ? "Just a moment…" : "Start earning early"}
               </button>
               <p style={{ textAlign: "center", fontSize: 12, color: "var(--text-faint)" }}>
                 No credit card. No spam.
@@ -346,7 +346,7 @@ export default function Page() {
       <nav style={{ position: "sticky", top: 0, zIndex: 99, background: "rgba(7,7,10,0.85)", borderBottom: "1px solid rgba(255,255,255,0.04)", padding: "0 28px", height: 58, display: "flex", alignItems: "center", justifyContent: "space-between", backdropFilter: "blur(16px)" }}>
         <Logo />
         <button className="btn-primary" onClick={() => setView("form")} style={{ padding: "9px 20px", fontSize: 14, borderRadius: 100 }}>
-          Get early access
+          Start earning early
         </button>
       </nav>
 
@@ -359,7 +359,7 @@ export default function Page() {
           <div className="hero-eyebrow" style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(155,109,255,0.07)", border: "1px solid rgba(155,109,255,0.16)", borderRadius: 100, padding: "7px 18px", marginBottom: 52 }}>
             <span className="dot" />
             <span style={{ fontSize: 13, color: "var(--text-dim)", letterSpacing: "0.01em" }}>
-              <span style={{ color: "var(--text)", fontWeight: 600 }}>Early access open</span>
+              <span style={{ color: "var(--text)", fontWeight: 600 }}>Earner early access</span>
             </span>
           </div>
 
@@ -368,12 +368,12 @@ export default function Page() {
           </h1>
 
           <p className="hero-sub" style={{ fontSize: "clamp(17px, 2vw, 21px)", color: "var(--text-body)", lineHeight: 1.7, maxWidth: 520, margin: "0 auto 56px" }}>
-            Something new is coming. Sign up now and be among the first to know.
+            Something new is coming. Sign up to earn — before anyone else.
           </p>
 
           <div className="hero-cta" style={{ display: "flex", justifyContent: "center", marginBottom: 40 }}>
             <button className="btn-primary" onClick={() => setView("form")} style={{ fontSize: 17, padding: "20px 48px", borderRadius: 14 }}>
-              Get early access
+              Start earning early
             </button>
           </div>
 
@@ -389,16 +389,16 @@ export default function Page() {
           <div style={{ position: "absolute", bottom: -80, right: "0%", width: 360, height: 360, borderRadius: "50%", background: "radial-gradient(circle, rgba(242,139,130,0.06), transparent 60%)", pointerEvents: "none" }} />
           <div style={{ position: "relative" }}>
             <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 24, fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "var(--accent)", textTransform: "uppercase", background: "rgba(155,109,255,0.08)", border: "1px solid rgba(155,109,255,0.18)", borderRadius: 100, padding: "6px 16px" }}>
-              <span className="dot" style={{ background: "var(--accent)", width: 6, height: 6 }} /> Early access open
+              <span className="dot" style={{ background: "var(--accent)", width: 6, height: 6 }} /> Earner early access
             </div>
             <h2 style={{ fontSize: "clamp(32px, 5.5vw, 60px)", fontWeight: 900, letterSpacing: "-0.045em", lineHeight: 1.02, marginBottom: 18 }}>
-              Don&apos;t wait.<br /><span className="g">Get in early.</span>
+              Don&apos;t wait.<br /><span className="g">Start earning early.</span>
             </h2>
             <p style={{ fontSize: 16, color: "var(--text-dim)", lineHeight: 1.7, maxWidth: 460, margin: "0 auto 40px" }}>
               We&apos;re building something new. Sign up now and be among the first to experience it.
             </p>
             <button className="btn-primary" onClick={() => setView("form")} style={{ fontSize: 16, padding: "18px 48px", borderRadius: 14 }}>
-              Get early access
+              Start earning early
             </button>
           </div>
         </div>
