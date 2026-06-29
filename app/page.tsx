@@ -141,61 +141,68 @@ export default function Page() {
 
   /* ── DONE ── */
   if (view === "done") return (
-    <div style={{ background: "var(--bg)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 20px", position: "relative", overflow: "hidden" }}>
+    <div style={{ background: "var(--bg)", minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "60px 24px", position: "relative", overflow: "hidden" }}>
       <div id="cursor-glow" className="cursor-glow" />
-      <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 800, height: 600, background: "radial-gradient(ellipse, rgba(155,109,255,0.13), transparent 60%)", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", bottom: 0, right: 0, width: 500, height: 400, background: "radial-gradient(ellipse, rgba(242,139,130,0.06), transparent 60%)", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", top: "-10%", left: "50%", transform: "translateX(-50%)", width: 900, height: 700, background: "radial-gradient(ellipse, rgba(155,109,255,0.15), transparent 60%)", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", bottom: "-5%", right: "-5%", width: 600, height: 500, background: "radial-gradient(ellipse, rgba(242,139,130,0.07), transparent 60%)", pointerEvents: "none" }} />
 
-      <div style={{ maxWidth: 520, width: "100%", textAlign: "center", position: "relative" }} className="page-in">
+      <div style={{ width: "100%", maxWidth: 640, textAlign: "center", position: "relative" }} className="page-in">
 
-        {/* Position badge */}
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(155,109,255,0.1)", border: "1px solid rgba(155,109,255,0.2)", borderRadius: 100, padding: "7px 18px", marginBottom: 40 }}>
-          <span className="dot" />
-          <span style={{ fontSize: 13, color: "var(--accent)", fontWeight: 600, letterSpacing: "0.02em" }}>You&apos;re in</span>
+        {/* Nav logo */}
+        <div style={{ marginBottom: 64 }}>
+          <Logo />
         </div>
 
-        {/* Big number */}
-        <div style={{ fontSize: "clamp(80px, 18vw, 160px)", fontWeight: 900, letterSpacing: "-0.06em", lineHeight: 0.88, marginBottom: 20 }}>
+        {/* Label */}
+        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", color: "var(--text-faint)", textTransform: "uppercase", marginBottom: 16 }}>
+          Early access confirmed
+        </p>
+
+        {/* Giant number */}
+        <div style={{ fontSize: "clamp(100px, 22vw, 200px)", fontWeight: 900, letterSpacing: "-0.06em", lineHeight: 0.85, marginBottom: 32 }}>
           <span className="g">#{position.toLocaleString()}</span>
         </div>
 
-        <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.1em", color: "var(--text-faint)", textTransform: "uppercase", marginBottom: 8 }}>
-          Early access
+        {/* Message */}
+        <p style={{ fontSize: "clamp(18px, 2.5vw, 24px)", color: "var(--text-body)", lineHeight: 1.65, maxWidth: 420, margin: "0 auto 16px", fontWeight: 400 }}>
+          You&apos;re one of the first.
+        </p>
+        <p style={{ fontSize: 15, color: "var(--text-faint)", marginBottom: 64 }}>
+          We&apos;ll email you when it&apos;s time. Watch your inbox.
         </p>
 
-        <p style={{ fontSize: 17, color: "var(--text-dim)", lineHeight: 1.7, maxWidth: 380, margin: "0 auto 48px" }}>
-          Watch your inbox. We&apos;ll email you when it&apos;s time.
+        {/* Divider */}
+        <div style={{ height: 1, background: "var(--border)", marginBottom: 40 }} />
+
+        {/* Share label */}
+        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", color: "var(--text-faint)", textTransform: "uppercase", marginBottom: 24 }}>
+          Share with the world
         </p>
 
-        {/* Live counter */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 48 }}>
-          <span className="dot" />
-          <span style={{ fontSize: 14, color: "var(--text-dim)" }}>
-            <Ticker value={taken} /> {taken === 1 ? "person" : "people"} signed up
-          </span>
-        </div>
-
-        {/* Share section */}
-        <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", color: "var(--text-faint)", textTransform: "uppercase", marginBottom: 16 }}>
-          Spread the word
-        </p>
-
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 10 }}>
-          <a href={`https://wa.me/?text=Just got early access to RentOut — something big is coming. Get yours: https://getrentout.me`}
-            target="_blank" rel="noopener"
-            style={{ background: "#128C7E", borderRadius: 13, padding: "14px 8px", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none", textAlign: "center", display: "block" }}>
+        {/* Share buttons — 2 rows */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginBottom: 10 }}>
+          <a href="https://wa.me/?text=Just got early access to RentOut — something big is coming. Join here: https://getrentout.me"
+            target="_blank" rel="noopener" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "#128C7E", borderRadius: 12, padding: "13px 8px", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none" }}>
             WhatsApp
           </a>
-          <a href={`https://www.instagram.com/`}
-            target="_blank" rel="noopener"
-            style={{ background: "linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045)", borderRadius: 13, padding: "14px 8px", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none", textAlign: "center", display: "block" }}>
-            Instagram
+          <a href="https://www.facebook.com/sharer/sharer.php?u=https://getrentout.me"
+            target="_blank" rel="noopener" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "#1877F2", borderRadius: 12, padding: "13px 8px", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none" }}>
+            Facebook
           </a>
-          <a href={`https://twitter.com/intent/tweet?text=Just got early access to RentOut — something big is coming: https://getrentout.me`}
-            target="_blank" rel="noopener"
-            style={{ background: "#000", border: "1px solid #333", borderRadius: 13, padding: "14px 8px", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none", textAlign: "center", display: "block" }}>
-            X
+          <a href="https://twitter.com/intent/tweet?text=Just got early access to RentOut — something big is coming: https://getrentout.me"
+            target="_blank" rel="noopener" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "#0f0f0f", border: "1px solid #2a2a2a", borderRadius: 12, padding: "13px 8px", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none" }}>
+            X / Twitter
           </a>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10 }}>
+          <a href="https://t.me/share/url?url=https://getrentout.me&text=Just got early access to RentOut — something big is coming"
+            target="_blank" rel="noopener" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "#229ED9", borderRadius: 12, padding: "13px 8px", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none" }}>
+            Telegram
+          </a>
+          <button onClick={() => { navigator.clipboard.writeText("https://getrentout.me"); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
+            style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "13px 8px", fontSize: 14, fontWeight: 700, color: copied ? "var(--accent)" : "var(--text-dim)", cursor: "pointer", width: "100%" }}>
+            {copied ? "✓ Link copied" : "Copy link"}
+          </button>
         </div>
 
       </div>
