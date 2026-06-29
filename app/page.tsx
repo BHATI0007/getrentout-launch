@@ -254,14 +254,14 @@ export default function Page() {
 
       <div className="form-layout" style={{ paddingTop: 58, minHeight: "100vh" }}>
         {/* Left — brand */}
-        <div className="form-brand" style={{ position: "relative", overflow: "hidden" }}>
-          <div style={{ position: "absolute", top: -100, left: -100, width: 500, height: 500, background: "radial-gradient(circle, rgba(155,109,255,0.15), transparent 65%)", pointerEvents: "none" }} />
+        <div className="form-brand" style={{ position: "relative", overflow: "hidden", background: "linear-gradient(160deg, rgba(155,109,255,0.07) 0%, var(--bg) 60%)" }}>
+          <div style={{ position: "absolute", top: -100, left: -100, width: 600, height: 600, background: "radial-gradient(circle, rgba(155,109,255,0.18), transparent 65%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", maxWidth: 420 }}>
             <p className="section-label" style={{ marginBottom: 20 }}>Early access</p>
-            <h2 style={{ fontSize: "clamp(32px, 4vw, 52px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.05, marginBottom: 20 }}>
+            <h2 style={{ fontSize: "clamp(32px, 4vw, 52px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.05, marginBottom: 20, color: "var(--text)" }}>
               Something new<br />is coming.<br /><span className="g">Start earning early.</span>
             </h2>
-            <p style={{ fontSize: 16, color: "var(--text-body)", lineHeight: 1.75, marginBottom: 40 }}>
+            <p style={{ fontSize: 16, color: "#a0a0b8", lineHeight: 1.75, marginBottom: 40 }}>
               We&apos;re not ready to reveal everything yet. Sign up and be among the first to know when we launch.
             </p>
 
@@ -273,8 +273,8 @@ export default function Page() {
                 "Direct line to the team",
               ].map(text => (
                 <div key={text} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <span style={{ width: 22, height: 22, borderRadius: 6, background: "rgba(155,109,255,0.12)", border: "1px solid rgba(155,109,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "var(--accent)", fontWeight: 800, flexShrink: 0 }}>✓</span>
-                  <span style={{ fontSize: 14, color: "var(--text-dim)", lineHeight: 1.5 }}>{text}</span>
+                  <span style={{ width: 22, height: 22, borderRadius: 6, background: "rgba(155,109,255,0.15)", border: "1px solid rgba(155,109,255,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "var(--accent)", fontWeight: 800, flexShrink: 0 }}>✓</span>
+                  <span style={{ fontSize: 14, color: "#9898b0", lineHeight: 1.5 }}>{text}</span>
                 </div>
               ))}
             </div>
@@ -283,23 +283,23 @@ export default function Page() {
         </div>
 
         {/* Right — form */}
-        <div className="form-panel">
+        <div className="form-panel" style={{ background: "var(--bg)" }}>
           <div style={{ maxWidth: 400, width: "100%" }} className="page-in">
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(155,109,255,0.08)", border: "1px solid rgba(155,109,255,0.18)", borderRadius: 100, padding: "6px 14px", marginBottom: 28 }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(155,109,255,0.1)", border: "1px solid rgba(155,109,255,0.25)", borderRadius: 100, padding: "6px 14px", marginBottom: 28 }}>
               <span className="dot" style={{ background: "var(--accent)" }} />
               <span style={{ fontSize: 13, color: "var(--accent)", fontWeight: 600 }}>For early earners</span>
             </div>
 
-            <h3 style={{ fontSize: 24, fontWeight: 800, letterSpacing: "-0.03em", marginBottom: 6 }}>
+            <h3 style={{ fontSize: 26, fontWeight: 800, letterSpacing: "-0.03em", marginBottom: 8, color: "var(--text)" }}>
               Start earning early
             </h3>
-            <p style={{ fontSize: 14, color: "var(--text-dim)", marginBottom: 28, lineHeight: 1.6 }}>
+            <p style={{ fontSize: 14, color: "#9898b0", marginBottom: 28, lineHeight: 1.6 }}>
               60 seconds. We&apos;ll email you when we&apos;re ready.
             </p>
 
             <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <div>
-                <label style={{ fontSize: 12, fontWeight: 600, color: errors.name ? "var(--text-danger, #F28B82)" : "var(--text-dim)", letterSpacing: "0.04em", display: "block", marginBottom: 7 }}>Full name</label>
+                <label style={{ fontSize: 12, fontWeight: 600, color: errors.name ? "#F28B82" : "#9898b0", letterSpacing: "0.04em", display: "block", marginBottom: 7 }}>Full name</label>
                 <input
                   name="fullname" type="text" placeholder="Your name" className="field"
                   value={fields.name}
@@ -309,7 +309,7 @@ export default function Page() {
                 {errors.name && <p style={{ fontSize: 12, color: "#F28B82", marginTop: 6 }}>{errors.name}</p>}
               </div>
               <div>
-                <label style={{ fontSize: 12, fontWeight: 600, color: errors.email ? "#F28B82" : "var(--text-dim)", letterSpacing: "0.04em", display: "block", marginBottom: 7 }}>Email address</label>
+                <label style={{ fontSize: 12, fontWeight: 600, color: errors.email ? "#F28B82" : "#9898b0", letterSpacing: "0.04em", display: "block", marginBottom: 7 }}>Email address</label>
                 <input
                   type="email" placeholder="you@email.com" className="field"
                   inputMode="email" name="useremail"
@@ -320,7 +320,7 @@ export default function Page() {
                 {errors.email && <p style={{ fontSize: 12, color: "#F28B82", marginTop: 6 }}>{errors.email}</p>}
               </div>
               <div>
-                <label style={{ fontSize: 12, fontWeight: 600, color: errors.city ? "#F28B82" : "var(--text-dim)", letterSpacing: "0.04em", display: "block", marginBottom: 7 }}>Your city</label>
+                <label style={{ fontSize: 12, fontWeight: 600, color: errors.city ? "#F28B82" : "#9898b0", letterSpacing: "0.04em", display: "block", marginBottom: 7 }}>Your city</label>
                 <input
                   type="text" placeholder="City" className="field"
                   name="usercity"
@@ -361,19 +361,19 @@ export default function Page() {
         <div style={{ position: "absolute", top: -200, left: "50%", transform: "translateX(-50%)", width: 1000, height: 700, background: "radial-gradient(ellipse at center, rgba(155,109,255,0.14), transparent 60%)", pointerEvents: "none" }} />
         <div style={{ position: "absolute", bottom: -80, right: "0%", width: 600, height: 500, background: "radial-gradient(ellipse at center, rgba(242,139,130,0.05), transparent 60%)", pointerEvents: "none" }} />
 
-        <div style={{ position: "relative", maxWidth: 960, margin: "0 auto", padding: "104px 24px 96px", textAlign: "center" }}>
-          <div className="hero-eyebrow" style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(155,109,255,0.07)", border: "1px solid rgba(155,109,255,0.16)", borderRadius: 100, padding: "7px 18px", marginBottom: 52 }}>
+        <div style={{ position: "relative", maxWidth: 960, margin: "0 auto", padding: "72px 24px 64px", textAlign: "center" }}>
+          <div className="hero-eyebrow" style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(155,109,255,0.07)", border: "1px solid rgba(155,109,255,0.16)", borderRadius: 100, padding: "7px 18px", marginBottom: 36 }}>
             <span className="dot" />
             <span style={{ fontSize: 13, color: "var(--text-dim)", letterSpacing: "0.01em" }}>
               <span style={{ color: "var(--text)", fontWeight: 600 }}>Earner early access</span>
             </span>
           </div>
 
-          <h1 className="hero-h1" style={{ fontSize: "clamp(58px, 13vw, 140px)", fontWeight: 900, lineHeight: 0.9, letterSpacing: "-0.055em", marginBottom: 36 }}>
+          <h1 className="hero-h1" style={{ fontSize: "clamp(52px, 10vw, 118px)", fontWeight: 900, lineHeight: 0.9, letterSpacing: "-0.055em", marginBottom: 28 }}>
             Sell anything.<br /><span className="g">Keep everything.</span>
           </h1>
 
-          <p className="hero-sub" style={{ fontSize: "clamp(17px, 2vw, 21px)", color: "var(--text-body)", lineHeight: 1.7, maxWidth: 520, margin: "0 auto 56px" }}>
+          <p className="hero-sub" style={{ fontSize: "clamp(17px, 2vw, 21px)", color: "var(--text-body)", lineHeight: 1.7, maxWidth: 520, margin: "0 auto 40px" }}>
             Something new is coming. Sign up to earn — before anyone else.
           </p>
 
@@ -433,17 +433,19 @@ export default function Page() {
             </p>
             {/* Countdown */}
             {(cd.d > 0 || cd.h > 0 || cd.m > 0) && (
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginBottom: 28 }}>
-                {[{ v: cd.d, l: "days" }, { v: cd.h, l: "hrs" }, { v: cd.m, l: "min" }].map(({ v, l }, i) => (
-                  <div key={l} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "rgba(155,109,255,0.07)", border: "1px solid rgba(155,109,255,0.14)", borderRadius: 10, padding: "8px 14px", minWidth: 52 }}>
-                      <span style={{ fontSize: 22, fontWeight: 900, letterSpacing: "-0.03em", color: "var(--text)" }}>{String(v).padStart(2, "0")}</span>
-                      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", color: "var(--text-faint)", textTransform: "uppercase", marginTop: 2 }}>{l}</span>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 28 }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                  {[{ v: cd.d, l: "days" }, { v: cd.h, l: "hrs" }, { v: cd.m, l: "min" }].map(({ v, l }, i) => (
+                    <div key={l} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "rgba(155,109,255,0.09)", border: "1px solid rgba(155,109,255,0.22)", borderRadius: 10, padding: "10px 18px", minWidth: 58 }}>
+                        <span style={{ fontSize: 24, fontWeight: 900, letterSpacing: "-0.03em", color: "var(--text)" }}>{String(v).padStart(2, "0")}</span>
+                        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", color: "var(--text-dim)", textTransform: "uppercase", marginTop: 3 }}>{l}</span>
+                      </div>
+                      {i < 2 && <span style={{ fontSize: 22, fontWeight: 900, color: "var(--text-dim)", lineHeight: 1, paddingBottom: 14 }}>:</span>}
                     </div>
-                    {i < 2 && <span style={{ fontSize: 18, fontWeight: 900, color: "var(--text-faint)", marginBottom: 16 }}>:</span>}
-                  </div>
-                ))}
-                <span style={{ fontSize: 12, color: "var(--text-faint)", marginLeft: 10 }}>left to join</span>
+                  ))}
+                </div>
+                <span style={{ fontSize: 12, fontWeight: 600, color: "var(--text-dim)", letterSpacing: "0.04em" }}>left to claim your spot</span>
               </div>
             )}
             <button className="btn-primary" onClick={() => setView("form")} style={{ fontSize: 16, padding: "18px 48px", borderRadius: 14 }}>
