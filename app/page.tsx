@@ -134,6 +134,8 @@ export default function Page() {
   const [loading, setLoading] = useState(false);
   const [position, setPosition] = useState(0);
   const [copied, setCopied] = useState(false);
+  const [myRefCode, setMyRefCode] = useState<string | null>(null);
+  const [refCode, setRefCode] = useState<string | null>(null);
   const [fields, setFields] = useState({ name: "", email: "", city: "" });
   const [errors, setErrors] = useState({ name: "", email: "", city: "" });
   const spots = useSpots();
@@ -141,6 +143,11 @@ export default function Page() {
   const taken = TOTAL - spots;
   useReveal();
   useCursorGlow();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setRefCode(params.get("ref"));
+  }, []);
 
   const validate = () => {
     const e = { name: "", email: "", city: "" };
@@ -161,10 +168,11 @@ export default function Page() {
       const res = await fetch("/api/provider", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(fields),
+        body: JSON.stringify({ ...fields, referredBy: refCode }),
       });
       const data = await res.json();
       setPosition(data.position ?? taken + 1);
+      setMyRefCode(data.referralCode ?? null);
       setView("done");
     } finally {
       setLoading(false);
@@ -206,34 +214,61 @@ export default function Page() {
       {/* Bottom share section — pinned to bottom like Robinhood */}
       <div style={{ padding: "40px 24px 48px", maxWidth: 560, width: "100%", margin: "0 auto", position: "relative" }}>
         <div style={{ height: 1, background: "var(--border)", marginBottom: 32 }} />
+
+        {/* Referral callout */}
+        {myRefCode && (
+          <div style={{ background: "rgba(155,109,255,0.08)", border: "1px solid rgba(155,109,255,0.22)", borderRadius: 16, padding: "18px 20px", marginBottom: 28, textAlign: "center" }}>
+            <p style={{ fontSize: 13, fontWeight: 700, color: "#b090ff", marginBottom: 4, letterSpacing: "0.04em" }}>
+              YOUR REFERRAL LINK
+            </p>
+            <p style={{ fontSize: 13, color: "#8888aa", marginBottom: 2 }}>
+              Each friend who signs up moves you <span style={{ color: "var(--text)", fontWeight: 700 }}>5 spots higher</span>.
+            </p>
+            <p style={{ fontSize: 12, color: "#666688", fontFamily: "monospace", marginTop: 8 }}>
+              getrentout.me?ref={myRefCode}
+            </p>
+          </div>
+        )}
+
         <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", color: "var(--text-faint)", textTransform: "uppercase", marginBottom: 20, textAlign: "center" }}>
           Spread the word
         </p>
         {/* Share grid — real brand logos */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 10 }}>
-          {[
-            { label: "WhatsApp", bg: "#25D366", href: "https://wa.me/?text=Just got early access to RentOut — something big is coming. Get yours: https://getrentout.me", icon: Icons.whatsapp },
-            { label: "Instagram", bg: "linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)", href: "https://www.instagram.com/", icon: Icons.instagram },
-            { label: "Facebook", bg: "#1877F2", href: "https://www.facebook.com/sharer/sharer.php?u=https://getrentout.me", icon: Icons.facebook },
-            { label: "X", bg: "#000", border: "1px solid #2a2a2a", href: "https://twitter.com/intent/tweet?text=Just got early access to RentOut — something big is coming: https://getrentout.me", icon: Icons.twitter },
-            { label: "Telegram", bg: "#229ED9", href: "https://t.me/share/url?url=https://getrentout.me&text=Just got early access to RentOut — something big is coming", icon: Icons.telegram },
-            { label: "TikTok", bg: "#010101", border: "1px solid #333", href: "https://www.tiktok.com/", icon: Icons.tiktok },
-            { label: "Reddit", bg: "#FF4500", href: "https://www.reddit.com/submit?url=https://getrentout.me&title=Just got early access to RentOut — something big is coming", icon: Icons.reddit },
-            { label: "LinkedIn", bg: "#0A66C2", href: "https://www.linkedin.com/sharing/share-offsite/?url=https://getrentout.me", icon: Icons.linkedin },
-          ].map(({ label, bg, border, href, icon }) => (
-            <a key={label} href={href} target="_blank" rel="noopener"
-              style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, background: bg, border: border || "none", borderRadius: 16, padding: "18px 8px", textDecoration: "none", transition: "opacity .15s" }}
-              onMouseEnter={e => (e.currentTarget.style.opacity = "0.8")}
-              onMouseLeave={e => (e.currentTarget.style.opacity = "1")}>
-              {icon}
-              <span style={{ fontSize: 11, fontWeight: 700, color: "#fff", letterSpacing: "0.04em" }}>{label}</span>
-            </a>
-          ))}
-        </div>
-        <button onClick={() => { navigator.clipboard.writeText("https://getrentout.me"); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
-          style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, background: copied ? "rgba(155,109,255,0.1)" : "var(--surface)", border: `1px solid ${copied ? "rgba(155,109,255,0.3)" : "var(--border)"}`, borderRadius: 14, padding: "16px", fontSize: 15, fontWeight: 700, color: copied ? "var(--accent)" : "var(--text-dim)", cursor: "pointer", width: "100%", transition: "all .2s" }}>
-          {Icons.copy} {copied ? "Link copied!" : "Copy link — getrentout.me"}
-        </button>
+        {(() => {
+          const shareUrl = myRefCode ? `https://getrentout.me?ref=${myRefCode}` : "https://getrentout.me";
+          const shareText = "Just got early access to RentOut — something big is coming. Get yours:";
+          return (
+            <>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 10 }}>
+                {[
+                  { label: "WhatsApp", bg: "#25D366", href: `https://wa.me/?text=${encodeURIComponent(`${shareText} ${shareUrl}`)}`, icon: Icons.whatsapp },
+                  { label: "Instagram", bg: "linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)", href: "https://www.instagram.com/", icon: Icons.instagram },
+                  { label: "Facebook", bg: "#1877F2", href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, icon: Icons.facebook },
+                  { label: "X", bg: "#000", border: "1px solid #2a2a2a", href: `https://twitter.com/intent/tweet?text=${encodeURIComponent(`${shareText} ${shareUrl}`)}`, icon: Icons.twitter },
+                  { label: "Telegram", bg: "#229ED9", href: `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`, icon: Icons.telegram },
+                  { label: "TikTok", bg: "#010101", border: "1px solid #333", href: "https://www.tiktok.com/", icon: Icons.tiktok },
+                  { label: "Reddit", bg: "#FF4500", href: `https://www.reddit.com/submit?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(shareText)}`, icon: Icons.reddit },
+                  { label: "LinkedIn", bg: "#0A66C2", href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`, icon: Icons.linkedin },
+                ].map(({ label, bg, border, href, icon }) => (
+                  <a key={label} href={href} target="_blank" rel="noopener"
+                    style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, background: bg, border: border || "none", borderRadius: 16, padding: "18px 8px", textDecoration: "none", transition: "opacity .15s" }}
+                    onMouseEnter={e => (e.currentTarget.style.opacity = "0.8")}
+                    onMouseLeave={e => (e.currentTarget.style.opacity = "1")}>
+                    {icon}
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "#fff", letterSpacing: "0.04em" }}>{label}</span>
+                  </a>
+                ))}
+              </div>
+              <button onClick={() => {
+                navigator.clipboard.writeText(myRefCode ? `https://getrentout.me?ref=${myRefCode}` : "https://getrentout.me");
+                setCopied(true); setTimeout(() => setCopied(false), 2000);
+              }}
+                style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, background: copied ? "rgba(155,109,255,0.1)" : "var(--surface)", border: `1px solid ${copied ? "rgba(155,109,255,0.3)" : "var(--border)"}`, borderRadius: 14, padding: "16px", fontSize: 15, fontWeight: 700, color: copied ? "var(--accent)" : "var(--text-dim)", cursor: "pointer", width: "100%", transition: "all .2s" }}>
+                {Icons.copy} {copied ? "Link copied!" : myRefCode ? `Copy your referral link` : "Copy link — getrentout.me"}
+              </button>
+            </>
+          );
+        })()}
 
       </div>
     </div>
