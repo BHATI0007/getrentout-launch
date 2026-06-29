@@ -219,16 +219,15 @@ export default function Page() {
               Your service.<br />Your price.<br /><span className="g">Zero cut. Forever.</span>
             </h2>
             <p style={{ fontSize: 16, color: "var(--text-body)", lineHeight: 1.75, marginBottom: 40 }}>
-              The first 100,000 providers on RentOut keep every dollar they earn — for life. Offer closes in {cd.d} days.
+              The first 100,000 providers keep 100% of everything they earn — for life. After that, this offer is gone forever.
             </p>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 40 }}>
               {[
-                "Keep 100% of every booking — forever",
-                "Set your own price and availability",
-                "No fixed categories — offer anything",
-                "Verified customers, escrow payments",
-                "Beta app access before public launch",
+                "100% of every booking — forever",
+                "Early access before public launch",
+                "Founding provider badge, locked in",
+                "First in line when we go live",
               ].map(text => (
                 <div key={text} style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   <span style={{ width: 22, height: 22, borderRadius: 6, background: "rgba(155,109,255,0.12)", border: "1px solid rgba(155,109,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "var(--accent)", fontWeight: 800, flexShrink: 0 }}>✓</span>
@@ -320,7 +319,7 @@ export default function Page() {
           </h1>
 
           <p className="hero-sub" style={{ fontSize: "clamp(17px, 2vw, 21px)", color: "var(--text-body)", lineHeight: 1.7, maxWidth: 520, margin: "0 auto 56px" }}>
-            The first marketplace where anyone can offer any service — gaming, photography, tutoring, fitness, anything — and keep 100% of every booking. Forever.
+            Something new is coming. The first 100,000 providers get in free — and keep 100% of everything they earn. Forever.
           </p>
 
           <div className="hero-cta" style={{ display: "flex", justifyContent: "center", marginBottom: 40 }}>
@@ -335,33 +334,11 @@ export default function Page() {
         </div>
       </div>
 
-      {/* MARQUEE */}
-      <div style={{ overflow: "hidden", padding: "16px 0", maskImage: "linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent)", WebkitMaskImage: "linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent)" }}>
-        <div style={{ display: "flex", gap: 14, width: "max-content", animation: "marquee 55s linear infinite" }}>
-          {[...SERVICES, ...SERVICES].map((s, i) => (
-            <div key={i} className="card" style={{ width: 268, padding: "20px 22px", flexShrink: 0 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: 13 }}>
-                <div style={{ width: 40, height: 40, borderRadius: 11, background: `${s.c}18`, border: `1px solid ${s.c}30`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, fontWeight: 800, color: s.c, flexShrink: 0 }}>{s.who[0]}</div>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>{s.who}</div>
-                  <div style={{ fontSize: 12, color: "var(--text-faint)", marginTop: 1 }}>{s.tag}</div>
-                </div>
-              </div>
-              <div style={{ fontSize: 13, color: "var(--text-body)", marginBottom: 14, lineHeight: 1.4 }}>{s.what}</div>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <span style={{ fontSize: 14, fontWeight: 700, color: "var(--text)" }}>{s.price}</span>
-                <span style={{ fontSize: 12, color: s.c, fontWeight: 600 }}>Book →</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* STATS */}
       <div style={{ maxWidth: 880, margin: "0 auto", padding: "80px 24px 20px" }}>
         <div className="stats reveal">
           {[
-            { l: "Founding spots available", v: 100000, s: "" },
+            { l: "Founding spots", v: 100000, s: "" },
             { l: "Countries at launch", v: 160, s: "+" },
             { l: "Commission for founders", v: -1, s: "" },
           ].map(({ l, v, s }) => (
@@ -374,85 +351,6 @@ export default function Page() {
       </div>
 
       <hr className="hr" style={{ marginTop: 80 }} />
-
-      {/* HOW IT WORKS */}
-      <div style={{ maxWidth: 960, margin: "0 auto", padding: "100px 24px" }}>
-        <div className="reveal" style={{ textAlign: "center", marginBottom: 60 }}>
-          <p className="section-label">01 — How it works</p>
-          <h2 style={{ fontSize: "clamp(30px, 4.5vw, 52px)", fontWeight: 900, letterSpacing: "-0.04em" }}>Earn in three steps</h2>
-        </div>
-        <div className="bento">
-          <div className="card bento-wide reveal d1" style={{ padding: "40px 36px" }}>
-            <div className="step-badge-purple">Step 01</div>
-            <h3 style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-0.03em", marginBottom: 10 }}>List any service</h3>
-            <p style={{ fontSize: 15, color: "var(--text-body)", lineHeight: 1.75 }}>Gaming, photography, tutoring, cooking, fitness — whatever you&apos;re good at. No fixed categories. Live in minutes.</p>
-          </div>
-          <div className="card bento-tall reveal d2" style={{ padding: "40px 36px" }}>
-            <div className="step-badge-purple">Step 02</div>
-            <h3 style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-0.03em", marginBottom: 10 }}>Set your terms</h3>
-            <p style={{ fontSize: 15, color: "var(--text-body)", lineHeight: 1.75, marginBottom: 24 }}>Your price. Your hours. Your rules.</p>
-            <div>
-              {["Any price you set", "Any hours you choose", "Anywhere you are", "Your rules, always"].map((t, i) => (
-                <div key={t} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 0", borderTop: i ? "1px solid var(--border)" : "none" }}>
-                  <span style={{ color: "var(--accent)", fontSize: 12, fontWeight: 800, width: 18, flexShrink: 0 }}>✓</span>
-                  <span style={{ fontSize: 14, color: "var(--text-dim)" }}>{t}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="card reveal d1" style={{ padding: "40px 36px" }}>
-            <div className="step-badge-coral">Step 03</div>
-            <h3 style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-0.03em", marginBottom: 10 }}>Get paid</h3>
-            <p style={{ fontSize: 15, color: "var(--text-body)", lineHeight: 1.75 }}>Customer books. You show up. Money hits your account via Razorpay.</p>
-          </div>
-          <div className="card reveal d2" style={{ padding: "36px 32px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", color: "var(--text-faint)", textTransform: "uppercase", marginBottom: 20 }}>You keep</p>
-            <div>
-              <div style={{ fontSize: "clamp(56px, 8vw, 80px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1, marginBottom: 6 }} className="g">100%</div>
-              <p style={{ fontSize: 14, color: "var(--text-dim)" }}>of every booking, for life</p>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 20, paddingTop: 20, borderTop: "1px solid var(--border)" }}>
-              <span className="dot" style={{ background: "var(--accent)" }} />
-              <span style={{ fontSize: 13, color: "var(--text-faint)" }}><Ticker value={taken} /> founders joined</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <hr className="hr" />
-
-      {/* TESTIMONIALS */}
-      <div style={{ maxWidth: 960, margin: "0 auto", padding: "100px 24px" }}>
-        <div className="reveal" style={{ textAlign: "center", marginBottom: 60 }}>
-          <p className="section-label">02 — Early providers</p>
-          <h2 style={{ fontSize: "clamp(30px, 4.5vw, 52px)", fontWeight: 900, letterSpacing: "-0.04em" }}>Already earning</h2>
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 12 }}>
-          {TESTIMONIALS.map((t, i) => (
-            <div key={i} className={`card reveal${i > 0 ? ` d${i}` : ""}`} style={{ padding: "32px 28px" }}>
-              <p style={{ fontSize: 15, color: "var(--text-body)", lineHeight: 1.75, marginBottom: 24, fontStyle: "italic" }}>&ldquo;{t.quote}&rdquo;</p>
-              <div style={{ borderTop: "1px solid var(--border)", paddingTop: 18 }}>
-                <p style={{ fontSize: 14, fontWeight: 700, color: "var(--text)", marginBottom: 2 }}>{t.name}</p>
-                <p style={{ fontSize: 12, color: "var(--text-faint)" }}>{t.role}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <hr className="hr" />
-
-      {/* TRUST */}
-      <div style={{ maxWidth: 880, margin: "0 auto", padding: "56px 24px" }}>
-        <p className="reveal" style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", color: "var(--text-faint)", textTransform: "uppercase", textAlign: "center", marginBottom: 28 }}>Built on trusted infrastructure</p>
-        <div className="trust-row reveal d1">
-          {["Razorpay", "Payoneer", "Firebase", "256-bit SSL", "GDPR ready"].map(t => (
-            <span key={t} className="trust-item">{t}</span>
-          ))}
-        </div>
-      </div>
-
-      <hr className="hr" />
 
       {/* BOTTOM CTA */}
       <div style={{ maxWidth: 820, margin: "0 auto", padding: "100px 24px 120px" }}>
