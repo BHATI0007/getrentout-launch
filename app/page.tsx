@@ -559,11 +559,6 @@ export default function Page() {
       <div style={{ padding: "28px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16 }}>
         <Logo />
         <div style={{ display: "flex", gap: 24, alignItems: "center", flexWrap: "wrap" }}>
-          {["Privacy", "Terms"].map(t => (
-            <a key={t} href={`/${t.toLowerCase()}`} style={{ fontSize: 13, color: "var(--text-faint)", textDecoration: "none", transition: "color .2s" }}
-              onMouseEnter={e => (e.currentTarget.style.color = "var(--text-dim)")}
-              onMouseLeave={e => (e.currentTarget.style.color = "var(--text-faint)")}>{t}</a>
-          ))}
           <a href="mailto:hello@getrentout.me" style={{ fontSize: 13, color: "var(--text-faint)", textDecoration: "none", transition: "color .2s" }}
             onMouseEnter={e => (e.currentTarget.style.color = "var(--text-dim)")}
             onMouseLeave={e => (e.currentTarget.style.color = "var(--text-faint)")}>hello@getrentout.me</a>
