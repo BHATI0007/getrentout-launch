@@ -138,6 +138,10 @@ export default function Page() {
   const [refCode, setRefCode] = useState<string | null>(null);
   const [fields, setFields] = useState({ name: "", email: "", city: "" });
   const [errors, setErrors] = useState({ name: "", email: "", city: "" });
+  const [showRankModal, setShowRankModal] = useState(false);
+  const [rankEmail, setRankEmail] = useState("");
+  const [rankLoading, setRankLoading] = useState(false);
+  const [rankError, setRankError] = useState("");
   const spots = useSpots();
   const cd = useCountdown();
   const taken = TOTAL - spots;
@@ -148,6 +152,27 @@ export default function Page() {
     const params = new URLSearchParams(window.location.search);
     setRefCode(params.get("ref"));
   }, []);
+
+  const lookupRank = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!rankEmail.trim()) return;
+    setRankLoading(true);
+    setRankError("");
+    try {
+      const res = await fetch("/api/status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: rankEmail.trim() }),
+      });
+      const data = await res.json();
+      if (data.error) { setRankError("We couldn't find that email. Did you sign up?"); return; }
+      window.open(`/r/${data.referralCode}`, "_blank");
+      setShowRankModal(false);
+      setRankEmail("");
+    } finally {
+      setRankLoading(false);
+    }
+  };
 
   const validate = () => {
     const e = { name: "", email: "", city: "" };
@@ -411,11 +436,40 @@ export default function Page() {
             onMouseLeave={e => { e.currentTarget.style.color = "#8888aa"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; }}>
             🏆 Leaderboard
           </a>
+          <button onClick={() => { setShowRankModal(true); setRankError(""); setRankEmail(""); }}
+            style={{ fontSize: 13, fontWeight: 700, color: "#8888aa", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 100, padding: "7px 14px", cursor: "pointer", transition: "all .2s" }}
+            onMouseEnter={e => { e.currentTarget.style.color = "#b090ff"; e.currentTarget.style.borderColor = "rgba(155,109,255,0.3)"; }}
+            onMouseLeave={e => { e.currentTarget.style.color = "#8888aa"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; }}>
+            Check my rank
+          </button>
           <button className="btn-primary" onClick={() => setView("form")} style={{ padding: "9px 20px", fontSize: 14, borderRadius: 100 }}>
             Start earning early
           </button>
         </div>
       </nav>
+
+      {/* Rank lookup modal */}
+      {showRankModal && (
+        <div onClick={() => setShowRankModal(false)} style={{ position: "fixed", inset: 0, zIndex: 999, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: "#111118", border: "1px solid rgba(155,109,255,0.25)", borderRadius: 24, padding: "40px 32px", width: "100%", maxWidth: 400, position: "relative" }}>
+            <button onClick={() => setShowRankModal(false)} style={{ position: "absolute", top: 16, right: 16, background: "none", border: "none", color: "#666688", fontSize: 20, cursor: "pointer", lineHeight: 1 }}>×</button>
+            <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.16em", color: "#9B6DFF", textTransform: "uppercase", marginBottom: 12 }}>Already signed up?</p>
+            <h3 style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-0.03em", marginBottom: 8, color: "#f0f0fa" }}>Check your rank</h3>
+            <p style={{ fontSize: 14, color: "#8888aa", marginBottom: 24, lineHeight: 1.6 }}>Enter the email you signed up with to see your current position.</p>
+            <form onSubmit={lookupRank} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <input
+                type="email" placeholder="you@email.com" value={rankEmail}
+                onChange={e => { setRankEmail(e.target.value); setRankError(""); }}
+                className="field" style={{ borderColor: rankError ? "#F28B82" : undefined }}
+              />
+              {rankError && <p style={{ fontSize: 12, color: "#F28B82", marginTop: -4 }}>{rankError}</p>}
+              <button type="submit" disabled={rankLoading} className="btn-primary" style={{ width: "100%", fontSize: 15, padding: "15px", borderRadius: 12 }}>
+                {rankLoading ? "Looking up…" : "See my rank →"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* HERO */}
       <div style={{ position: "relative", overflow: "hidden" }}>
