@@ -103,7 +103,7 @@ function ShaderBackground() {
     window.addEventListener("resize",onResize);
     return ()=>{ cancelAnimationFrame(raf); window.removeEventListener("mousemove",onMove); window.removeEventListener("resize",onResize); };
   },[]);
-  return <canvas ref={ref} style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:0,opacity:0.65}}/>;
+  return <canvas ref={ref} style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:0,opacity:0.35}}/>;
 }
 
 /* ── Live activity toasts ── */
@@ -244,7 +244,7 @@ function ParticleField() {
     window.addEventListener("resize", onResize);
     return () => { cancelAnimationFrame(raf); window.removeEventListener("mousemove", onMove); window.removeEventListener("resize", onResize); };
   }, []);
-  return <canvas ref={canvasRef} style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0, opacity: 0.55 }} />;
+  return <canvas ref={canvasRef} style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0, opacity: 0.3 }} />;
 }
 
 /* ── Done screen count-up ── */
