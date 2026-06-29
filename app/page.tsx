@@ -99,11 +99,6 @@ const SERVICES = [
   { who: "Meera", what: "Study partner", price: "$5/hr", tag: "Tutoring", c: "#38bdf8" },
 ];
 
-const TESTIMONIALS = [
-  { quote: "Made $400 in my first two weeks just playing FIFA with people. Zero commission means I actually keep it all.", name: "Arjun S.", role: "Gaming partner, London" },
-  { quote: "Finally a platform that doesn't take 30% of everything. Set my own rates, work when I want.", name: "Priya M.", role: "Photographer, New York" },
-  { quote: "Listed my guitar lessons and got 3 bookings the same week. The setup took 5 minutes.", name: "Dev K.", role: "Music teacher, Toronto" },
-];
 
 const Logo = () => (
   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -227,7 +222,7 @@ export default function Page() {
                 "Early access before anyone else",
                 "First in line on launch day",
                 "Exclusive early member benefits",
-                "Direct line to the founding team",
+                "Direct line to the team",
               ].map(text => (
                 <div key={text} style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   <span style={{ width: 22, height: 22, borderRadius: 6, background: "rgba(155,109,255,0.12)", border: "1px solid rgba(155,109,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "var(--accent)", fontWeight: 800, flexShrink: 0 }}>✓</span>

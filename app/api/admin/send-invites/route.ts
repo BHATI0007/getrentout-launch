@@ -61,42 +61,41 @@ export async function POST(req: NextRequest) {
                 </div>
 
                 <h1 style="font-size:32px;font-weight:800;line-height:1.15;margin-bottom:12px;letter-spacing:-0.5px;">
-                  Hey ${p.name}, the app is ready. 🎉
+                  Hey ${p.name}, it's ready.
                 </h1>
                 <p style="color:#888;font-size:15px;line-height:1.7;margin-bottom:32px;">
-                  You signed up as a founding provider on RentOut. We've been building hard —
-                  and now it's time to put it in your hands first.
+                  You signed up early on RentOut. We've been building — and now it's time to put it in your hands first.
                 </p>
 
                 <div style="background:#0d0d0d;border:1px solid rgba(155,109,255,0.25);border-radius:16px;padding:28px;margin-bottom:28px;">
                   <p style="color:#9B6DFF;font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;">
-                    Your beta access
+                    Your early access
                   </p>
                   <p style="font-size:16px;color:#ccc;line-height:1.7;margin-bottom:20px;">
-                    Tap the button below to join the internal testing group and download the app on your Android device.
+                    Tap below to download the app on your Android device. You're getting in before anyone else.
                   </p>
                   <a href="${testingLink}"
                     style="display:block;background:linear-gradient(110deg,#9B6DFF,#b57dff);color:#fff;text-decoration:none;
                            text-align:center;padding:15px 24px;border-radius:12px;font-weight:700;font-size:15px;letter-spacing:-0.2px;">
-                    Download RentOut Beta →
+                    Download RentOut →
                   </a>
                 </div>
 
                 <div style="background:#0a0a0a;border:1px solid #1e1e1e;border-radius:12px;padding:20px;margin-bottom:28px;">
-                  <p style="color:#aaa;font-size:13px;font-weight:600;margin-bottom:12px;">As a founding provider you get:</p>
+                  <p style="color:#aaa;font-size:13px;font-weight:600;margin-bottom:12px;">As an early member you get:</p>
                   <ul style="color:#666;font-size:13px;line-height:2;padding-left:18px;margin:0;">
-                    <li>Zero commission on every booking — <strong style="color:#9B6DFF;">forever</strong></li>
-                    <li>Permanent Founding Provider badge on your profile</li>
-                    <li>First in search results on launch day</li>
-                    <li>Direct line to the founder (reply to this email)</li>
+                    <li>Access before the public launch</li>
+                    <li>Early member badge on your profile</li>
+                    <li>First in line when we go live</li>
+                    <li>Direct line to the team (reply to this email)</li>
                   </ul>
                 </div>
 
                 <p style="color:#555;font-size:14px;line-height:1.7;margin-bottom:8px;">
-                  Your category: <strong style="color:#aaa;">${p.category}</strong> · ${p.city}
+                  Signed up from ${p.city}
                 </p>
                 <p style="color:#555;font-size:13px;line-height:1.6;">
-                  Reply to this email if you hit any issues or have feedback. I read everything.
+                  Reply to this email anytime. I read everything.
                 </p>
                 <p style="color:#555;font-size:13px;margin-top:8px;">— Vineet, founder</p>
 
