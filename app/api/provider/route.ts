@@ -40,7 +40,9 @@ export async function POST(req: NextRequest) {
       created_at: new Date().toISOString(),
     });
 
-    // Notify admin only
+    // Notify admin only for first 100 signups — after that check Supabase directly
+    if (position > 100) return NextResponse.json({ success: true, position });
+
     await resend.emails.send({
       from: "RentOut <noreply@getrentout.me>",
       to: "vineet.bhati.ug24@nsut.ac.in",
