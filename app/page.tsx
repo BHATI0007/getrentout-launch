@@ -77,12 +77,12 @@ function Ticker({ value }: { value: number }) {
 }
 
 const SERVICES = [
-  { who: "Alex", what: "FIFA gaming partner", price: "$15/hr", tag: "Gaming", c: "#a855f7" },
-  { who: "Maya", what: "Portrait photographer", price: "$45/hr", tag: "Photography", c: "#ec4899" },
+  { who: "Alex", what: "FIFA gaming partner", price: "$15/hr", tag: "Gaming", c: "#9B6DFF" },
+  { who: "Maya", what: "Portrait photographer", price: "$45/hr", tag: "Photography", c: "#F28B82" },
   { who: "Sam", what: "Spanish conversation", price: "$20/hr", tag: "Language", c: "#38bdf8" },
-  { who: "Priya", what: "Watch-party companion", price: "$25/hr", tag: "Social", c: "#a855f7" },
+  { who: "Priya", what: "Watch-party companion", price: "$25/hr", tag: "Social", c: "#9B6DFF" },
   { who: "Leo", what: "City photo walk", price: "$30/hr", tag: "Travel", c: "#fb923c" },
-  { who: "Nina", what: "Home-cooked dinner", price: "$40/session", tag: "Food", c: "#ec4899" },
+  { who: "Nina", what: "Home-cooked dinner", price: "$40/session", tag: "Food", c: "#F28B82" },
 ];
 
 type V = "home" | "provider" | "customer" | "done-p" | "done-c";
@@ -145,7 +145,7 @@ export default function Page() {
       <div style={{ maxWidth: 400, width: "100%", textAlign: "center" }}>
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 40 }}><Logo /></div>
         <div className="card" style={{ padding: "40px 28px", marginBottom: 10, borderRadius: 20 }}>
-          <div style={{ width: 60, height: 60, borderRadius: 16, overflow: "hidden", margin: "0 auto 20px", boxShadow: "0 0 36px rgba(168,85,247,0.4)" }}>
+          <div style={{ width: 60, height: 60, borderRadius: 16, overflow: "hidden", margin: "0 auto 20px", boxShadow: "0 0 36px rgba(155,109,255,0.4)" }}>
             <Image src="/logo.png" alt="RentOut" width={60} height={60} />
           </div>
           <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", color: "var(--text-faint)", textTransform: "uppercase", marginBottom: 10 }}>Founding Provider</p>
@@ -206,7 +206,7 @@ export default function Page() {
           <button onClick={() => setView("home")} style={{ background: "none", border: "none", color: "var(--text-faint)", cursor: "pointer", fontSize: 14, padding: 0, marginBottom: 32, display: "flex", alignItems: "center", gap: 6 }}>← Back</button>
           <div style={{ marginBottom: 28 }}><Logo /></div>
           {isP && (
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(168,85,247,0.1)", border: "1px solid rgba(168,85,247,0.25)", borderRadius: 100, padding: "6px 14px", marginBottom: 20 }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(155,109,255,0.1)", border: "1px solid rgba(155,109,255,0.25)", borderRadius: 100, padding: "6px 14px", marginBottom: 20 }}>
               <span className="dot" style={{ background: "var(--accent)" }} />
               <span style={{ fontSize: 13, fontWeight: 600, color: "var(--accent)" }}>Founding offer closes in {cd.d}d {cd.h}h</span>
             </div>
@@ -243,29 +243,30 @@ export default function Page() {
 
       {/* HERO */}
       <div style={{ position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", top: -120, left: "50%", transform: "translateX(-50%)", width: 600, height: 400, background: "radial-gradient(ellipse at center, rgba(168,85,247,0.14), transparent 65%)", pointerEvents: "none" }} />
-        <div style={{ position: "relative", maxWidth: 760, margin: "0 auto", padding: "72px 20px 64px", textAlign: "center" }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 100, padding: "7px 16px", marginBottom: 30 }}>
+        <div style={{ position: "absolute", top: -160, left: "50%", transform: "translateX(-50%)", width: 800, height: 600, background: "radial-gradient(ellipse at center, rgba(155,109,255,0.18), transparent 65%)", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", bottom: -80, right: "10%", width: 400, height: 300, background: "radial-gradient(ellipse at center, rgba(242,139,130,0.07), transparent 65%)", pointerEvents: "none" }} />
+        <div style={{ position: "relative", maxWidth: 820, margin: "0 auto", padding: "80px 20px 72px", textAlign: "center" }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(155,109,255,0.1)", border: "1px solid rgba(155,109,255,0.22)", borderRadius: 100, padding: "7px 16px", marginBottom: 36 }}>
             <span className="dot" />
             <span style={{ fontSize: 13, color: "var(--text-dim)" }}>Founding offer closes in <span style={{ color: "var(--text)", fontWeight: 600 }}>{cd.d}d {cd.h}h</span></span>
           </div>
 
-          <div style={{ marginBottom: 28 }}>
-            <div style={{ width: 84, height: 84, borderRadius: 22, overflow: "hidden", margin: "0 auto", animation: "float 5s ease-in-out infinite", boxShadow: "0 0 0 1px var(--border), 0 24px 60px rgba(168,85,247,0.3)" }}>
-              <Image src="/logo.png" alt="RentOut" width={84} height={84} priority />
+          <div style={{ marginBottom: 32 }}>
+            <div style={{ width: 90, height: 90, borderRadius: 24, overflow: "hidden", margin: "0 auto", animation: "float 5s ease-in-out infinite", boxShadow: "0 0 0 1px rgba(155,109,255,0.2), 0 24px 60px rgba(155,109,255,0.35)" }}>
+              <Image src="/logo.png" alt="RentOut" width={90} height={90} priority />
             </div>
           </div>
 
-          <h1 style={{ fontSize: "clamp(44px, 8.5vw, 84px)", fontWeight: 900, lineHeight: 1.02, letterSpacing: "-0.04em", marginBottom: 20 }}>
+          <h1 style={{ fontSize: "clamp(52px, 10vw, 100px)", fontWeight: 900, lineHeight: 0.97, letterSpacing: "-0.045em", marginBottom: 24 }}>
             Hire anyone.<br /><span className="g">For anything.</span>
           </h1>
-          <p style={{ fontSize: "clamp(16px, 2vw, 18px)", color: "var(--text-body)", lineHeight: 1.7, maxWidth: 470, margin: "0 auto 36px" }}>
+          <p style={{ fontSize: "clamp(16px, 2vw, 19px)", color: "var(--text-body)", lineHeight: 1.75, maxWidth: 500, margin: "0 auto 40px" }}>
             The first marketplace where anyone can offer any service — on their own terms, at their own price.
           </p>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 10, alignItems: "center", marginBottom: 24 }}>
-            <button className="btn-primary" onClick={() => setView("provider")} style={{ width: "100%", maxWidth: 320, fontSize: 16, padding: "15px 32px" }}>Start earning — it&apos;s free</button>
-            <button className="btn-secondary" onClick={() => setView("customer")} style={{ width: "100%", maxWidth: 320, fontSize: 15, padding: "14px 32px" }}>I want to hire someone</button>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, alignItems: "center", marginBottom: 28 }}>
+            <button className="btn-primary" onClick={() => setView("provider")} style={{ width: "100%", maxWidth: 340, fontSize: 16, padding: "16px 32px", borderRadius: 14 }}>Start earning — it&apos;s free</button>
+            <button className="btn-secondary" onClick={() => setView("customer")} style={{ width: "100%", maxWidth: 340, fontSize: 15, padding: "15px 32px", borderRadius: 14 }}>I want to hire someone</button>
           </div>
           <p style={{ fontSize: 13, color: "var(--text-faint)" }}>Zero commission for the first 100,000 providers. Forever.</p>
         </div>
@@ -315,12 +316,12 @@ export default function Page() {
         </div>
         <div className="bento">
           <div className="card bento-wide reveal d1" style={{ padding: "30px 28px" }}>
-            <div style={{ display: "inline-flex", padding: "5px 11px", borderRadius: 8, background: "rgba(168,85,247,0.12)", border: "1px solid rgba(168,85,247,0.22)", fontSize: 12, fontWeight: 700, color: "var(--accent)", marginBottom: 16 }}>STEP 01</div>
+            <div style={{ display: "inline-flex", padding: "5px 11px", borderRadius: 8, background: "rgba(155,109,255,0.12)", border: "1px solid rgba(155,109,255,0.22)", fontSize: 12, fontWeight: 700, color: "var(--accent)", marginBottom: 16 }}>STEP 01</div>
             <h3 style={{ fontSize: 20, fontWeight: 800, letterSpacing: "-0.4px", marginBottom: 8 }}>List any service</h3>
             <p style={{ fontSize: 15, color: "var(--text-body)", lineHeight: 1.7 }}>Gaming, photography, tutoring, cooking, companionship — whatever you&apos;re good at. No fixed categories, no restrictions. Live in minutes.</p>
           </div>
           <div className="card bento-tall reveal d2" style={{ padding: "30px 28px" }}>
-            <div style={{ display: "inline-flex", padding: "5px 11px", borderRadius: 8, background: "rgba(168,85,247,0.12)", border: "1px solid rgba(168,85,247,0.22)", fontSize: 12, fontWeight: 700, color: "var(--accent)", marginBottom: 16 }}>STEP 02</div>
+            <div style={{ display: "inline-flex", padding: "5px 11px", borderRadius: 8, background: "rgba(155,109,255,0.12)", border: "1px solid rgba(155,109,255,0.22)", fontSize: 12, fontWeight: 700, color: "var(--accent)", marginBottom: 16 }}>STEP 02</div>
             <h3 style={{ fontSize: 20, fontWeight: 800, letterSpacing: "-0.4px", marginBottom: 8 }}>Set your terms</h3>
             <p style={{ fontSize: 15, color: "var(--text-body)", lineHeight: 1.7, marginBottom: 22 }}>Your price. Your hours. Your rules. No platform deciding for you.</p>
             <div>
@@ -368,9 +369,9 @@ export default function Page() {
       {/* BOTTOM CTA */}
       <div style={{ maxWidth: 760, margin: "0 auto", padding: "72px 20px 92px" }}>
         <div className="card reveal" style={{ borderRadius: 22, padding: "clamp(40px, 6vw, 64px) clamp(24px, 5vw, 52px)", textAlign: "center", position: "relative", overflow: "hidden" }}>
-          <div style={{ position: "absolute", top: -100, left: "50%", transform: "translateX(-50%)", width: 320, height: 320, borderRadius: "50%", background: "radial-gradient(circle, rgba(168,85,247,0.16), transparent 60%)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", top: -100, left: "50%", transform: "translateX(-50%)", width: 320, height: 320, borderRadius: "50%", background: "radial-gradient(circle, rgba(155,109,255,0.16), transparent 60%)", pointerEvents: "none" }} />
           <div style={{ position: "relative" }}>
-            <div style={{ width: 60, height: 60, borderRadius: 16, overflow: "hidden", margin: "0 auto 22px", boxShadow: "0 0 40px rgba(168,85,247,0.4)" }}>
+            <div style={{ width: 60, height: 60, borderRadius: 16, overflow: "hidden", margin: "0 auto 22px", boxShadow: "0 0 40px rgba(155,109,255,0.4)" }}>
               <Image src="/logo.png" alt="RentOut" width={60} height={60} />
             </div>
             <div style={{ display: "inline-flex", alignItems: "center", gap: 7, marginBottom: 16, fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", color: "var(--accent)", textTransform: "uppercase" }}>
