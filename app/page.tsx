@@ -16,7 +16,7 @@ const Icons = {
   telegram: <BrandLogo src="https://cdn.simpleicons.org/telegram/ffffff" alt="Telegram" />,
   reddit: <BrandLogo src="https://cdn.simpleicons.org/reddit/ffffff" alt="Reddit" />,
   linkedin: <BrandLogo src="https://cdn.simpleicons.org/linkedin/ffffff" alt="LinkedIn" />,
-  tiktok: <BrandLogo src="https://cdn.simpleicons.org/tiktok/010101" alt="TikTok" />,
+  tiktok: <BrandLogo src="https://cdn.simpleicons.org/tiktok/ffffff" alt="TikTok" />,
   email: <svg viewBox="0 0 24 24" width="24" height="24" fill="#fff"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>,
   copy: <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>,
 };
@@ -399,7 +399,22 @@ export default function Page() {
         </div>
       </div>
 
-      <hr className="hr" style={{ marginTop: 80 }} />
+      {/* Services marquee strip */}
+      <div style={{ overflow: "hidden", padding: "8px 0 64px", maskImage: "linear-gradient(to right, transparent, black 8%, black 92%, transparent)", WebkitMaskImage: "linear-gradient(to right, transparent, black 8%, black 92%, transparent)" }}>
+        <div className="marquee-track" style={{ display: "flex", gap: 12, width: "max-content" }}>
+          {[...SERVICES, ...SERVICES].map((s, i) => (
+            <div key={i} style={{ flexShrink: 0, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ width: 36, height: 36, borderRadius: 10, background: `${s.c}18`, border: `1px solid ${s.c}30`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, color: s.c, flexShrink: 0 }}>{s.who[0]}</div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", whiteSpace: "nowrap" }}>{s.what}</div>
+                <div style={{ fontSize: 12, color: "var(--text-dim)", marginTop: 2 }}>{s.price} · {s.tag}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <hr className="hr" />
 
       {/* BOTTOM CTA */}
       <div style={{ maxWidth: 820, margin: "0 auto", padding: "100px 24px 120px" }}>
@@ -416,6 +431,21 @@ export default function Page() {
             <p style={{ fontSize: 16, color: "var(--text-dim)", lineHeight: 1.7, maxWidth: 460, margin: "0 auto 40px" }}>
               We&apos;re building something new. Sign up now and be among the first to experience it.
             </p>
+            {/* Countdown */}
+            {(cd.d > 0 || cd.h > 0 || cd.m > 0) && (
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginBottom: 28 }}>
+                {[{ v: cd.d, l: "days" }, { v: cd.h, l: "hrs" }, { v: cd.m, l: "min" }].map(({ v, l }, i) => (
+                  <div key={l} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "rgba(155,109,255,0.07)", border: "1px solid rgba(155,109,255,0.14)", borderRadius: 10, padding: "8px 14px", minWidth: 52 }}>
+                      <span style={{ fontSize: 22, fontWeight: 900, letterSpacing: "-0.03em", color: "var(--text)" }}>{String(v).padStart(2, "0")}</span>
+                      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", color: "var(--text-faint)", textTransform: "uppercase", marginTop: 2 }}>{l}</span>
+                    </div>
+                    {i < 2 && <span style={{ fontSize: 18, fontWeight: 900, color: "var(--text-faint)", marginBottom: 16 }}>:</span>}
+                  </div>
+                ))}
+                <span style={{ fontSize: 12, color: "var(--text-faint)", marginLeft: 10 }}>left to join</span>
+              </div>
+            )}
             <button className="btn-primary" onClick={() => setView("form")} style={{ fontSize: 16, padding: "18px 48px", borderRadius: 14 }}>
               Start earning early
             </button>
