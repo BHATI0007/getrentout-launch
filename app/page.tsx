@@ -127,6 +127,7 @@ export default function Page() {
   const [view, setView] = useState<V>("home");
   const [loading, setLoading] = useState(false);
   const [position, setPosition] = useState(0);
+  const [copied, setCopied] = useState(false);
   const [fields, setFields] = useState({ name: "", email: "", city: "" });
   const [errors, setErrors] = useState({ name: "", email: "", city: "" });
   const spots = useSpots();
