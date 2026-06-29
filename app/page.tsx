@@ -198,7 +198,7 @@ export default function Page() {
         <p style={{ fontSize: "clamp(20px, 2.5vw, 28px)", fontWeight: 600, color: "var(--text)", marginBottom: 12, letterSpacing: "-0.02em" }}>
           You&apos;re one of the first.
         </p>
-        <p style={{ fontSize: 16, color: "var(--text-faint)", maxWidth: 360, textAlign: "center", lineHeight: 1.6 }}>
+        <p style={{ fontSize: 16, color: "#8888aa", maxWidth: 360, textAlign: "center", lineHeight: 1.6 }}>
           We&apos;ll email you when it&apos;s time.<br />Watch your inbox.
         </p>
       </div>
