@@ -187,8 +187,13 @@ export default function Page() {
       <div style={{ position: "absolute", bottom: "-10%", right: "-10%", width: 700, height: 600, background: "radial-gradient(ellipse, rgba(242,139,130,0.06), transparent 55%)", pointerEvents: "none" }} />
 
       {/* Top nav */}
-      <div style={{ padding: "24px 32px", display: "flex", justifyContent: "center", position: "relative" }}>
+      <div style={{ padding: "24px 32px", display: "flex", justifyContent: "center", alignItems: "center", position: "relative" }}>
         <Logo />
+        <a href="/leaderboard" target="_blank" rel="noopener" style={{ position: "absolute", right: 32, fontSize: 13, fontWeight: 700, color: "#8888aa", textDecoration: "none", display: "flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 100, padding: "7px 14px", transition: "all .2s" }}
+          onMouseEnter={e => { e.currentTarget.style.color = "#b090ff"; e.currentTarget.style.borderColor = "rgba(155,109,255,0.3)"; }}
+          onMouseLeave={e => { e.currentTarget.style.color = "#8888aa"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; }}>
+          🏆 Leaderboard
+        </a>
       </div>
 
       {/* Main content */}
@@ -211,11 +216,17 @@ export default function Page() {
         </p>
 
         {myRefCode && (
-          <a href={`/r/${myRefCode}`} target="_blank" rel="noopener"
-            style={{ marginTop: 20, display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 600, color: "#9B6DFF", textDecoration: "none", background: "rgba(155,109,255,0.08)", border: "1px solid rgba(155,109,255,0.2)", borderRadius: 100, padding: "8px 18px" }}>
-            <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#9B6DFF", display: "inline-block" }} />
-            Check your position anytime →
-          </a>
+          <div style={{ marginTop: 20, display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center" }}>
+            <a href={`/r/${myRefCode}`} target="_blank" rel="noopener"
+              style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 600, color: "#9B6DFF", textDecoration: "none", background: "rgba(155,109,255,0.08)", border: "1px solid rgba(155,109,255,0.2)", borderRadius: 100, padding: "8px 18px" }}>
+              <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#9B6DFF", display: "inline-block" }} />
+              Check your position anytime →
+            </a>
+            <a href={`/leaderboard?me=${myRefCode}`} target="_blank" rel="noopener"
+              style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 600, color: "#c0a080", textDecoration: "none", background: "rgba(242,139,130,0.07)", border: "1px solid rgba(242,139,130,0.2)", borderRadius: 100, padding: "8px 18px" }}>
+              🏆 See your rank
+            </a>
+          </div>
         )}
       </div>
 
@@ -394,9 +405,16 @@ export default function Page() {
 
       <nav style={{ position: "sticky", top: 0, zIndex: 99, background: "rgba(7,7,10,0.85)", borderBottom: "1px solid rgba(255,255,255,0.04)", padding: "0 28px", height: 58, display: "flex", alignItems: "center", justifyContent: "space-between", backdropFilter: "blur(16px)" }}>
         <Logo />
-        <button className="btn-primary" onClick={() => setView("form")} style={{ padding: "9px 20px", fontSize: 14, borderRadius: 100 }}>
-          Start earning early
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <a href="/leaderboard" target="_blank" rel="noopener" style={{ fontSize: 13, fontWeight: 700, color: "#8888aa", textDecoration: "none", display: "flex", alignItems: "center", gap: 6, padding: "7px 14px", borderRadius: 100, border: "1px solid rgba(255,255,255,0.07)", background: "rgba(255,255,255,0.03)", transition: "all .2s" }}
+            onMouseEnter={e => { e.currentTarget.style.color = "#b090ff"; e.currentTarget.style.borderColor = "rgba(155,109,255,0.3)"; }}
+            onMouseLeave={e => { e.currentTarget.style.color = "#8888aa"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; }}>
+            🏆 Leaderboard
+          </a>
+          <button className="btn-primary" onClick={() => setView("form")} style={{ padding: "9px 20px", fontSize: 14, borderRadius: 100 }}>
+            Start earning early
+          </button>
+        </div>
       </nav>
 
       {/* HERO */}
