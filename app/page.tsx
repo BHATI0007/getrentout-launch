@@ -378,15 +378,17 @@ export default function Page() {
             </button>
           </div>
 
-          {/* Live spots counter */}
-          <div className="hero-note" style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 100, padding: "10px 22px" }}>
-            <span className="dot" />
-            <span style={{ fontSize: 14, color: "var(--text-faint)", letterSpacing: "0.01em" }}>
-              <span style={{ fontSize: 16, fontWeight: 800, color: "var(--text)", letterSpacing: "-0.03em" }}>
-                <Ticker value={TOTAL - spots} />
+          {/* 3D live spots remaining */}
+          <div className="hero-note" style={{ textAlign: "center" }}>
+            <div className="counter-3d">
+              <Ticker value={spots} />
+            </div>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 12 }}>
+              <span className="dot" />
+              <span style={{ fontSize: 13, color: "var(--text-faint)", letterSpacing: "0.06em", textTransform: "uppercase", fontWeight: 600 }}>
+                spots remaining
               </span>
-              <span style={{ color: "var(--text-faint)" }}> / {TOTAL.toLocaleString()} spots taken</span>
-            </span>
+            </div>
           </div>
 
         </div>
