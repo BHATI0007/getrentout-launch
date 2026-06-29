@@ -77,14 +77,14 @@ export default function LeaderboardPage() {
               const isTop3 = l.rank <= 3;
               return (
                 <div key={l.referralCode}
-                  className="leader-row"
+                  className="leader-row card-flip"
                   style={{
                     display: "flex", alignItems: "center", gap: 16,
                     background: isMe ? "rgba(155,109,255,0.1)" : isTop3 ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.02)",
                     border: `1px solid ${isMe ? "rgba(155,109,255,0.35)" : isTop3 ? "rgba(255,255,255,0.07)" : "rgba(255,255,255,0.04)"}`,
                     borderRadius: 16, padding: "16px 20px",
                     transition: "transform 0.15s ease, box-shadow 0.15s ease, border-color 0.2s",
-                    animationDelay: `${l.rank * 0.07}s`, animationFillMode: "both",
+                    animationDelay: `${l.rank * 0.1}s`, animationFillMode: "both",
                   }}
                   onMouseMove={e => {
                     const r = e.currentTarget.getBoundingClientRect();
@@ -123,8 +123,8 @@ export default function LeaderboardPage() {
 
                   {/* Referral count */}
                   <div style={{ textAlign: "right", flexShrink: 0 }}>
-                    <div style={{ fontSize: 20, fontWeight: 900, letterSpacing: "-0.03em", background: "linear-gradient(135deg,#9B6DFF,#F28B82)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                      {l.referralCount}
+                    <div style={{ fontSize: 20, fontWeight: 900, letterSpacing: "-0.03em", background: "linear-gradient(135deg,#9B6DFF,#F28B82)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", overflow: "hidden" }}>
+                      <span className="odometer-digit" style={{ animationDelay: `${l.rank * 0.1 + 0.3}s` }}>{l.referralCount}</span>
                     </div>
                     <div style={{ fontSize: 11, color: "#555577", fontWeight: 600 }}>
                       {l.referralCount === 1 ? "referral" : "referrals"}

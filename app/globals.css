@@ -450,6 +450,127 @@ input, select, textarea, button { font-family: inherit; }
   will-change: transform;
 }
 
+/* ── Scroll progress bar ── */
+.scroll-progress {
+  position: fixed; top: 0; left: 0; height: 2px; z-index: 99998;
+  background: linear-gradient(90deg, #9B6DFF, #c87dff, #F28B82);
+  pointer-events: none; transition: width 0.08s linear;
+  box-shadow: 0 0 8px rgba(155,109,255,0.6);
+}
+
+/* ── Button ripple ── */
+@keyframes ripple-out {
+  from { transform: scale(0); opacity: 0.45; }
+  to   { transform: scale(3.5); opacity: 0; }
+}
+.ripple-el {
+  position: absolute; border-radius: 50%; background: rgba(255,255,255,0.3);
+  pointer-events: none; animation: ripple-out 0.65s ease-out forwards;
+}
+
+/* ── Floating input labels ── */
+.field-wrap { position: relative; }
+.field-wrap .field { padding-top: 22px; padding-bottom: 7px; }
+.float-label {
+  position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+  font-size: 15px; color: #52527a; pointer-events: none;
+  transition: all 0.2s cubic-bezier(.16,1,.3,1); font-weight: 400;
+}
+.float-label.up {
+  top: 9px; transform: none; font-size: 10px; color: #9B6DFF;
+  font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
+}
+
+/* ── Cursor trail ── */
+@keyframes trail-fade {
+  from { opacity: 0.7; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0.1); }
+}
+.cursor-trail {
+  position: fixed; pointer-events: none; z-index: 9996;
+  width: 5px; height: 5px; border-radius: 50%;
+  background: rgba(155,109,255,0.8);
+  transform: translate(-50%,-50%);
+  animation: trail-fade 0.45s ease-out forwards;
+}
+
+/* ── Preloader ── */
+@keyframes preloader-reveal {
+  from { opacity: 1; }
+  to   { opacity: 0; pointer-events: none; }
+}
+.preloader {
+  position: fixed; inset: 0; z-index: 99999; background: #07070a;
+  display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 20px;
+}
+.preloader.exit { animation: preloader-reveal 0.5s cubic-bezier(.16,1,.3,1) 0.1s forwards; }
+@keyframes preload-fill {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+.preloader-bar {
+  width: 160px; height: 2px; background: rgba(155,109,255,0.15); border-radius: 2px; overflow: hidden;
+}
+.preloader-bar-inner {
+  height: 100%; width: 100%;
+  background: linear-gradient(90deg, #9B6DFF, #F28B82);
+  transform-origin: left;
+  animation: preload-fill 1.1s cubic-bezier(.16,1,.3,1) forwards;
+}
+
+/* ── Typewriter cursor ── */
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+.typer-cursor {
+  display: inline-block; width: 3px; height: 0.82em; background: #9B6DFF;
+  margin-left: 3px; vertical-align: middle; border-radius: 1px;
+  animation: blink 0.75s ease-in-out infinite;
+}
+
+/* ── 3D card flip on leaderboard load ── */
+@keyframes card-flip-in {
+  from { opacity: 0; transform: perspective(900px) rotateY(-70deg) translateX(-24px); }
+  to   { opacity: 1; transform: perspective(900px) rotateY(0deg) translateX(0); }
+}
+.card-flip { animation: card-flip-in 0.55s cubic-bezier(.16,1,.3,1) both; }
+
+/* ── Copy burst particle ── */
+@keyframes copy-burst {
+  from { transform: translate(-50%,-50%) scale(1); opacity: 1; }
+  to   { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+}
+.copy-particle {
+  position: fixed; width: 6px; height: 6px; border-radius: 50%;
+  pointer-events: none; z-index: 9997;
+  animation: copy-burst 0.5s ease-out forwards;
+}
+
+/* ── Odometer roll ── */
+@keyframes odometer-up {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+.odometer-digit {
+  display: inline-block; overflow: hidden;
+  animation: odometer-up 0.4s cubic-bezier(.16,1,.3,1) both;
+}
+
+/* ── View exit ── */
+@keyframes view-exit {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-14px); }
+}
+.view-exiting { animation: view-exit 0.25s cubic-bezier(.16,1,.3,1) forwards; }
+
+/* ── Stars ── */
+@keyframes star-twinkle {
+  0%,100% { opacity: 0.2; transform: scale(1); }
+  50%     { opacity: 0.9; transform: scale(1.3); }
+}
+.star-dot {
+  position: absolute; border-radius: 50%; background: #fff; pointer-events: none;
+  animation: star-twinkle var(--sdur,3s) ease-in-out var(--sdel,0s) infinite;
+}
+
 /* Mobile nav — hide secondary buttons on small screens */
 @media (max-width: 600px) {
   .nav-hide-mobile { display: none !important; }

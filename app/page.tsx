@@ -56,6 +56,175 @@ function useCursorGlow() {
   }, []);
 }
 
+/* ── Preloader ── */
+function Preloader({ onDone }: { onDone: () => void }) {
+  const [exiting, setExiting] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => { setExiting(true); setTimeout(onDone, 550); }, 1300);
+    return () => clearTimeout(t);
+  }, [onDone]);
+  return (
+    <div className={`preloader${exiting ? " exit" : ""}`}>
+      <Image src="/logo.png" alt="RentOut" width={52} height={52} style={{ borderRadius: 15, opacity: 0.95 }} />
+      <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: "-0.02em", color: "#f0f0fa" }}>RentOut</div>
+      <div className="preloader-bar"><div className="preloader-bar-inner" /></div>
+    </div>
+  );
+}
+
+/* ── Particle field ── */
+function ParticleField() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const canvas = canvasRef.current!;
+    const ctx = canvas.getContext("2d")!;
+    let W = (canvas.width = window.innerWidth);
+    let H = (canvas.height = window.innerHeight);
+    const mouse = { x: -999, y: -999 };
+    const pts = Array.from({ length: 48 }, () => ({
+      x: Math.random() * W, y: Math.random() * H,
+      vx: (Math.random() - 0.5) * 0.35, vy: (Math.random() - 0.5) * 0.35,
+    }));
+    const onMove = (e: MouseEvent) => { mouse.x = e.clientX; mouse.y = e.clientY; };
+    window.addEventListener("mousemove", onMove);
+    let raf: number;
+    const draw = () => {
+      ctx.clearRect(0, 0, W, H);
+      pts.forEach(p => {
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0 || p.x > W) p.vx *= -1;
+        if (p.y < 0 || p.y > H) p.vy *= -1;
+        const dx = mouse.x - p.x, dy = mouse.y - p.y, d = Math.hypot(dx, dy);
+        if (d < 140) { p.vx += dx * 0.00018; p.vy += dy * 0.00018; }
+        const speed = Math.hypot(p.vx, p.vy);
+        if (speed > 1) { p.vx /= speed; p.vy /= speed; }
+        ctx.beginPath(); ctx.arc(p.x, p.y, 1.5, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(155,109,255,0.55)"; ctx.fill();
+      });
+      for (let i = 0; i < pts.length; i++) for (let j = i + 1; j < pts.length; j++) {
+        const d = Math.hypot(pts[i].x - pts[j].x, pts[i].y - pts[j].y);
+        if (d < 110) {
+          ctx.beginPath(); ctx.moveTo(pts[i].x, pts[i].y); ctx.lineTo(pts[j].x, pts[j].y);
+          ctx.strokeStyle = `rgba(155,109,255,${0.12 * (1 - d / 110)})`; ctx.lineWidth = 0.6; ctx.stroke();
+        }
+      }
+      raf = requestAnimationFrame(draw);
+    };
+    draw();
+    const onResize = () => { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; };
+    window.addEventListener("resize", onResize);
+    return () => { cancelAnimationFrame(raf); window.removeEventListener("mousemove", onMove); window.removeEventListener("resize", onResize); };
+  }, []);
+  return <canvas ref={canvasRef} style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0, opacity: 0.55 }} />;
+}
+
+/* ── Done screen count-up ── */
+function CountUpTo({ target }: { target: number }) {
+  const [n, setN] = useState(1);
+  useEffect(() => {
+    const dur = 1000; const t0 = Date.now();
+    const tick = () => {
+      const p = Math.min((Date.now() - t0) / dur, 1);
+      setN(Math.max(1, Math.round((1 - Math.pow(1 - p, 3)) * target)));
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, [target]);
+  return <>{n.toLocaleString()}</>;
+}
+
+function useScrollProgress() {
+  useEffect(() => {
+    const bar = document.getElementById("scroll-progress");
+    if (!bar) return;
+    const update = () => {
+      const total = document.documentElement.scrollHeight - window.innerHeight;
+      bar.style.width = total > 0 ? `${(window.scrollY / total) * 100}%` : "0%";
+    };
+    window.addEventListener("scroll", update, { passive: true });
+    return () => window.removeEventListener("scroll", update);
+  }, []);
+}
+
+function useButtonRipple() {
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      const btn = (e.target as HTMLElement).closest(".btn-primary") as HTMLElement | null;
+      if (!btn) return;
+      const r = btn.getBoundingClientRect();
+      const size = Math.max(r.width, r.height);
+      const el = document.createElement("div");
+      el.className = "ripple-el";
+      el.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - r.left - size / 2}px;top:${e.clientY - r.top - size / 2}px`;
+      btn.appendChild(el);
+      setTimeout(() => el.remove(), 700);
+    };
+    document.addEventListener("click", onClick);
+    return () => document.removeEventListener("click", onClick);
+  }, []);
+}
+
+function useCursorTrail() {
+  useEffect(() => {
+    let last = 0;
+    const move = (e: MouseEvent) => {
+      const now = Date.now();
+      if (now - last < 40) return;
+      last = now;
+      const el = document.createElement("div");
+      el.className = "cursor-trail";
+      el.style.left = e.clientX + "px";
+      el.style.top = e.clientY + "px";
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 460);
+    };
+    window.addEventListener("mousemove", move);
+    return () => window.removeEventListener("mousemove", move);
+  }, []);
+}
+
+function useHeroShadow() {
+  useEffect(() => {
+    const hero = document.querySelector(".hero-line-1") as HTMLElement | null;
+    if (!hero) return;
+    const move = (e: MouseEvent) => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 24;
+      const y = (e.clientY / window.innerHeight - 0.5) * 12;
+      hero.style.textShadow = `${-x * 0.4}px ${-y * 0.4}px 0 rgba(155,109,255,0.18), ${-x * 0.8}px ${-y * 0.8}px 0 rgba(155,109,255,0.07)`;
+    };
+    window.addEventListener("mousemove", move);
+    return () => window.removeEventListener("mousemove", move);
+  }, []);
+}
+
+function useSoundOnClick() {
+  useEffect(() => {
+    let ctx: AudioContext | null = null;
+    const play = (freq = 700) => {
+      try {
+        if (!ctx) ctx = new AudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(freq * 0.5, ctx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.07, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+        osc.start(); osc.stop(ctx.currentTime + 0.13);
+      } catch { /* AudioContext blocked */ }
+    };
+    const onClick = (e: MouseEvent) => {
+      const t = e.target as HTMLElement;
+      if (t.closest(".btn-primary")) play(800);
+      else if (t.closest("button")) play(600);
+      else if (t.closest("a")) play(500);
+    };
+    document.addEventListener("click", onClick);
+    return () => document.removeEventListener("click", onClick);
+  }, []);
+}
+
 function useMagneticButtons() {
   useEffect(() => {
     const btns = Array.from(document.querySelectorAll<HTMLElement>(".btn-primary"));
@@ -263,6 +432,14 @@ export default function Page() {
   const [rankLoading, setRankLoading] = useState(false);
   const [rankError, setRankError] = useState("");
   const scrambleRef = useRef<HTMLDivElement>(null);
+  const [loaded, setLoaded] = useState(false);
+  const [showCursor, setShowCursor] = useState(true);
+  const [exiting, setExiting] = useState(false);
+  const starsRef = useRef(Array.from({ length: 32 }, (_, i) => ({
+    id: i, left: `${(i * 37 + 11) % 100}%`, top: `${(i * 53 + 7) % 100}%`,
+    size: (i % 3) * 0.8 + 0.6,
+    dur: `${(i % 5) * 0.7 + 2}s`, del: `${(i % 7) * 0.5}s`,
+  })));
   const spots = useSpots();
   const cd = useCountdown();
   const taken = TOTAL - spots;
@@ -271,7 +448,13 @@ export default function Page() {
   useParallax();
   useMagneticButtons();
   useNavGlass();
-  useTextScramble(scrambleRef, "Sell anything.", 800);
+  useScrollProgress();
+  useButtonRipple();
+  useCursorTrail();
+  useHeroShadow();
+  useSoundOnClick();
+  useTextScramble(scrambleRef, "Sell anything.", 900);
+  useEffect(() => { setTimeout(() => setShowCursor(false), 850); }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -329,6 +512,8 @@ export default function Page() {
     }
   };
 
+  if (!loaded) return <Preloader onDone={() => setLoaded(true)} />;
+
   /* ── DONE ── */
   if (view === "done") return (
     <div className="view-transition" style={{ background: "var(--bg)", minHeight: "100vh", display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
@@ -356,7 +541,7 @@ export default function Page() {
         </p>
 
         <div style={{ fontSize: "clamp(120px, 28vw, 280px)", fontWeight: 900, letterSpacing: "-0.06em", lineHeight: 0.82, marginBottom: 40, textAlign: "center" }}>
-          <span className="g">#{position.toLocaleString()}</span>
+          <span className="g">#<CountUpTo target={position} /></span>
         </div>
 
         <p style={{ fontSize: "clamp(20px, 2.5vw, 28px)", fontWeight: 600, color: "var(--text)", marginBottom: 12, letterSpacing: "-0.02em" }}>
@@ -430,9 +615,19 @@ export default function Page() {
                   </a>
                 ))}
               </div>
-              <button onClick={() => {
+              <button onClick={(e) => {
                 navigator.clipboard.writeText(myRefCode ? `https://getrentout.me?ref=${myRefCode}` : "https://getrentout.me");
                 setCopied(true); setTimeout(() => setCopied(false), 2000);
+                // copy burst
+                const r = e.currentTarget.getBoundingClientRect();
+                const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+                const colors = ["#9B6DFF","#F28B82","#c87dff","#fff","#38bdf8"];
+                Array.from({length:8}).forEach((_,i) => {
+                  const el = document.createElement("div"); el.className = "copy-particle";
+                  const angle = (i/8)*Math.PI*2; const dist = 40+Math.random()*30;
+                  el.style.cssText = `left:${cx}px;top:${cy}px;background:${colors[i%colors.length]};--tx:${Math.cos(angle)*dist-3}px;--ty:${Math.sin(angle)*dist-3}px`;
+                  document.body.appendChild(el); setTimeout(()=>el.remove(),520);
+                });
               }}
                 style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, background: copied ? "rgba(155,109,255,0.1)" : "var(--surface)", border: `1px solid ${copied ? "rgba(155,109,255,0.3)" : "var(--border)"}`, borderRadius: 14, padding: "16px", fontSize: 15, fontWeight: 700, color: copied ? "var(--accent)" : "var(--text-dim)", cursor: "pointer", width: "100%", transition: "all .2s" }}>
                 {Icons.copy} {copied ? "Link copied!" : myRefCode ? `Copy your referral link` : "Copy link — getrentout.me"}
@@ -505,35 +700,30 @@ export default function Page() {
 
             <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <div>
-                <label style={{ fontSize: 12, fontWeight: 600, color: errors.name ? "#F28B82" : "#a8a8c8", letterSpacing: "0.04em", display: "block", marginBottom: 7 }}>Full name</label>
-                <input
-                  name="fullname" type="text" placeholder="Your name" className="field"
-                  value={fields.name}
-                  style={{ borderColor: errors.name ? "#F28B82" : undefined }}
-                  onChange={e => { setFields(p => ({ ...p, name: e.target.value })); setErrors(p => ({ ...p, name: "" })); }}
-                />
+                <div className="field-wrap">
+                  <input name="fullname" type="text" placeholder=" " className="field"
+                    value={fields.name} style={{ borderColor: errors.name ? "#F28B82" : undefined }}
+                    onChange={e => { setFields(p => ({ ...p, name: e.target.value })); setErrors(p => ({ ...p, name: "" })); }} />
+                  <label className={`float-label${fields.name ? " up" : ""}`} style={{ color: errors.name ? "#F28B82" : undefined }}>Full name</label>
+                </div>
                 {errors.name && <p style={{ fontSize: 12, color: "#F28B82", marginTop: 6 }}>{errors.name}</p>}
               </div>
               <div>
-                <label style={{ fontSize: 12, fontWeight: 600, color: errors.email ? "#F28B82" : "#a8a8c8", letterSpacing: "0.04em", display: "block", marginBottom: 7 }}>Email address</label>
-                <input
-                  type="email" placeholder="you@email.com" className="field"
-                  inputMode="email" name="useremail"
-                  value={fields.email}
-                  style={{ borderColor: errors.email ? "#F28B82" : undefined }}
-                  onChange={e => { setFields(p => ({ ...p, email: e.target.value })); setErrors(p => ({ ...p, email: "" })); }}
-                />
+                <div className="field-wrap">
+                  <input type="email" placeholder=" " className="field" inputMode="email" name="useremail"
+                    value={fields.email} style={{ borderColor: errors.email ? "#F28B82" : undefined }}
+                    onChange={e => { setFields(p => ({ ...p, email: e.target.value })); setErrors(p => ({ ...p, email: "" })); }} />
+                  <label className={`float-label${fields.email ? " up" : ""}`} style={{ color: errors.email ? "#F28B82" : undefined }}>Email address</label>
+                </div>
                 {errors.email && <p style={{ fontSize: 12, color: "#F28B82", marginTop: 6 }}>{errors.email}</p>}
               </div>
               <div>
-                <label style={{ fontSize: 12, fontWeight: 600, color: errors.city ? "#F28B82" : "#a8a8c8", letterSpacing: "0.04em", display: "block", marginBottom: 7 }}>Your city</label>
-                <input
-                  type="text" placeholder="City" className="field"
-                  name="usercity"
-                  value={fields.city}
-                  style={{ borderColor: errors.city ? "#F28B82" : undefined }}
-                  onChange={e => { setFields(p => ({ ...p, city: e.target.value })); setErrors(p => ({ ...p, city: "" })); }}
-                />
+                <div className="field-wrap">
+                  <input type="text" placeholder=" " className="field" name="usercity"
+                    value={fields.city} style={{ borderColor: errors.city ? "#F28B82" : undefined }}
+                    onChange={e => { setFields(p => ({ ...p, city: e.target.value })); setErrors(p => ({ ...p, city: "" })); }} />
+                  <label className={`float-label${fields.city ? " up" : ""}`} style={{ color: errors.city ? "#F28B82" : undefined }}>Your city</label>
+                </div>
                 {errors.city && <p style={{ fontSize: 12, color: "#F28B82", marginTop: 6 }}>{errors.city}</p>}
               </div>
               <div style={{ height: 4 }} />
@@ -553,6 +743,8 @@ export default function Page() {
   /* ── HOME ── */
   return (
     <div style={{ background: "var(--bg)", minHeight: "100vh" }}>
+      <div id="scroll-progress" className="scroll-progress" style={{ width: "0%" }} />
+      <ParticleField />
       <div id="cursor-glow" className="cursor-glow" />
 
       <nav style={{ position: "sticky", top: 0, zIndex: 99, background: "rgba(7,7,10,0.85)", borderBottom: "1px solid rgba(255,255,255,0.04)", padding: "0 28px", height: 58, display: "flex", alignItems: "center", justifyContent: "space-between", backdropFilter: "blur(16px)" }}>
@@ -608,6 +800,10 @@ export default function Page() {
         </div>
         {/* Spotlight beam */}
         <div className="spotlight" style={{ zIndex: 1 }} />
+        {/* Star field */}
+        {starsRef.current.map(s => (
+          <div key={s.id} className="star-dot" style={{ left: s.left, top: s.top, width: s.size, height: s.size, "--sdur": s.dur, "--sdel": s.del } as React.CSSProperties} />
+        ))}
 
         <div style={{ position: "relative", maxWidth: 960, margin: "0 auto", padding: "72px 24px 64px", textAlign: "center" }}>
           <div className="hero-eyebrow" style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(155,109,255,0.07)", border: "1px solid rgba(155,109,255,0.16)", borderRadius: 100, padding: "7px 18px", marginBottom: 36 }}>
@@ -618,8 +814,11 @@ export default function Page() {
           </div>
 
           <div style={{ marginBottom: 28 }}>
-            <div ref={scrambleRef} className="hero-line-1" style={{ fontSize: "clamp(52px, 10vw, 118px)", fontWeight: 900, lineHeight: 0.92, letterSpacing: "-0.055em", color: "#f8f8fa" }}>
-              Sell anything.
+            <div style={{ position: "relative", display: "inline-block" }}>
+              <div ref={scrambleRef} className="hero-line-1" style={{ fontSize: "clamp(52px, 10vw, 118px)", fontWeight: 900, lineHeight: 0.92, letterSpacing: "-0.055em", color: "#f8f8fa", display: "inline" }}>
+                Sell anything.
+              </div>
+              {showCursor && <span className="typer-cursor" />}
             </div>
             <div className="hero-line-2" style={{ fontSize: "clamp(52px, 10vw, 118px)", fontWeight: 900, lineHeight: 0.92, letterSpacing: "-0.055em" }}>
               <span className="g hero-glitch">Keep everything.</span>
