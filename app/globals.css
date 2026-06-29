@@ -405,11 +405,12 @@ input, select, textarea, button { font-family: inherit; }
   letter-spacing: -0.055em;
   line-height: 1;
   background: linear-gradient(110deg, #9B6DFF 0%, #c87dff 45%, #F28B82 100%);
+  background-size: 200% 100%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   text-shadow: none;
-  animation: counter-in 1s cubic-bezier(.16,1,.3,1) 0.7s both, counter-float 3.6s ease-in-out 1.7s infinite;
+  animation: counter-in 1s cubic-bezier(.16,1,.3,1) 0.7s both, counter-float 3.6s ease-in-out 1.7s infinite, neon-flicker 9s ease-in-out 3s infinite, gradient-flow 5s ease-in-out infinite;
   display: inline-block;
   transform-style: preserve-3d;
   perspective: 800px;
@@ -554,6 +555,10 @@ input, select, textarea, button { font-family: inherit; }
   animation: odometer-up 0.4s cubic-bezier(.16,1,.3,1) both;
 }
 
+/* ── View Transitions API ── */
+::view-transition-old(root) { animation: view-exit 0.3s cubic-bezier(.4,0,1,1) both; }
+::view-transition-new(root) { animation: page-in 0.45s cubic-bezier(.16,1,.3,1) both; }
+
 /* ── View exit ── */
 @keyframes view-exit {
   from { opacity: 1; transform: translateY(0); }
@@ -675,6 +680,79 @@ input, select, textarea, button { font-family: inherit; }
 .map-dot-ring {
   animation: map-pulse 2.5s ease-out infinite;
   transform-origin: center;
+}
+
+/* ── Custom cursor ── */
+*, *::before, *::after { cursor: none !important; }
+.cursor-dot {
+  position: fixed; pointer-events: none; z-index: 999999;
+  width: 8px; height: 8px; border-radius: 50%; background: #9B6DFF;
+  transform: translate(-50%,-50%); transition: transform 0.15s ease, opacity 0.2s, background 0.2s;
+  mix-blend-mode: screen;
+}
+.cursor-dot.hovered { transform: translate(-50%,-50%) scale(0); opacity: 0; }
+.cursor-ring {
+  position: fixed; pointer-events: none; z-index: 999998;
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 1.5px solid rgba(155,109,255,0.65);
+  transform: translate(-50%,-50%); transition: width 0.2s ease, height 0.2s ease, border-color 0.2s, opacity 0.2s;
+}
+.cursor-ring.hovered { width: 52px; height: 52px; border-color: rgba(155,109,255,0.35); }
+.cursor-ring.clicking { width: 24px; height: 24px; border-color: rgba(242,139,130,0.9); }
+
+/* ── Rotating gradient border on CTA ── */
+.cta-border-wrap { position: relative; display: inline-flex; border-radius: 16px; padding: 2px; }
+.cta-border-bg { position: absolute; inset: 0; border-radius: 16px; overflow: hidden; }
+.cta-border-bg::before {
+  content: ''; position: absolute;
+  width: 200%; height: 200%; top: -50%; left: -50%;
+  background: conic-gradient(#9B6DFF 0deg, #c87dff 90deg, #F28B82 180deg, #38bdf8 270deg, #9B6DFF 360deg);
+  animation: cta-spin 3s linear infinite;
+}
+@keyframes cta-spin { to { transform: rotate(360deg); } }
+.cta-border-inner { position: relative; border-radius: 14px; overflow: hidden; background: #07070a; }
+
+/* ── Phosphor glow on gradient text ── */
+.g { filter: drop-shadow(0 0 12px rgba(155,109,255,0.4)) drop-shadow(0 0 28px rgba(155,109,255,0.15)); }
+
+/* ── Neon flicker on counter ── */
+@keyframes neon-flicker {
+  0%,91%,100% { opacity: 1; }
+  92% { opacity: 0.92; }
+  93% { opacity: 1; }
+  94% { opacity: 0.88; }
+  95% { opacity: 1; }
+  96% { opacity: 0.94; }
+}
+
+/* ── CTA idle pulse ── */
+@keyframes idle-pulse {
+  0%,100% { box-shadow: 0 1px 0 rgba(255,255,255,0.15) inset, 0 10px 32px rgba(155,109,255,0.38); }
+  50%     { box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 16px 60px rgba(155,109,255,0.7), 0 0 0 8px rgba(155,109,255,0.08); }
+}
+.btn-idle { animation: idle-pulse 2.5s ease-in-out infinite !important; }
+
+/* ── Exit intent popup ── */
+@keyframes exit-popup-in {
+  from { opacity: 0; transform: translate(-50%,-50%) scale(0.9); }
+  to   { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+}
+.exit-popup {
+  position: fixed; top: 50%; left: 50%; z-index: 99999;
+  transform: translate(-50%,-50%);
+  background: #0e0e18; border: 1px solid rgba(155,109,255,0.3);
+  border-radius: 24px; padding: 40px 36px; max-width: 400px; width: 90%;
+  box-shadow: 0 0 0 9999px rgba(0,0,0,0.7), 0 32px 80px rgba(155,109,255,0.15);
+  backdrop-filter: blur(20px);
+  animation: exit-popup-in 0.4s cubic-bezier(.16,1,.3,1) forwards;
+  text-align: center;
+}
+
+/* ── Viewer count badge ── */
+.viewer-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(242,139,130,0.08); border: 1px solid rgba(242,139,130,0.2);
+  border-radius: 100px; padding: 5px 12px; font-size: 12px; font-weight: 600; color: #F28B82;
 }
 
 /* Mobile nav — hide secondary buttons on small screens */

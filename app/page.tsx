@@ -262,6 +262,89 @@ function CountUpTo({ target }: { target: number }) {
   return <>{n.toLocaleString()}</>;
 }
 
+/* ── Spring cursor ── */
+function useSpringCursor() {
+  useEffect(() => {
+    const dot = document.getElementById("cursor-dot");
+    const ring = document.getElementById("cursor-ring");
+    if (!dot || !ring) return;
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    const onMove = (e: MouseEvent) => {
+      mx = e.clientX; my = e.clientY;
+      dot.style.left = mx + "px"; dot.style.top = my + "px";
+    };
+    const onDown = () => ring.classList.add("clicking");
+    const onUp = () => ring.classList.remove("clicking");
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mousedown", onDown);
+    window.addEventListener("mouseup", onUp);
+    let raf: number;
+    const tick = () => {
+      rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+      ring.style.left = rx + "px"; ring.style.top = ry + "px";
+      raf = requestAnimationFrame(tick);
+    };
+    tick();
+    const els = document.querySelectorAll("a, button");
+    const enter = () => { dot.classList.add("hovered"); ring.classList.add("hovered"); };
+    const leave = () => { dot.classList.remove("hovered"); ring.classList.remove("hovered"); };
+    els.forEach(el => { el.addEventListener("mouseenter", enter); el.addEventListener("mouseleave", leave); });
+    return () => { cancelAnimationFrame(raf); window.removeEventListener("mousemove", onMove); window.removeEventListener("mousedown", onDown); window.removeEventListener("mouseup", onUp); };
+  }, []);
+}
+
+/* ── Gyroscope parallax ── */
+function useGyroscope() {
+  useEffect(() => {
+    const handler = (e: DeviceOrientationEvent) => {
+      const blobs = document.querySelector(".aurora-parallax") as HTMLElement | null;
+      if (!blobs) return;
+      const x = Math.max(-1, Math.min(1, (e.gamma ?? 0) / 25));
+      const y = Math.max(-1, Math.min(1, ((e.beta ?? 0) - 30) / 25));
+      blobs.style.transform = `translate(${x * 28}px, ${y * 18}px)`;
+    };
+    window.addEventListener("deviceorientation", handler);
+    return () => window.removeEventListener("deviceorientation", handler);
+  }, []);
+}
+
+/* ── Ambient hover particles from CTA ── */
+function useAmbientParticles() {
+  useEffect(() => {
+    const btn = document.querySelector(".cta-border-wrap") as HTMLElement | null;
+    if (!btn) return;
+    let interval: ReturnType<typeof setInterval> | null = null;
+    const emit = () => {
+      const r = btn.getBoundingClientRect();
+      const el = document.createElement("div");
+      const x = r.left + Math.random() * r.width;
+      const y = r.top + Math.random() * r.height;
+      const colors = ["#9B6DFF", "#F28B82", "#c87dff", "#38bdf8"];
+      el.style.cssText = `position:fixed;left:${x}px;top:${y}px;width:4px;height:4px;border-radius:50%;background:${colors[Math.floor(Math.random() * colors.length)]};pointer-events:none;z-index:9997;transition:all 0.8s ease-out;transform:translate(-50%,-50%)`;
+      document.body.appendChild(el);
+      requestAnimationFrame(() => {
+        el.style.transform = `translate(calc(-50% + ${(Math.random() - 0.5) * 60}px), calc(-50% - ${Math.random() * 60 + 20}px))`;
+        el.style.opacity = "0";
+      });
+      setTimeout(() => el.remove(), 900);
+    };
+    const start = () => { interval = setInterval(emit, 80); };
+    const stop = () => { if (interval) { clearInterval(interval); interval = null; } };
+    btn.addEventListener("mouseenter", start);
+    btn.addEventListener("mouseleave", stop);
+    return () => { btn.removeEventListener("mouseenter", start); btn.removeEventListener("mouseleave", stop); stop(); };
+  }, []);
+}
+
+/* ── View Transitions API ── */
+function transitionTo(cb: () => void) {
+  if ((document as any).startViewTransition) {
+    (document as any).startViewTransition(cb);
+  } else {
+    cb();
+  }
+}
+
 function useKonami(cb: () => void) {
   useEffect(() => {
     const seq = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
@@ -614,7 +697,12 @@ export default function Page() {
   const [exiting, setExiting] = useState(false);
   const [konamiActive, setKonamiActive] = useState(false);
   const [chargeLevel, setChargeLevel] = useState(0);
+  const [viewerCount, setViewerCount] = useState(0);
+  const [showExit, setShowExit] = useState(false);
+  const [isIdle, setIsIdle] = useState(false);
+  const [timeGreeting, setTimeGreeting] = useState("");
   const chargeTimer = useRef<ReturnType<typeof setInterval>|null>(null);
+  const exitShown = useRef(false);
   const haptic = useHaptic();
   const starsRef = useRef(Array.from({ length: 32 }, (_, i) => ({
     id: i, left: `${(i * 37 + 11) % 100}%`, top: `${(i * 53 + 7) % 100}%`,
@@ -637,6 +725,52 @@ export default function Page() {
   useTextScramble(scrambleRef, "Sell anything.", 900);
   use3DHeroTilt();
   useScrollJack();
+  useSpringCursor();
+  useGyroscope();
+  useAmbientParticles();
+
+  // Time-aware greeting
+  useEffect(() => {
+    const h = new Date().getHours();
+    setTimeGreeting(h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening");
+  }, []);
+
+  // Viewer count (realistic simulation)
+  useEffect(() => {
+    const base = 12 + Math.floor(Math.random() * 8);
+    setViewerCount(base);
+    const id = setInterval(() => setViewerCount(v => v + (Math.random() > 0.5 ? 1 : -1) * Math.floor(Math.random() * 2)), 7000);
+    return () => clearInterval(id);
+  }, []);
+
+  // Exit intent
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (e.clientY <= 2 && !exitShown.current && view === "home") {
+        exitShown.current = true; setShowExit(true);
+      }
+    };
+    document.addEventListener("mouseleave", handler);
+    return () => document.removeEventListener("mouseleave", handler);
+  }, [view]);
+
+  // Auto-detect city from IP
+  useEffect(() => {
+    if (view === "form" && !fields.city) {
+      fetch("https://ipapi.co/city/").then(r => r.text()).then(city => {
+        if (city && city.length < 40 && !city.includes("<")) setFields(p => ({ ...p, city }));
+      }).catch(() => {});
+    }
+  }, [view]);
+
+  // Idle CTA pulse
+  useEffect(() => {
+    let t: ReturnType<typeof setTimeout>;
+    const reset = () => { clearTimeout(t); setIsIdle(false); t = setTimeout(() => setIsIdle(true), 5000); };
+    window.addEventListener("mousemove", reset); window.addEventListener("keydown", reset);
+    reset();
+    return () => { clearTimeout(t); window.removeEventListener("mousemove", reset); window.removeEventListener("keydown", reset); };
+  }, []);
   useKonami(() => {
     setKonamiActive(true);
     haptic();
@@ -942,11 +1076,32 @@ export default function Page() {
   /* ── HOME ── */
   return (
     <div style={{ background: "var(--bg)", minHeight: "100vh" }} className={konamiActive ? "konami-active" : ""}>
+      {/* Custom cursor */}
+      <div id="cursor-dot" className="cursor-dot" />
+      <div id="cursor-ring" className="cursor-ring" />
       <div id="scroll-progress" className="scroll-progress" style={{ width: "0%" }} />
       <div className="scanlines" /><div className="scan-sweep" />
       <ShaderBackground />
       <ParticleField />
       <ActivityToast />
+
+      {/* Exit intent popup */}
+      {showExit && (
+        <div className="exit-popup">
+          <div style={{ fontSize: 36, marginBottom: 12 }}>⏳</div>
+          <h3 style={{ fontSize: 22, fontWeight: 900, letterSpacing: "-0.03em", marginBottom: 8 }}>Wait — spots are filling up.</h3>
+          <p style={{ fontSize: 14, color: "#8888aa", marginBottom: 24, lineHeight: 1.6 }}>
+            {viewerCount} people are looking at this right now.<br />Your spot won&apos;t be saved if you leave.
+          </p>
+          <button className={`btn-primary${isIdle ? " btn-idle" : ""}`} style={{ width: "100%", fontSize: 15, padding: "16px", borderRadius: 12 }}
+            onClick={() => { setShowExit(false); transitionTo(() => setView("form")); haptic(); }}>
+            Claim my spot now →
+          </button>
+          <button onClick={() => setShowExit(false)} style={{ marginTop: 14, background: "none", border: "none", color: "#555577", fontSize: 13, cursor: "pointer" }}>
+            No thanks, I&apos;ll miss out
+          </button>
+        </div>
+      )}
       <div id="cursor-glow" className="cursor-glow" />
 
       <nav style={{ position: "sticky", top: 0, zIndex: 99, background: "rgba(7,7,10,0.85)", borderBottom: "1px solid rgba(255,255,255,0.04)", padding: "0 28px", height: 58, display: "flex", alignItems: "center", justifyContent: "space-between", backdropFilter: "blur(16px)" }}>
@@ -1008,11 +1163,22 @@ export default function Page() {
         ))}
 
         <div className="hero-tilt hero-jacked" style={{ position: "relative", maxWidth: 960, margin: "0 auto", padding: "72px 24px 64px", textAlign: "center" }}>
-          <div className="hero-eyebrow" style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(155,109,255,0.07)", border: "1px solid rgba(155,109,255,0.16)", borderRadius: 100, padding: "7px 18px", marginBottom: 36 }}>
-            <span className="dot" />
-            <span style={{ fontSize: 13, color: "var(--text-dim)", letterSpacing: "0.01em" }}>
-              <span style={{ color: "var(--text)", fontWeight: 600 }}>Earner early access</span>
-            </span>
+          {timeGreeting && (
+            <p style={{ fontSize: 13, color: "#666688", fontWeight: 600, marginBottom: 12, letterSpacing: "0.04em" }}>{timeGreeting} 👋</p>
+          )}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 36, flexWrap: "wrap" }}>
+            <div className="hero-eyebrow" style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(155,109,255,0.07)", border: "1px solid rgba(155,109,255,0.16)", borderRadius: 100, padding: "7px 18px" }}>
+              <span className="dot" />
+              <span style={{ fontSize: 13, color: "var(--text-dim)", letterSpacing: "0.01em" }}>
+                <span style={{ color: "var(--text)", fontWeight: 600 }}>Earner early access</span>
+              </span>
+            </div>
+            {viewerCount > 0 && (
+              <div className="hero-eyebrow viewer-badge">
+                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#F28B82", display: "inline-block", animation: "pulse-dot 2s infinite" }} />
+                {viewerCount} viewing now
+              </div>
+            )}
           </div>
 
           <div style={{ marginBottom: 28 }}>
@@ -1032,25 +1198,30 @@ export default function Page() {
           </p>
 
           <div className="hero-cta" style={{ display: "flex", justifyContent: "center", marginBottom: 40 }}>
-            <div style={{ position: "relative", display: "inline-block" }}>
-              {chargeLevel > 0 && (
-                <svg className="charge-ring" viewBox="0 0 44 44" style={{ position: "absolute", inset: -6, width: "calc(100% + 12px)", height: "calc(100% + 12px)", pointerEvents: "none", zIndex: 2 }}>
-                  <circle cx="22" cy="22" r="18" strokeDasharray="113" strokeDashoffset={113 - (113 * chargeLevel / 100)} fill="none" stroke="rgba(155,109,255,0.9)" strokeWidth="2.5" strokeLinecap="round" style={{ transform: "rotate(-90deg)", transformOrigin: "center" }} />
-                </svg>
-              )}
-              <button className="btn-primary"
-                style={{ fontSize: 17, padding: "20px 48px", borderRadius: 14, transform: chargeLevel > 50 ? `scale(${1 + chargeLevel * 0.002})` : undefined }}
-                onClick={() => { setView("form"); haptic(); }}
-                onPointerDown={() => {
-                  setChargeLevel(0);
-                  chargeTimer.current = setInterval(() => {
-                    setChargeLevel(p => { if (p >= 100) { clearInterval(chargeTimer.current!); return 100; } return p + 2; });
-                  }, 20);
-                }}
-                onPointerUp={() => { clearInterval(chargeTimer.current!); setChargeLevel(0); }}
-                onPointerLeave={() => { clearInterval(chargeTimer.current!); setChargeLevel(0); }}>
-                Start earning early
-              </button>
+            <div className="cta-border-wrap" style={{ borderRadius: 16 }}>
+              <div className="cta-border-bg" />
+              <div className="cta-border-inner" style={{ padding: 2 }}>
+                <div style={{ position: "relative", display: "inline-block" }}>
+                  {chargeLevel > 0 && (
+                    <svg viewBox="0 0 44 44" style={{ position: "absolute", inset: -6, width: "calc(100% + 12px)", height: "calc(100% + 12px)", pointerEvents: "none", zIndex: 2 }}>
+                      <circle cx="22" cy="22" r="18" strokeDasharray="113" strokeDashoffset={113 - (113 * chargeLevel / 100)} fill="none" stroke="rgba(155,109,255,0.9)" strokeWidth="2.5" strokeLinecap="round" style={{ transform: "rotate(-90deg)", transformOrigin: "center" }} />
+                    </svg>
+                  )}
+                  <button className={`btn-primary${isIdle ? " btn-idle" : ""}`}
+                    style={{ fontSize: 17, padding: "20px 48px", borderRadius: 14, transform: chargeLevel > 50 ? `scale(${1 + chargeLevel * 0.002})` : undefined }}
+                    onClick={() => { transitionTo(() => setView("form")); haptic(); }}
+                    onPointerDown={() => {
+                      setChargeLevel(0); haptic();
+                      chargeTimer.current = setInterval(() => {
+                        setChargeLevel(p => { if (p >= 100) { clearInterval(chargeTimer.current!); return 100; } return p + 2; });
+                      }, 20);
+                    }}
+                    onPointerUp={() => { clearInterval(chargeTimer.current!); setChargeLevel(0); }}
+                    onPointerLeave={() => { clearInterval(chargeTimer.current!); setChargeLevel(0); }}>
+                    Start earning early
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
