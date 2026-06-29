@@ -329,6 +329,14 @@ export default function Page() {
         </div>
       </div>
 
+      {/* STATS */}
+      <div style={{ maxWidth: 880, margin: "0 auto", padding: "80px 24px 20px" }}>
+        <div className="reveal" style={{ textAlign: "center" }}>
+          <div className="stat-num"><CountUp to={100000} /></div>
+          <div style={{ fontSize: 13, color: "var(--text-faint)", marginTop: 8, letterSpacing: "0.02em" }}>Early access spots</div>
+        </div>
+      </div>
+
       <hr className="hr" style={{ marginTop: 80 }} />
 
       {/* BOTTOM CTA */}
