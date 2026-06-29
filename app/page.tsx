@@ -399,22 +399,7 @@ export default function Page() {
         </div>
       </div>
 
-      {/* Services marquee strip */}
-      <div style={{ overflow: "hidden", padding: "8px 0 64px", maskImage: "linear-gradient(to right, transparent, black 8%, black 92%, transparent)", WebkitMaskImage: "linear-gradient(to right, transparent, black 8%, black 92%, transparent)" }}>
-        <div className="marquee-track" style={{ display: "flex", gap: 12, width: "max-content" }}>
-          {[...SERVICES, ...SERVICES].map((s, i) => (
-            <div key={i} style={{ flexShrink: 0, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: `${s.c}18`, border: `1px solid ${s.c}30`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, color: s.c, flexShrink: 0 }}>{s.who[0]}</div>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", whiteSpace: "nowrap" }}>{s.what}</div>
-                <div style={{ fontSize: 12, color: "var(--text-dim)", marginTop: 2 }}>{s.price} · {s.tag}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <hr className="hr" />
+      <hr className="hr" style={{ marginTop: 40 }} />
 
       {/* BOTTOM CTA */}
       <div style={{ maxWidth: 820, margin: "0 auto", padding: "100px 24px 120px" }}>
