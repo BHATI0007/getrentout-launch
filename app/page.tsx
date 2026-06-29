@@ -2,6 +2,10 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import dynamic from "next/dynamic";
+
+const ThreeScene = dynamic(() => import("./components/ThreeScene"), { ssr: false });
+const MultiCursors = dynamic(() => import("./components/MultiCursors"), { ssr: false });
 
 const BrandLogo = ({ src, alt }: { src: string; alt: string }) => (
   // eslint-disable-next-line @next/next/no-img-element
@@ -1082,7 +1086,9 @@ export default function Page() {
       <div id="scroll-progress" className="scroll-progress" style={{ width: "0%" }} />
       <div className="scanlines" /><div className="scan-sweep" />
       <ShaderBackground />
+      <ThreeScene />
       <ParticleField />
+      <MultiCursors />
       <ActivityToast />
 
       {/* Exit intent popup */}
