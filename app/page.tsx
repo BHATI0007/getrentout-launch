@@ -266,6 +266,45 @@ function CountUpTo({ target }: { target: number }) {
   return <>{n.toLocaleString()}</>;
 }
 
+/* ── Click starburst effect ── */
+function useClickEffect() {
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      const cx = e.clientX, cy = e.clientY;
+
+      // Expanding ring
+      const ring = document.createElement("div");
+      ring.className = "click-ring-burst";
+      ring.style.left = cx + "px"; ring.style.top = cy + "px";
+      document.body.appendChild(ring);
+      setTimeout(() => ring.remove(), 550);
+
+      // Second ring
+      const ring2 = document.createElement("div");
+      ring2.className = "click-ring-burst2";
+      ring2.style.left = cx + "px"; ring2.style.top = cy + "px";
+      document.body.appendChild(ring2);
+      setTimeout(() => ring2.remove(), 500);
+
+      // 8 starburst rays
+      const rayCount = 8;
+      for (let i = 0; i < rayCount; i++) {
+        const angle = (i / rayCount) * 360;
+        const ray = document.createElement("div");
+        ray.className = "click-ray";
+        ray.style.left = cx + "px";
+        ray.style.top = cy + "px";
+        ray.style.transform = `rotate(${angle}deg)`;
+        ray.style.animationDelay = `${i * 0.012}s`;
+        document.body.appendChild(ray);
+        setTimeout(() => ray.remove(), 500);
+      }
+    };
+    window.addEventListener("click", handler);
+    return () => window.removeEventListener("click", handler);
+  }, []);
+}
+
 /* ── Spring cursor ── */
 function useSpringCursor() {
   useEffect(() => {
@@ -277,8 +316,8 @@ function useSpringCursor() {
       mx = e.clientX; my = e.clientY;
       dot.style.left = mx + "px"; dot.style.top = my + "px";
     };
-    const onDown = () => ring.classList.add("clicking");
-    const onUp = () => ring.classList.remove("clicking");
+    const onDown = () => { ring.classList.add("clicking"); dot.classList.add("clicking"); };
+    const onUp = () => { ring.classList.remove("clicking"); dot.classList.remove("clicking"); };
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mousedown", onDown);
     window.addEventListener("mouseup", onUp);
@@ -730,6 +769,7 @@ export default function Page() {
   use3DHeroTilt();
   useScrollJack();
   useSpringCursor();
+  useClickEffect();
   useGyroscope();
   useAmbientParticles();
 

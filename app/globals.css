@@ -697,22 +697,59 @@ nav, main, section, footer,
 *, *::before, *::after { cursor: none !important; }
 .cursor-dot {
   position: fixed; pointer-events: none; z-index: 999999;
-  width: 16px; height: 16px; border-radius: 50%;
-  background: radial-gradient(circle, #c87dff, #9B6DFF);
+  width: 20px; height: 20px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #c87dff, #9B6DFF);
   transform: translate(-50%,-50%);
-  transition: transform 0.12s ease, opacity 0.2s, width 0.2s, height 0.2s;
-  box-shadow: 0 0 12px rgba(155,109,255,0.7), 0 0 24px rgba(155,109,255,0.3);
+  transition: transform 0.1s ease, width 0.15s ease, height 0.15s ease, background 0.15s, box-shadow 0.15s;
+  box-shadow: 0 0 14px rgba(155,109,255,0.8), 0 0 30px rgba(155,109,255,0.35);
 }
-.cursor-dot.hovered { width: 8px; height: 8px; opacity: 0.6; }
+.cursor-dot.hovered  { width: 10px; height: 10px; opacity: 0.7; }
+.cursor-dot.clicking { width: 28px; height: 28px; background: radial-gradient(circle, #F28B82, #ff6b6b); box-shadow: 0 0 20px rgba(242,139,130,0.9), 0 0 40px rgba(242,139,130,0.4); }
+
 .cursor-ring {
   position: fixed; pointer-events: none; z-index: 999998;
   width: 52px; height: 52px; border-radius: 50%;
-  border: 2px solid rgba(155,109,255,0.55);
+  border: 2px solid rgba(155,109,255,0.5);
   transform: translate(-50%,-50%);
-  transition: width 0.25s ease, height 0.25s ease, border-color 0.2s;
+  transition: width 0.2s cubic-bezier(.16,1,.3,1), height 0.2s cubic-bezier(.16,1,.3,1), border-color 0.2s, opacity 0.2s;
 }
-.cursor-ring.hovered { width: 72px; height: 72px; border-color: rgba(155,109,255,0.3); border-width: 1.5px; }
-.cursor-ring.clicking { width: 32px; height: 32px; border-color: rgba(242,139,130,0.9); border-width: 2.5px; }
+.cursor-ring.hovered  { width: 70px; height: 70px; border-color: rgba(155,109,255,0.25); }
+.cursor-ring.clicking { width: 90px; height: 90px; border-color: rgba(155,109,255,0.12); border-width: 1px; opacity: 0.6; }
+
+/* ── Click starburst rays ── */
+@keyframes click-ray {
+  from { width: 0px; opacity: 1; }
+  to   { width: 55px; opacity: 0; }
+}
+.click-ray {
+  position: fixed; height: 2px; pointer-events: none; z-index: 999997;
+  background: linear-gradient(90deg, #9B6DFF, rgba(155,109,255,0));
+  transform-origin: left center;
+  border-radius: 2px;
+  animation: click-ray 0.45s cubic-bezier(.16,1,.3,1) forwards;
+}
+
+/* ── Click ring burst ── */
+@keyframes click-ring-burst {
+  from { width: 20px; height: 20px; opacity: 0.9; border-color: #9B6DFF; }
+  to   { width: 120px; height: 120px; opacity: 0; border-color: rgba(155,109,255,0.05); }
+}
+.click-ring-burst {
+  position: fixed; border-radius: 50%; pointer-events: none; z-index: 999996;
+  border: 1.5px solid #9B6DFF; transform: translate(-50%,-50%);
+  animation: click-ring-burst 0.5s cubic-bezier(.16,1,.3,1) forwards;
+}
+
+/* ── Second delayed ring ── */
+@keyframes click-ring-burst2 {
+  from { width: 20px; height: 20px; opacity: 0.5; border-color: #F28B82; }
+  to   { width: 80px; height: 80px; opacity: 0; border-color: rgba(242,139,130,0); }
+}
+.click-ring-burst2 {
+  position: fixed; border-radius: 50%; pointer-events: none; z-index: 999995;
+  border: 1px solid #F28B82; transform: translate(-50%,-50%);
+  animation: click-ring-burst2 0.4s cubic-bezier(.16,1,.3,1) 0.06s forwards;
+}
 
 /* ── Rotating gradient border on CTA ── */
 .cta-border-wrap { position: relative; display: inline-flex; border-radius: 16px; padding: 2px; }
@@ -727,7 +764,7 @@ nav, main, section, footer,
 .cta-border-inner { position: relative; border-radius: 14px; overflow: hidden; background: #07070a; }
 
 /* ── Phosphor glow on gradient text ── */
-.g { filter: drop-shadow(0 0 12px rgba(155,109,255,0.4)) drop-shadow(0 0 28px rgba(155,109,255,0.15)); }
+.g { filter: drop-shadow(0 0 8px rgba(155,109,255,0.25)); }
 
 /* ── Neon flicker on counter ── */
 @keyframes neon-flicker {
