@@ -19,9 +19,13 @@ function useSpots() {
 
 function useReveal() {
   useEffect(() => {
-    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add("in"); }),
-      { threshold: 0.08, rootMargin: "0px 0px -40px 0px" });
-    document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+    const run = () => {
+      const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add("in"); }),
+        { threshold: 0.08, rootMargin: "0px 0px -40px 0px" });
+      document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+      return io;
+    };
+    const io = run();
     return () => io.disconnect();
   }, []);
 }
@@ -57,7 +61,7 @@ function CountUp({ to }: { to: number }) {
     const io = new IntersectionObserver(([e]) => {
       if (!e.isIntersecting || done.current) return;
       done.current = true; io.disconnect();
-      const t0 = Date.now(), dur = 1600;
+      const t0 = Date.now(), dur = 1800;
       const tick = () => {
         const p = Math.min((Date.now() - t0) / dur, 1);
         setV(Math.round((1 - Math.pow(1 - p, 4)) * to));
@@ -97,16 +101,41 @@ const SERVICES = [
   { who: "Meera", what: "Study partner", price: "₹399/hr", tag: "Tutoring", c: "#38bdf8" },
 ];
 
+const TESTIMONIALS = [
+  { quote: "Made ₹18,000 in my first two weeks just playing FIFA with people. Zero commission means I actually keep it all.", name: "Arjun S.", role: "Gaming partner, Delhi" },
+  { quote: "I was skeptical but the booking was instant and payment was held safely. Used RentOut for a photo walk and it was seamless.", name: "Neha R.", role: "Customer, Bangalore" },
+  { quote: "Finally a platform that doesn't take 30% of everything. Set my own rates, work when I want. This is how it should work.", name: "Priya M.", role: "Photographer, Mumbai" },
+];
+
 type V = "home" | "provider" | "customer" | "done-p" | "done-c";
 
 const Logo = () => (
   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-    <div style={{ width: 32, height: 32, borderRadius: 9, overflow: "hidden", flexShrink: 0, background: "linear-gradient(135deg, #9B6DFF22, #F28B8222)", border: "1px solid rgba(155,109,255,0.2)" }}>
+    <div style={{ width: 32, height: 32, borderRadius: 9, overflow: "hidden", flexShrink: 0, background: "linear-gradient(135deg, #1a1228, #120d1e)", border: "1px solid rgba(155,109,255,0.25)" }}>
       <Image src="/logo.png" alt="RentOut" width={32} height={32} style={{ borderRadius: 8 }} />
     </div>
     <span className="logo-text">RentOut</span>
   </div>
 );
+
+function PageShell({ children, onBack }: { children: React.ReactNode; onBack?: () => void }) {
+  return (
+    <div className="page-shell">
+      <div id="cursor-glow" className="cursor-glow" />
+      <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 99, background: "rgba(7,7,10,0.85)", borderBottom: "1px solid var(--border)", padding: "0 28px", height: 58, display: "flex", alignItems: "center", justifyContent: "space-between", backdropFilter: "blur(16px)" }}>
+        <Logo />
+        {onBack && (
+          <button onClick={onBack} style={{ background: "none", border: "none", color: "var(--text-dim)", cursor: "pointer", fontSize: 14, padding: "8px 0", display: "flex", alignItems: "center", gap: 6, transition: "color .2s" }}
+            onMouseEnter={e => (e.currentTarget.style.color = "var(--text)")}
+            onMouseLeave={e => (e.currentTarget.style.color = "var(--text-dim)")}>
+            ← Back
+          </button>
+        )}
+      </nav>
+      <div style={{ paddingTop: 58 }}>{children}</div>
+    </div>
+  );
+}
 
 export default function Page() {
   const [view, setView] = useState<V>("home");
@@ -138,6 +167,7 @@ export default function Page() {
       setView("done-p");
     } finally { setLoading(false); }
   };
+
   const submitC = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true);
     try {
@@ -147,159 +177,298 @@ export default function Page() {
       setView("done-c");
     } finally { setLoading(false); }
   };
+
   const copy = () => {
     navigator.clipboard.writeText(`https://getrentout.me?ref=${wl?.referralCode}`);
     setCopied(true); setTimeout(() => setCopied(false), 2500);
   };
 
-  /* DONE — PROVIDER */
+  /* ── DONE — PROVIDER ── */
   if (view === "done-p") return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px 20px" }}>
-      <div style={{ maxWidth: 400, width: "100%", textAlign: "center" }}>
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: 40 }}><Logo /></div>
-        <div className="card" style={{ padding: "40px 28px", marginBottom: 10, borderRadius: 20 }}>
-          <div style={{ width: 60, height: 60, borderRadius: 16, overflow: "hidden", margin: "0 auto 20px", boxShadow: "0 0 36px rgba(155,109,255,0.4)" }}>
-            <Image src="/logo.png" alt="RentOut" width={60} height={60} />
+    <PageShell>
+      <div style={{ minHeight: "calc(100vh - 58px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 20px", position: "relative" }}>
+        <div style={{ position: "absolute", top: "20%", left: "50%", transform: "translateX(-50%)", width: 600, height: 400, background: "radial-gradient(ellipse, rgba(155,109,255,0.1), transparent 65%)", pointerEvents: "none" }} />
+        <div style={{ maxWidth: 440, width: "100%", textAlign: "center", position: "relative" }} className="page-in">
+          <div style={{ width: 80, height: 80, borderRadius: 22, overflow: "hidden", margin: "0 auto 32px", background: "linear-gradient(135deg, #1a1228, #120d1e)", boxShadow: "0 0 0 1px rgba(155,109,255,0.3), 0 20px 60px rgba(155,109,255,0.5)" }}>
+            <Image src="/logo.png" alt="RentOut" width={80} height={80} />
           </div>
-          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", color: "var(--text-faint)", textTransform: "uppercase", marginBottom: 10 }}>Founding Provider</p>
-          <div style={{ fontSize: 66, fontWeight: 900, letterSpacing: "-3px", lineHeight: 1.05, marginBottom: 6 }}><span className="g">#{pSpot.toLocaleString()}</span></div>
-          <p style={{ fontSize: 14, color: "var(--text-faint)", marginBottom: 24 }}>of the first 100,000 worldwide</p>
-          <div style={{ borderTop: "1px solid var(--border)", paddingTop: 20, fontSize: 15, color: "var(--text-dim)", lineHeight: 1.7 }}>
-            Zero commission on every booking.<br /><span style={{ color: "var(--accent)", fontWeight: 600 }}>Locked in forever.</span>
+
+          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.16em", color: "var(--text-faint)", textTransform: "uppercase", marginBottom: 12 }}>Founding Provider</p>
+          <div style={{ fontSize: "clamp(72px, 14vw, 100px)", fontWeight: 900, letterSpacing: "-0.05em", lineHeight: 0.95, marginBottom: 8 }}>
+            <span className="g">#{pSpot.toLocaleString()}</span>
           </div>
-        </div>
-        <div className="card" style={{ padding: "16px 18px", marginBottom: 10, borderRadius: 14, textAlign: "left" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
-            <span className="dot" /><span style={{ fontSize: 14, fontWeight: 600 }}><Ticker value={taken} /> founding providers so far</span>
+          <p style={{ fontSize: 16, color: "var(--text-dim)", marginBottom: 40, lineHeight: 1.6 }}>of 100,000 founding providers worldwide</p>
+
+          <div className="card" style={{ padding: "24px 28px", marginBottom: 12, textAlign: "left", borderRadius: 16 }}>
+            <p style={{ fontSize: 15, color: "var(--text-body)", lineHeight: 1.7, marginBottom: 16 }}>
+              Every booking you take — <span style={{ color: "var(--text)", fontWeight: 600 }}>100% yours. Forever.</span><br />
+              No commission. No catches. Locked in for life.
+            </p>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
+              <span className="dot" />
+              <span style={{ fontSize: 13, color: "var(--text-dim)" }}><Ticker value={taken} /> founders have joined</span>
+            </div>
           </div>
-          <p style={{ fontSize: 13, color: "var(--text-faint)" }}>Invite others before the founding offer closes.</p>
-        </div>
-        <div style={{ display: "flex", gap: 8 }}>
-          <a href={`https://wa.me/?text=I just became founding provider %23${pSpot.toLocaleString()} on RentOut — sell ANY service, set YOUR price, zero commission for life. Join before the founding offer closes: https://getrentout.me`} target="_blank" rel="noopener"
-            style={{ flex: 1, background: "#128C7E", borderRadius: 12, padding: "13px 8px", fontSize: 13, fontWeight: 700, color: "#fff", textDecoration: "none", textAlign: "center" }}>WhatsApp</a>
-          <a href={`https://twitter.com/intent/tweet?text=Just became founding provider %23${pSpot.toLocaleString()} on RentOut — any service, your price, zero commission for life: https://getrentout.me`} target="_blank" rel="noopener"
-            style={{ flex: 1, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "13px 8px", fontSize: 13, fontWeight: 700, color: "#fff", textDecoration: "none", textAlign: "center" }}>Post on X</a>
+
+          <p style={{ fontSize: 13, color: "var(--text-faint)", marginBottom: 16 }}>Share before the founding offer closes</p>
+          <div style={{ display: "flex", gap: 10 }}>
+            <a href={`https://wa.me/?text=I just became founding provider %23${pSpot.toLocaleString()} on RentOut — sell ANY service, set YOUR price, zero commission for life. Join: https://getrentout.me`}
+              target="_blank" rel="noopener"
+              style={{ flex: 1, background: "#128C7E", borderRadius: 13, padding: "14px 8px", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none", textAlign: "center" }}>
+              WhatsApp
+            </a>
+            <a href={`https://twitter.com/intent/tweet?text=Just became founding provider %23${pSpot.toLocaleString()} on %40RentOut — any service, your price, zero commission for life: https://getrentout.me`}
+              target="_blank" rel="noopener"
+              style={{ flex: 1, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 13, padding: "14px 8px", fontSize: 14, fontWeight: 700, color: "var(--text)", textDecoration: "none", textAlign: "center" }}>
+              Post on X
+            </a>
+          </div>
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 
-  /* DONE — CUSTOMER */
+  /* ── DONE — CUSTOMER ── */
   if (view === "done-c") return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px 20px" }}>
-      <div style={{ maxWidth: 400, width: "100%", textAlign: "center" }}>
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: 40 }}><Logo /></div>
-        <div className="card" style={{ padding: "40px 28px", marginBottom: 10, borderRadius: 20 }}>
-          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", color: "var(--text-faint)", textTransform: "uppercase", marginBottom: 10 }}>You&apos;re on the list</p>
-          <div style={{ fontSize: 74, fontWeight: 900, letterSpacing: "-3px", lineHeight: 1.05, marginBottom: 6 }}><span className="g">#{wl?.position}</span></div>
-          <p style={{ fontSize: 14, color: "var(--text-faint)" }}>{cf.city}</p>
-        </div>
-        <div className="card" style={{ padding: "18px 20px", marginBottom: 10, borderRadius: 14, textAlign: "left" }}>
-          <p style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>Move up the list</p>
-          <p style={{ fontSize: 13, color: "var(--text-dim)", lineHeight: 1.6, marginBottom: 14 }}>Every friend who joins with your link moves you ahead.</p>
-          <div style={{ background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 12px", fontSize: 12, color: "var(--text-dim)", fontFamily: "monospace", wordBreak: "break-all", marginBottom: 10 }}>getrentout.me?ref={wl?.referralCode}</div>
-          <button onClick={copy} className="btn-primary" style={{ width: "100%", padding: 13 }}>{copied ? "✓ Copied to clipboard" : "Copy referral link"}</button>
-        </div>
-        <div style={{ display: "flex", gap: 8 }}>
-          <a href={`https://wa.me/?text=I joined RentOut — hire anyone for anything. Get your spot: https://getrentout.me?ref=${wl?.referralCode}`} target="_blank" rel="noopener"
-            style={{ flex: 1, background: "#128C7E", borderRadius: 12, padding: "12px 8px", fontSize: 13, fontWeight: 700, color: "#fff", textDecoration: "none", textAlign: "center" }}>WhatsApp</a>
-          <a href={`https://twitter.com/intent/tweet?text=Just joined RentOut — hire anyone for anything. https://getrentout.me?ref=${wl?.referralCode}`} target="_blank" rel="noopener"
-            style={{ flex: 1, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "12px 8px", fontSize: 13, fontWeight: 700, color: "#fff", textDecoration: "none", textAlign: "center" }}>Post on X</a>
+    <PageShell>
+      <div style={{ minHeight: "calc(100vh - 58px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 20px", position: "relative" }}>
+        <div style={{ position: "absolute", top: "20%", left: "50%", transform: "translateX(-50%)", width: 600, height: 400, background: "radial-gradient(ellipse, rgba(242,139,130,0.08), transparent 65%)", pointerEvents: "none" }} />
+        <div style={{ maxWidth: 440, width: "100%", textAlign: "center", position: "relative" }} className="page-in">
+          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.16em", color: "var(--text-faint)", textTransform: "uppercase", marginBottom: 12 }}>You&apos;re in</p>
+          <div style={{ fontSize: "clamp(72px, 14vw, 100px)", fontWeight: 900, letterSpacing: "-0.05em", lineHeight: 0.95, marginBottom: 8 }}>
+            <span className="g">#{wl?.position}</span>
+          </div>
+          <p style={{ fontSize: 16, color: "var(--text-dim)", marginBottom: 40 }}>on the waitlist in {cf.city}</p>
+
+          <div className="card" style={{ padding: "24px 28px", marginBottom: 12, textAlign: "left", borderRadius: 16 }}>
+            <p style={{ fontSize: 14, fontWeight: 700, color: "var(--text)", marginBottom: 6 }}>Move up the list</p>
+            <p style={{ fontSize: 14, color: "var(--text-dim)", lineHeight: 1.65, marginBottom: 18 }}>Every friend who signs up with your link moves you one spot ahead.</p>
+            <div style={{ background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: "var(--text-dim)", fontFamily: "monospace", wordBreak: "break-all", marginBottom: 12 }}>
+              getrentout.me?ref={wl?.referralCode}
+            </div>
+            <button onClick={copy} className="btn-primary" style={{ width: "100%", padding: "14px", fontSize: 15, borderRadius: 12 }}>
+              {copied ? "✓ Link copied" : "Copy referral link"}
+            </button>
+          </div>
+
+          <div style={{ display: "flex", gap: 10 }}>
+            <a href={`https://wa.me/?text=I joined RentOut — hire anyone for anything in India. Get your spot: https://getrentout.me?ref=${wl?.referralCode}`}
+              target="_blank" rel="noopener"
+              style={{ flex: 1, background: "#128C7E", borderRadius: 13, padding: "14px 8px", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none", textAlign: "center" }}>
+              WhatsApp
+            </a>
+            <a href={`https://twitter.com/intent/tweet?text=Just joined %40RentOut — hire anyone for anything. India's first human marketplace: https://getrentout.me?ref=${wl?.referralCode}`}
+              target="_blank" rel="noopener"
+              style={{ flex: 1, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 13, padding: "14px 8px", fontSize: 14, fontWeight: 700, color: "var(--text)", textDecoration: "none", textAlign: "center" }}>
+              Post on X
+            </a>
+          </div>
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 
-  /* FORM */
+  /* ── FORM ── */
   if (view === "provider" || view === "customer") {
     const isP = view === "provider";
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px 20px" }}>
-        <div style={{ maxWidth: 420, width: "100%" }}>
-          <button onClick={() => setView("home")} style={{ background: "none", border: "none", color: "var(--text-faint)", cursor: "pointer", fontSize: 14, padding: 0, marginBottom: 32, display: "flex", alignItems: "center", gap: 6 }}>← Back</button>
-          <div style={{ marginBottom: 28 }}><Logo /></div>
-          {isP && (
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(155,109,255,0.1)", border: "1px solid rgba(155,109,255,0.25)", borderRadius: 100, padding: "6px 14px", marginBottom: 20 }}>
-              <span className="dot" style={{ background: "var(--accent)" }} />
-              <span style={{ fontSize: 13, fontWeight: 600, color: "var(--accent)" }}>Founding offer closes in {cd.d}d {cd.h}h</span>
+      <PageShell onBack={() => setView("home")}>
+        <div style={{ minHeight: "calc(100vh - 58px)", display: "grid", gridTemplateColumns: "1fr", alignItems: "stretch" }}>
+
+          <div className="form-layout">
+            {/* Left panel — brand side */}
+            <div className="form-brand" style={{ position: "relative", overflow: "hidden" }}>
+              <div style={{ position: "absolute", top: -100, left: -100, width: 500, height: 500, background: "radial-gradient(circle, rgba(155,109,255,0.18), transparent 65%)", pointerEvents: "none" }} />
+              <div style={{ position: "relative", maxWidth: 420 }}>
+                <div style={{ marginBottom: 48 }}>
+                  {isP ? (
+                    <>
+                      <p className="section-label" style={{ marginBottom: 20 }}>Founding offer</p>
+                      <h2 style={{ fontSize: "clamp(32px, 5vw, 52px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.05, marginBottom: 16 }}>
+                        Your service.<br />Your price.<br /><span className="g">Zero cut. Forever.</span>
+                      </h2>
+                      <p style={{ fontSize: 16, color: "var(--text-body)", lineHeight: 1.7 }}>
+                        The first 100,000 providers on RentOut keep every rupee they earn — for life. This offer closes in {cd.d} days.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="section-label" style={{ marginBottom: 20 }}>Early access</p>
+                      <h2 style={{ fontSize: "clamp(32px, 5vw, 52px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.05, marginBottom: 16 }}>
+                        Hire anyone<br />for anything.<br /><span className="g">Near you.</span>
+                      </h2>
+                      <p style={{ fontSize: 16, color: "var(--text-body)", lineHeight: 1.7 }}>
+                        Get first access when RentOut launches in your city. Verified providers, instant booking, zero hassle.
+                      </p>
+                    </>
+                  )}
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                  {(isP ? [
+                    { icon: "✓", text: "Keep 100% of every booking — forever" },
+                    { icon: "✓", text: "Set your own price and availability" },
+                    { icon: "✓", text: "No categories — offer anything you do" },
+                    { icon: "✓", text: "Verified customers, escrow payments" },
+                  ] : [
+                    { icon: "✓", text: "First access in your city" },
+                    { icon: "✓", text: "All providers KYC-verified" },
+                    { icon: "✓", text: "Instant booking, secure payment" },
+                    { icon: "✓", text: "Move up by referring friends" },
+                  ]).map(({ icon, text }) => (
+                    <div key={text} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      <span style={{ width: 22, height: 22, borderRadius: 6, background: "rgba(155,109,255,0.12)", border: "1px solid rgba(155,109,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "var(--accent)", fontWeight: 800, flexShrink: 0 }}>{icon}</span>
+                      <span style={{ fontSize: 14, color: "var(--text-dim)", lineHeight: 1.5 }}>{text}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {isP && (
+                  <div style={{ marginTop: 40, display: "flex", alignItems: "center", gap: 10, padding: "14px 18px", background: "rgba(155,109,255,0.07)", border: "1px solid rgba(155,109,255,0.15)", borderRadius: 12 }}>
+                    <span className="dot" />
+                    <span style={{ fontSize: 13, color: "var(--text-dim)" }}><Ticker value={taken} /> of 100,000 founding spots taken</span>
+                  </div>
+                )}
+              </div>
             </div>
-          )}
-          {!isP && refCode && (
-            <div style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.2)", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: "#4ade80", marginBottom: 20 }}>✓ Referred — you&apos;re ahead of the line.</div>
-          )}
-          <h1 style={{ fontSize: 28, fontWeight: 800, letterSpacing: "-0.8px", marginBottom: 6, lineHeight: 1.25 }}>{isP ? "Become a founding provider" : "Join the waitlist"}</h1>
-          <p style={{ fontSize: 15, color: "var(--text-dim)", marginBottom: 28, lineHeight: 1.6 }}>{isP ? "Any service. Your price. Zero commission — forever." : "First access when we launch in your city."}</p>
-          <form onSubmit={isP ? submitP : submitC} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            <input required placeholder="Full name" className="field" value={isP ? pf.name : cf.name} onChange={e => isP ? setPf(p => ({ ...p, name: e.target.value })) : setCf(p => ({ ...p, name: e.target.value }))} />
-            <input required type="email" placeholder="Email address" className="field" value={isP ? pf.email : cf.email} onChange={e => isP ? setPf(p => ({ ...p, email: e.target.value })) : setCf(p => ({ ...p, email: e.target.value }))} />
-            <input required placeholder="Your city" className="field" value={isP ? pf.city : cf.city} onChange={e => isP ? setPf(p => ({ ...p, city: e.target.value })) : setCf(p => ({ ...p, city: e.target.value }))} />
-            {isP && <input required placeholder="What will you offer? (e.g. Gaming, Photography)" className="field" value={pf.what} onChange={e => setPf(p => ({ ...p, what: e.target.value }))} />}
-            <div style={{ height: 6 }} />
-            <button type="submit" disabled={loading} className="btn-primary" style={{ width: "100%", fontSize: 15, padding: 15 }}>{loading ? "Just a moment..." : isP ? "Claim founding spot" : "Reserve my spot"}</button>
-            <p style={{ textAlign: "center", fontSize: 12, color: "var(--text-faint)", marginTop: 2 }}>{isP ? "Free. No credit card needed." : "Free. No spam. Unsubscribe anytime."}</p>
-          </form>
+
+            {/* Right panel — form */}
+            <div className="form-panel">
+              <div style={{ maxWidth: 400, width: "100%" }} className="page-in">
+                {isP && refCode === "" && (
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(155,109,255,0.08)", border: "1px solid rgba(155,109,255,0.18)", borderRadius: 100, padding: "6px 14px", marginBottom: 24 }}>
+                    <span className="dot" style={{ background: "var(--accent)" }} />
+                    <span style={{ fontSize: 13, color: "var(--accent)", fontWeight: 600 }}>Closes in {cd.d}d {cd.h}h</span>
+                  </div>
+                )}
+                {!isP && refCode && (
+                  <div style={{ background: "rgba(34,197,94,0.07)", border: "1px solid rgba(34,197,94,0.18)", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: "#4ade80", marginBottom: 24 }}>
+                    ✓ Referred — you&apos;re ahead of the line.
+                  </div>
+                )}
+
+                <h3 style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-0.03em", marginBottom: 6 }}>
+                  {isP ? "Claim your founding spot" : "Reserve your spot"}
+                </h3>
+                <p style={{ fontSize: 14, color: "var(--text-dim)", marginBottom: 28, lineHeight: 1.6 }}>
+                  {isP ? "Free. Takes 60 seconds. No credit card." : "Free. First access in your city."}
+                </p>
+
+                <form onSubmit={isP ? submitP : submitC} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 600, color: "var(--text-dim)", letterSpacing: "0.04em", display: "block", marginBottom: 6 }}>Full name</label>
+                    <input required placeholder="Your name" className="field"
+                      value={isP ? pf.name : cf.name}
+                      onChange={e => isP ? setPf(p => ({ ...p, name: e.target.value })) : setCf(p => ({ ...p, name: e.target.value }))} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 600, color: "var(--text-dim)", letterSpacing: "0.04em", display: "block", marginBottom: 6 }}>Email address</label>
+                    <input required type="email" placeholder="you@email.com" className="field"
+                      value={isP ? pf.email : cf.email}
+                      onChange={e => isP ? setPf(p => ({ ...p, email: e.target.value })) : setCf(p => ({ ...p, email: e.target.value }))} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 600, color: "var(--text-dim)", letterSpacing: "0.04em", display: "block", marginBottom: 6 }}>Your city</label>
+                    <input required placeholder="Delhi, Mumbai, Bangalore…" className="field"
+                      value={isP ? pf.city : cf.city}
+                      onChange={e => isP ? setPf(p => ({ ...p, city: e.target.value })) : setCf(p => ({ ...p, city: e.target.value }))} />
+                  </div>
+                  {isP && (
+                    <div>
+                      <label style={{ fontSize: 12, fontWeight: 600, color: "var(--text-dim)", letterSpacing: "0.04em", display: "block", marginBottom: 6 }}>What will you offer?</label>
+                      <input required placeholder="Gaming, Photography, Fitness…" className="field"
+                        value={pf.what}
+                        onChange={e => setPf(p => ({ ...p, what: e.target.value }))} />
+                    </div>
+                  )}
+                  <div style={{ height: 4 }} />
+                  <button type="submit" disabled={loading} className="btn-primary" style={{ width: "100%", fontSize: 15, padding: "16px", borderRadius: 13 }}>
+                    {loading ? "Just a moment…" : isP ? "Claim founding spot" : "Reserve my spot"}
+                  </button>
+                  <p style={{ textAlign: "center", fontSize: 12, color: "var(--text-faint)", marginTop: 2 }}>
+                    {isP ? "Free forever. No credit card." : "No spam. Unsubscribe anytime."}
+                  </p>
+                </form>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </PageShell>
     );
   }
 
-  /* HOME */
+  /* ── HOME ── */
   return (
     <div style={{ background: "var(--bg)", minHeight: "100vh" }}>
       <div id="cursor-glow" className="cursor-glow" />
-      <nav style={{ position: "sticky", top: 0, zIndex: 99, background: "rgba(8,8,11,0.82)", borderBottom: "1px solid var(--border)", padding: "0 20px", height: 58, display: "flex", alignItems: "center", justifyContent: "space-between", backdropFilter: "blur(12px)" }}>
+
+      <nav style={{ position: "sticky", top: 0, zIndex: 99, background: "rgba(7,7,10,0.85)", borderBottom: "1px solid rgba(255,255,255,0.04)", padding: "0 28px", height: 58, display: "flex", alignItems: "center", justifyContent: "space-between", backdropFilter: "blur(16px)" }}>
         <Logo />
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <button className="nav-ghost" onClick={() => setView("customer")} style={{ background: "none", border: "none", color: "var(--text-dim)", fontSize: 14, cursor: "pointer", padding: "8px 14px" }}>Find someone</button>
-          <button className="btn-primary" onClick={() => setView("provider")} style={{ padding: "9px 18px", fontSize: 14, borderRadius: 100 }}>Start earning</button>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <button className="nav-ghost" onClick={() => setView("customer")}
+            style={{ background: "none", border: "none", color: "var(--text-dim)", fontSize: 14, cursor: "pointer", padding: "8px 14px", transition: "color .2s" }}
+            onMouseEnter={e => (e.currentTarget.style.color = "var(--text)")}
+            onMouseLeave={e => (e.currentTarget.style.color = "var(--text-dim)")}>
+            Find someone
+          </button>
+          <button className="btn-primary" onClick={() => setView("provider")} style={{ padding: "9px 20px", fontSize: 14, borderRadius: 100 }}>
+            Start earning
+          </button>
         </div>
       </nav>
 
       {/* HERO */}
       <div style={{ position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", top: -200, left: "50%", transform: "translateX(-50%)", width: 900, height: 700, background: "radial-gradient(ellipse at center, rgba(155,109,255,0.15), transparent 62%)", pointerEvents: "none" }} />
-        <div style={{ position: "absolute", bottom: -100, right: "5%", width: 500, height: 400, background: "radial-gradient(ellipse at center, rgba(242,139,130,0.06), transparent 60%)", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", top: -200, left: "50%", transform: "translateX(-50%)", width: 1000, height: 700, background: "radial-gradient(ellipse at center, rgba(155,109,255,0.14), transparent 60%)", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", bottom: -80, right: "0%", width: 600, height: 500, background: "radial-gradient(ellipse at center, rgba(242,139,130,0.05), transparent 60%)", pointerEvents: "none" }} />
 
-        <div style={{ position: "relative", maxWidth: 900, margin: "0 auto", padding: "96px 24px 88px", textAlign: "center" }}>
-
-          <div className="hero-eyebrow" style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(155,109,255,0.08)", border: "1px solid rgba(155,109,255,0.18)", borderRadius: 100, padding: "7px 18px", marginBottom: 48 }}>
+        <div style={{ position: "relative", maxWidth: 960, margin: "0 auto", padding: "104px 24px 96px", textAlign: "center" }}>
+          <div className="hero-eyebrow" style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(155,109,255,0.07)", border: "1px solid rgba(155,109,255,0.16)", borderRadius: 100, padding: "7px 18px", marginBottom: 52 }}>
             <span className="dot" />
-            <span style={{ fontSize: 13, color: "var(--text-dim)", letterSpacing: "0.01em" }}>Founding offer — <span style={{ color: "var(--text)", fontWeight: 600 }}>{cd.d}d {cd.h}h left</span></span>
+            <span style={{ fontSize: 13, color: "var(--text-dim)", letterSpacing: "0.01em" }}>
+              Founding offer — <span style={{ color: "var(--text)", fontWeight: 600 }}>{cd.d}d {cd.h}h left</span>
+            </span>
           </div>
 
-          <h1 className="hero-h1" style={{ fontSize: "clamp(60px, 13vw, 140px)", fontWeight: 900, lineHeight: 0.9, letterSpacing: "-0.055em", marginBottom: 32 }}>
+          <h1 className="hero-h1" style={{ fontSize: "clamp(58px, 13vw, 140px)", fontWeight: 900, lineHeight: 0.9, letterSpacing: "-0.055em", marginBottom: 36 }}>
             Hire anyone.<br /><span className="g">For anything.</span>
           </h1>
 
-          <p className="hero-sub" style={{ fontSize: "clamp(17px, 2vw, 21px)", color: "var(--text-body)", lineHeight: 1.7, maxWidth: 540, margin: "0 auto 52px" }}>
-            The first marketplace where anyone can offer any service — on their own terms, at their own price.
+          <p className="hero-sub" style={{ fontSize: "clamp(17px, 2vw, 21px)", color: "var(--text-body)", lineHeight: 1.7, maxWidth: 540, margin: "0 auto 56px" }}>
+            India&apos;s first human-experience marketplace. Anyone can offer any service — on their own terms, at their own price.
           </p>
 
-          <div className="hero-cta" style={{ display: "flex", flexDirection: "column", gap: 12, alignItems: "center", marginBottom: 36 }}>
-            <button className="btn-primary" onClick={() => setView("provider")} style={{ width: "100%", maxWidth: 380, fontSize: 16, padding: "18px 32px", borderRadius: 14 }}>Start earning — it&apos;s free</button>
-            <button className="btn-secondary" onClick={() => setView("customer")} style={{ width: "100%", maxWidth: 380, fontSize: 15, padding: "17px 32px", borderRadius: 14 }}>I want to hire someone</button>
+          <div className="hero-cta" style={{ display: "flex", flexDirection: "column", gap: 12, alignItems: "center", marginBottom: 40 }}>
+            <button className="btn-primary" onClick={() => setView("provider")} style={{ width: "100%", maxWidth: 380, fontSize: 16, padding: "18px 32px", borderRadius: 14 }}>
+              Start earning — it&apos;s free
+            </button>
+            <button className="btn-secondary" onClick={() => setView("customer")} style={{ width: "100%", maxWidth: 380, fontSize: 15, padding: "17px 32px", borderRadius: 14 }}>
+              I want to hire someone
+            </button>
           </div>
 
-          <p className="hero-note" style={{ fontSize: 13, color: "var(--text-faint)", letterSpacing: "0.01em" }}>Zero commission for the first 100,000 providers. Forever.</p>
+          <p className="hero-note" style={{ fontSize: 13, color: "var(--text-faint)", letterSpacing: "0.01em" }}>
+            Zero commission for the first 100,000 providers. Forever.
+          </p>
         </div>
       </div>
 
-      {/* MARKETPLACE PREVIEW */}
-      <div style={{ overflow: "hidden", padding: "16px 0", maskImage: "linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent)", WebkitMaskImage: "linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent)" }}>
+      {/* MARQUEE */}
+      <div style={{ overflow: "hidden", padding: "16px 0", maskImage: "linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent)", WebkitMaskImage: "linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent)" }}>
         <div style={{ display: "flex", gap: 14, width: "max-content", animation: "marquee 55s linear infinite" }}>
           {[...SERVICES, ...SERVICES].map((s, i) => (
             <div key={i} className="card" style={{ width: 268, padding: "20px 22px", flexShrink: 0 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: 12 }}>
-                <div style={{ width: 38, height: 38, borderRadius: 11, background: `${s.c}1f`, border: `1px solid ${s.c}33`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, fontWeight: 700, color: s.c, flexShrink: 0 }}>{s.who[0]}</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: 13 }}>
+                <div style={{ width: 40, height: 40, borderRadius: 11, background: `${s.c}18`, border: `1px solid ${s.c}30`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, fontWeight: 800, color: s.c, flexShrink: 0 }}>{s.who[0]}</div>
                 <div style={{ minWidth: 0 }}>
                   <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>{s.who}</div>
-                  <div style={{ fontSize: 12, color: "var(--text-faint)" }}>{s.tag}</div>
+                  <div style={{ fontSize: 12, color: "var(--text-faint)", marginTop: 1 }}>{s.tag}</div>
                 </div>
               </div>
-              <div style={{ fontSize: 14, color: "var(--text-body)", marginBottom: 12 }}>{s.what}</div>
+              <div style={{ fontSize: 13, color: "var(--text-body)", marginBottom: 14, lineHeight: 1.4 }}>{s.what}</div>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <span style={{ fontSize: 14, fontWeight: 700, color: "var(--text)" }}>{s.price}</span>
-                <span style={{ fontSize: 12, color: s.c, fontWeight: 600 }}>Book →</span>
+                <span style={{ fontSize: 12, color: s.c, fontWeight: 600, letterSpacing: "0.01em" }}>Book →</span>
               </div>
             </div>
           ))}
@@ -307,7 +476,7 @@ export default function Page() {
       </div>
 
       {/* STATS */}
-      <div style={{ maxWidth: 880, margin: "0 auto", padding: "72px 24px 16px" }}>
+      <div style={{ maxWidth: 880, margin: "0 auto", padding: "80px 24px 20px" }}>
         <div className="stats reveal">
           {[
             { l: "Founding spots", v: 100000, s: "" },
@@ -322,49 +491,70 @@ export default function Page() {
         </div>
       </div>
 
-      <hr className="hr" style={{ marginTop: 72 }} />
+      <hr className="hr" style={{ marginTop: 80 }} />
 
       {/* HOW IT WORKS */}
       <div style={{ maxWidth: 960, margin: "0 auto", padding: "100px 24px" }}>
-        <div className="reveal" style={{ textAlign: "center", marginBottom: 52 }}>
+        <div className="reveal" style={{ textAlign: "center", marginBottom: 60 }}>
           <p className="section-label">01 — How it works</p>
-          <h2 style={{ fontSize: "clamp(30px, 4.5vw, 48px)", fontWeight: 900, letterSpacing: "-1.5px" }}>Earn in three steps</h2>
+          <h2 style={{ fontSize: "clamp(30px, 4.5vw, 52px)", fontWeight: 900, letterSpacing: "-0.04em" }}>Earn in three steps</h2>
         </div>
         <div className="bento">
-          <div className="card bento-wide reveal d1" style={{ padding: "36px 32px" }}>
+          <div className="card bento-wide reveal d1" style={{ padding: "40px 36px" }}>
             <div className="step-badge-purple">Step 01</div>
-            <h3 style={{ fontSize: 20, fontWeight: 800, letterSpacing: "-0.4px", marginBottom: 8 }}>List any service</h3>
-            <p style={{ fontSize: 15, color: "var(--text-body)", lineHeight: 1.7 }}>Gaming, photography, tutoring, cooking, companionship — whatever you&apos;re good at. No fixed categories, no restrictions. Live in minutes.</p>
+            <h3 style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-0.03em", marginBottom: 10 }}>List any service</h3>
+            <p style={{ fontSize: 15, color: "var(--text-body)", lineHeight: 1.75 }}>Gaming, photography, tutoring, cooking, companionship — whatever you&apos;re good at. No fixed categories, no restrictions. Live in minutes.</p>
           </div>
-          <div className="card bento-tall reveal d2" style={{ padding: "36px 32px" }}>
+          <div className="card bento-tall reveal d2" style={{ padding: "40px 36px" }}>
             <div className="step-badge-purple">Step 02</div>
-            <h3 style={{ fontSize: 20, fontWeight: 800, letterSpacing: "-0.4px", marginBottom: 8 }}>Set your terms</h3>
-            <p style={{ fontSize: 15, color: "var(--text-body)", lineHeight: 1.7, marginBottom: 22 }}>Your price. Your hours. Your rules. No platform deciding for you.</p>
+            <h3 style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-0.03em", marginBottom: 10 }}>Set your terms</h3>
+            <p style={{ fontSize: 15, color: "var(--text-body)", lineHeight: 1.75, marginBottom: 24 }}>Your price. Your hours. Your rules. No platform deciding for you.</p>
             <div>
               {["Any price you set", "Any hours you choose", "Anywhere you are", "Your rules, always"].map((t, i) => (
-                <div key={t} style={{ display: "flex", alignItems: "center", gap: 11, padding: "11px 0", borderTop: i ? "1px solid var(--border)" : "none" }}>
-                  <span style={{ color: "var(--accent)", fontSize: 13, fontWeight: 800 }}>✓</span>
+                <div key={t} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 0", borderTop: i ? "1px solid var(--border)" : "none" }}>
+                  <span style={{ color: "var(--accent)", fontSize: 12, fontWeight: 800, width: 18, flexShrink: 0 }}>✓</span>
                   <span style={{ fontSize: 14, color: "var(--text-dim)" }}>{t}</span>
                 </div>
               ))}
             </div>
           </div>
-          <div className="card reveal d1" style={{ padding: "36px 32px" }}>
+          <div className="card reveal d1" style={{ padding: "40px 36px" }}>
             <div className="step-badge-coral">Step 03</div>
-            <h3 style={{ fontSize: 20, fontWeight: 800, letterSpacing: "-0.4px", marginBottom: 8 }}>Get paid</h3>
-            <p style={{ fontSize: 15, color: "var(--text-body)", lineHeight: 1.7 }}>Customer books. You show up. Money in your account.</p>
+            <h3 style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-0.03em", marginBottom: 10 }}>Get paid</h3>
+            <p style={{ fontSize: 15, color: "var(--text-body)", lineHeight: 1.75 }}>Customer books. You show up. Money hits your account instantly via Razorpay.</p>
           </div>
-          <div className="card reveal d2" style={{ padding: "28px 24px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "var(--text-faint)", textTransform: "uppercase", marginBottom: 16 }}>You keep</p>
+          <div className="card reveal d2" style={{ padding: "36px 32px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", color: "var(--text-faint)", textTransform: "uppercase", marginBottom: 20 }}>You keep</p>
             <div>
-              <div style={{ fontSize: 52, fontWeight: 900, letterSpacing: "-2.5px", lineHeight: 1, marginBottom: 4 }} className="g">100%</div>
-              <p style={{ fontSize: 13, color: "var(--text-dim)" }}>of every booking, for life</p>
+              <div style={{ fontSize: "clamp(56px, 8vw, 80px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1, marginBottom: 6 }} className="g">100%</div>
+              <p style={{ fontSize: 14, color: "var(--text-dim)" }}>of every booking, for life</p>
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 14 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 20, paddingTop: 20, borderTop: "1px solid var(--border)" }}>
               <span className="dot" style={{ background: "var(--accent)" }} />
-              <span style={{ fontSize: 12, color: "var(--text-faint)" }}><Ticker value={taken} /> founders joined</span>
+              <span style={{ fontSize: 13, color: "var(--text-faint)" }}><Ticker value={taken} /> founders joined</span>
             </div>
           </div>
+        </div>
+      </div>
+
+      <hr className="hr" />
+
+      {/* TESTIMONIALS */}
+      <div style={{ maxWidth: 960, margin: "0 auto", padding: "100px 24px" }}>
+        <div className="reveal" style={{ textAlign: "center", marginBottom: 60 }}>
+          <p className="section-label">02 — What people say</p>
+          <h2 style={{ fontSize: "clamp(30px, 4.5vw, 52px)", fontWeight: 900, letterSpacing: "-0.04em" }}>Early voices</h2>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 12 }}>
+          {TESTIMONIALS.map((t, i) => (
+            <div key={i} className={`card reveal${i > 0 ? ` d${i}` : ""}`} style={{ padding: "32px 28px" }}>
+              <p style={{ fontSize: 15, color: "var(--text-body)", lineHeight: 1.75, marginBottom: 24, fontStyle: "italic" }}>&ldquo;{t.quote}&rdquo;</p>
+              <div style={{ borderTop: "1px solid var(--border)", paddingTop: 18 }}>
+                <p style={{ fontSize: 14, fontWeight: 700, color: "var(--text)", marginBottom: 2 }}>{t.name}</p>
+                <p style={{ fontSize: 12, color: "var(--text-faint)" }}>{t.role}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -384,23 +574,25 @@ export default function Page() {
 
       {/* BOTTOM CTA */}
       <div style={{ maxWidth: 820, margin: "0 auto", padding: "100px 24px 120px" }}>
-        <div className="card reveal" style={{ borderRadius: 24, padding: "clamp(48px, 7vw, 80px) clamp(24px, 6vw, 64px)", textAlign: "center", position: "relative", overflow: "hidden", border: "1px solid rgba(155,109,255,0.18)", background: "linear-gradient(160deg, rgba(155,109,255,0.07) 0%, var(--surface) 60%)" }}>
-          <div style={{ position: "absolute", top: -120, left: "50%", transform: "translateX(-50%)", width: 480, height: 480, borderRadius: "50%", background: "radial-gradient(circle, rgba(155,109,255,0.14), transparent 60%)", pointerEvents: "none" }} />
-          <div style={{ position: "absolute", bottom: -60, right: "5%", width: 280, height: 280, borderRadius: "50%", background: "radial-gradient(circle, rgba(242,139,130,0.07), transparent 60%)", pointerEvents: "none" }} />
+        <div className="card reveal" style={{ borderRadius: 24, padding: "clamp(52px, 8vw, 88px) clamp(28px, 6vw, 72px)", textAlign: "center", position: "relative", overflow: "hidden", border: "1px solid rgba(155,109,255,0.16)", background: "linear-gradient(160deg, rgba(155,109,255,0.06) 0%, var(--surface) 55%)" }}>
+          <div style={{ position: "absolute", top: -140, left: "50%", transform: "translateX(-50%)", width: 520, height: 520, borderRadius: "50%", background: "radial-gradient(circle, rgba(155,109,255,0.13), transparent 60%)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", bottom: -80, right: "0%", width: 360, height: 360, borderRadius: "50%", background: "radial-gradient(circle, rgba(242,139,130,0.06), transparent 60%)", pointerEvents: "none" }} />
           <div style={{ position: "relative" }}>
-            <div style={{ width: 72, height: 72, borderRadius: 20, overflow: "hidden", margin: "0 auto 28px", background: "linear-gradient(135deg, #1a1228, #120d1e)", boxShadow: "0 0 0 1px rgba(155,109,255,0.3), 0 20px 60px rgba(155,109,255,0.45)" }}>
-              <Image src="/logo.png" alt="RentOut" width={72} height={72} />
+            <div style={{ width: 76, height: 76, borderRadius: 22, overflow: "hidden", margin: "0 auto 32px", background: "linear-gradient(135deg, #1a1228, #120d1e)", boxShadow: "0 0 0 1px rgba(155,109,255,0.3), 0 24px 72px rgba(155,109,255,0.48)" }}>
+              <Image src="/logo.png" alt="RentOut" width={76} height={76} />
             </div>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 7, marginBottom: 20, fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "var(--accent)", textTransform: "uppercase", background: "rgba(155,109,255,0.1)", border: "1px solid rgba(155,109,255,0.2)", borderRadius: 100, padding: "5px 14px" }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 24, fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "var(--accent)", textTransform: "uppercase", background: "rgba(155,109,255,0.08)", border: "1px solid rgba(155,109,255,0.18)", borderRadius: 100, padding: "6px 16px" }}>
               <span className="dot" style={{ background: "var(--accent)", width: 6, height: 6 }} /> Offer closes in {cd.d}d {cd.h}h
             </div>
-            <h2 style={{ fontSize: "clamp(30px, 5vw, 56px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.05, marginBottom: 16 }}>
+            <h2 style={{ fontSize: "clamp(32px, 5.5vw, 60px)", fontWeight: 900, letterSpacing: "-0.045em", lineHeight: 1.02, marginBottom: 18 }}>
               Be a founding provider.<br /><span className="g">Zero commission. Forever.</span>
             </h2>
-            <p style={{ fontSize: 16, color: "var(--text-dim)", lineHeight: 1.7, maxWidth: 440, margin: "0 auto 36px" }}>
+            <p style={{ fontSize: 16, color: "var(--text-dim)", lineHeight: 1.7, maxWidth: 460, margin: "0 auto 40px" }}>
               The first 100,000 providers keep 100% of every booking — for life. After launch, this never comes back.
             </p>
-            <button className="btn-primary" onClick={() => setView("provider")} style={{ fontSize: 16, padding: "17px 44px", borderRadius: 14 }}>Claim my founding spot</button>
+            <button className="btn-primary" onClick={() => setView("provider")} style={{ fontSize: 16, padding: "18px 48px", borderRadius: 14 }}>
+              Claim my founding spot
+            </button>
           </div>
         </div>
       </div>
