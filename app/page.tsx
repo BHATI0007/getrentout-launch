@@ -329,22 +329,6 @@ export default function Page() {
         </div>
       </div>
 
-      {/* STATS */}
-      <div style={{ maxWidth: 880, margin: "0 auto", padding: "80px 24px 20px" }}>
-        <div className="stats reveal">
-          {[
-            { l: "Early access spots", v: 100000, s: "" },
-            { l: "Countries at launch", v: 160, s: "+" },
-            { l: "Cost to join", v: -1, s: "" },
-          ].map(({ l, v, s }) => (
-            <div className="stat" key={l}>
-              <div className="stat-num">{v === -1 ? <span className="g">$0</span> : <><CountUp to={v} />{s}</>}</div>
-              <div style={{ fontSize: 13, color: "var(--text-faint)", marginTop: 8, letterSpacing: "0.02em" }}>{l}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
       <hr className="hr" style={{ marginTop: 80 }} />
 
       {/* BOTTOM CTA */}
