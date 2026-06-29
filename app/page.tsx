@@ -285,7 +285,6 @@ export default function Page() {
                 <label style={{ fontSize: 12, fontWeight: 600, color: errors.name ? "var(--text-danger, #F28B82)" : "var(--text-dim)", letterSpacing: "0.04em", display: "block", marginBottom: 7 }}>Full name</label>
                 <input
                   type="text" placeholder="Your name" className="field"
-                  autoComplete="off" autoCorrect="off" autoCapitalize="words" spellCheck={false}
                   value={form.name}
                   style={{ borderColor: errors.name ? "#F28B82" : undefined }}
                   onChange={e => { setForm(p => ({ ...p, name: e.target.value })); setErrors(p => ({ ...p, name: "" })); }}
