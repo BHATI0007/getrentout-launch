@@ -116,14 +116,27 @@ export default function Page() {
   const [loading, setLoading] = useState(false);
   const [position, setPosition] = useState(0);
   const [form, setForm] = useState({ name: "", email: "", city: "" });
+  const [errors, setErrors] = useState({ name: "", email: "", city: "" });
   const spots = useSpots();
   const cd = useCountdown();
   const taken = TOTAL - spots;
   useReveal();
   useCursorGlow();
 
+  const validate = () => {
+    const e = { name: "", email: "", city: "" };
+    if (!form.name.trim()) e.name = "Please enter your name";
+    else if (form.name.trim().length < 2) e.name = "Name is too short";
+    if (!form.email.trim()) e.email = "Please enter your email";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) e.email = "That doesn't look like a valid email";
+    if (!form.city.trim()) e.city = "Please enter your city";
+    setErrors(e);
+    return !e.name && !e.email && !e.city;
+  };
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validate()) return;
     setLoading(true);
     try {
       const res = await fetch("/api/provider", {
@@ -269,31 +282,37 @@ export default function Page() {
 
             <form onSubmit={submit} autoComplete="off" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <div>
-                <label style={{ fontSize: 12, fontWeight: 600, color: "var(--text-dim)", letterSpacing: "0.04em", display: "block", marginBottom: 7 }}>Full name</label>
+                <label style={{ fontSize: 12, fontWeight: 600, color: errors.name ? "var(--text-danger, #F28B82)" : "var(--text-dim)", letterSpacing: "0.04em", display: "block", marginBottom: 7 }}>Full name</label>
                 <input
-                  required type="text" placeholder="Your name" className="field"
+                  type="text" placeholder="Your name" className="field"
                   autoComplete="off" autoCorrect="off" autoCapitalize="words" spellCheck={false}
                   value={form.name}
-                  onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
+                  style={{ borderColor: errors.name ? "#F28B82" : undefined }}
+                  onChange={e => { setForm(p => ({ ...p, name: e.target.value })); setErrors(p => ({ ...p, name: "" })); }}
                 />
+                {errors.name && <p style={{ fontSize: 12, color: "#F28B82", marginTop: 6 }}>{errors.name}</p>}
               </div>
               <div>
-                <label style={{ fontSize: 12, fontWeight: 600, color: "var(--text-dim)", letterSpacing: "0.04em", display: "block", marginBottom: 7 }}>Email address</label>
+                <label style={{ fontSize: 12, fontWeight: 600, color: errors.email ? "#F28B82" : "var(--text-dim)", letterSpacing: "0.04em", display: "block", marginBottom: 7 }}>Email address</label>
                 <input
-                  required type="email" placeholder="you@email.com" className="field"
+                  type="email" placeholder="you@email.com" className="field"
                   autoComplete="off" inputMode="email"
                   value={form.email}
-                  onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
+                  style={{ borderColor: errors.email ? "#F28B82" : undefined }}
+                  onChange={e => { setForm(p => ({ ...p, email: e.target.value })); setErrors(p => ({ ...p, email: "" })); }}
                 />
+                {errors.email && <p style={{ fontSize: 12, color: "#F28B82", marginTop: 6 }}>{errors.email}</p>}
               </div>
               <div>
-                <label style={{ fontSize: 12, fontWeight: 600, color: "var(--text-dim)", letterSpacing: "0.04em", display: "block", marginBottom: 7 }}>Your city</label>
+                <label style={{ fontSize: 12, fontWeight: 600, color: errors.city ? "#F28B82" : "var(--text-dim)", letterSpacing: "0.04em", display: "block", marginBottom: 7 }}>Your city</label>
                 <input
-                  required type="text" placeholder="City" className="field"
+                  type="text" placeholder="City" className="field"
                   autoComplete="off" autoCorrect="off"
                   value={form.city}
-                  onChange={e => setForm(p => ({ ...p, city: e.target.value }))}
+                  style={{ borderColor: errors.city ? "#F28B82" : undefined }}
+                  onChange={e => { setForm(p => ({ ...p, city: e.target.value })); setErrors(p => ({ ...p, city: "" })); }}
                 />
+                {errors.city && <p style={{ fontSize: 12, color: "#F28B82", marginTop: 6 }}>{errors.city}</p>}
               </div>
               <div style={{ height: 4 }} />
               <button type="submit" disabled={loading} className="btn-primary" style={{ width: "100%", fontSize: 15, padding: "17px", borderRadius: 13 }}>
