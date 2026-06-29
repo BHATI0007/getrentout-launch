@@ -144,6 +144,13 @@ export default function StatusPage() {
               ))}
             </div>
 
+            <a href={`/leaderboard?me=${code}`}
+              style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 14, padding: "14px", fontSize: 14, fontWeight: 700, color: "#8888aa", textDecoration: "none", width: "100%", marginBottom: 10, transition: "all .2s", boxSizing: "border-box" }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(155,109,255,0.25)"; e.currentTarget.style.color = "#b090ff"; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; e.currentTarget.style.color = "#8888aa"; }}>
+              🏆 View leaderboard
+            </a>
+
             <button onClick={() => { navigator.clipboard.writeText(shareUrl); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
               style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, background: copied ? "rgba(155,109,255,0.1)" : "rgba(255,255,255,0.04)", border: `1px solid ${copied ? "rgba(155,109,255,0.3)" : "rgba(255,255,255,0.08)"}`, borderRadius: 14, padding: "16px", fontSize: 14, fontWeight: 700, color: copied ? "#9B6DFF" : "#8888aa", cursor: "pointer", width: "100%", transition: "all .2s" }}>
               <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
