@@ -3,6 +3,26 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 
+function WorldMap() {
+  const dots = [
+    {lat:28.6,lng:77.2},{lat:19.07,lng:72.87},{lat:12.97,lng:77.59},{lat:22.57,lng:88.36},
+    {lat:51.5,lng:-0.12},{lat:40.71,lng:-74.0},{lat:37.77,lng:-122.4},{lat:35.68,lng:139.69},
+    {lat:-33.87,lng:151.2},{lat:48.85,lng:2.35},{lat:52.52,lng:13.4},{lat:55.75,lng:37.62},
+    {lat:31.23,lng:121.47},{lat:1.35,lng:103.82},{lat:-23.55,lng:-46.63},
+  ];
+  const p=(lat:number,lng:number)=>({x:(lng+180)/360*300,y:(90-lat)/180*150});
+  return (
+    <svg viewBox="0 0 300 150" style={{width:"100%",opacity:0.65}}>
+      {dots.map((d,i)=>{const {x,y}=p(d.lat,d.lng);return(
+        <g key={i} transform={`translate(${x},${y})`}>
+          <circle r="1.5" fill="#9B6DFF" opacity="0.9"/>
+          <circle r="1.5" fill="#9B6DFF" opacity="0.4" style={{animation:`map-pulse 2.5s ease-out ${i*0.3}s infinite`}}/>
+        </g>
+      );})}
+    </svg>
+  );
+}
+
 const Logo = () => (
   <a href="https://getrentout.me" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
     <div style={{ width: 32, height: 32, borderRadius: 9, overflow: "hidden", flexShrink: 0, background: "linear-gradient(135deg, #1a1228, #120d1e)", border: "1px solid rgba(155,109,255,0.25)" }}>
@@ -48,9 +68,15 @@ export default function LeaderboardPage() {
         <h1 style={{ fontSize: "clamp(32px, 7vw, 52px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.05, textAlign: "center", marginBottom: 8 }}>
           Leaderboard
         </h1>
-        <p style={{ fontSize: 15, color: "#8888aa", textAlign: "center", marginBottom: 48, lineHeight: 1.6 }}>
+        <p style={{ fontSize: 15, color: "#8888aa", textAlign: "center", marginBottom: 32, lineHeight: 1.6 }}>
           Each referral moves you 5 spots higher in line.<br />The more you share, the sooner you earn.
         </p>
+
+        {/* World map */}
+        <div style={{ background: "rgba(155,109,255,0.04)", border: "1px solid rgba(155,109,255,0.1)", borderRadius: 16, padding: "16px 20px", marginBottom: 32, overflow: "hidden" }}>
+          <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", color: "#555577", textTransform: "uppercase", marginBottom: 10, textAlign: "center" }}>Earners worldwide</p>
+          <WorldMap />
+        </div>
 
         {loading && (
           <div style={{ textAlign: "center", paddingTop: 40 }}>

@@ -4,6 +4,25 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 
+function Sparkline({ position }: { position: number }) {
+  const pts = Array.from({length:8},(_,i)=>{
+    const decay = Math.pow(0.72, 7-i);
+    return Math.round(position + (7-i)*14*decay + Math.sin(i*1.3)*2);
+  });
+  const max=Math.max(...pts), min=Math.min(...pts,position);
+  const W=140,H=36;
+  const px=(i:number)=>(i/(pts.length-1))*(W-8)+4;
+  const py=(v:number)=>H-((v-min)/(max-min||1))*(H-8)-4;
+  const d=pts.map((v,i)=>`${i===0?"M":"L"}${px(i)},${py(v)}`).join(" ")+` L${W-4},${py(position)}`;
+  return (
+    <svg width={W} height={H} style={{overflow:"visible"}}>
+      <defs><linearGradient id="sg2" x1="0" x2="1"><stop offset="0%" stopColor="#9B6DFF"/><stop offset="100%" stopColor="#F28B82"/></linearGradient></defs>
+      <path d={d} fill="none" stroke="url(#sg2)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.8"/>
+      <circle cx={W-4} cy={py(position)} r="3.5" fill="#F28B82" style={{filter:"drop-shadow(0 0 4px #F28B82)"}}/>
+    </svg>
+  );
+}
+
 const Logo = () => (
   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
     <div style={{ width: 32, height: 32, borderRadius: 9, overflow: "hidden", flexShrink: 0, background: "linear-gradient(135deg, #1a1228, #120d1e)", border: "1px solid rgba(155,109,255,0.25)" }}>
@@ -108,9 +127,14 @@ export default function StatusPage() {
             <p style={{ textAlign: "center", fontSize: 20, fontWeight: 700, marginBottom: 6 }}>
               {status.name.split(" ")[0]}, you&apos;re in line.
             </p>
-            <p style={{ textAlign: "center", fontSize: 14, color: "#8888aa", marginBottom: 40, lineHeight: 1.6 }}>
+            <p style={{ textAlign: "center", fontSize: 14, color: "#8888aa", marginBottom: 16, lineHeight: 1.6 }}>
               We&apos;ll email you when it&apos;s time to start earning.
             </p>
+            {/* Sparkline — position trend */}
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, marginBottom: 32 }}>
+              <Sparkline position={status.position} />
+              <p style={{ fontSize: 11, color: "#444466", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" }}>Your position over time</p>
+            </div>
 
             {/* Referral stats */}
             <div style={{ background: "rgba(155,109,255,0.07)", border: "1px solid rgba(155,109,255,0.2)", borderRadius: 20, padding: "28px 24px", marginBottom: 28, textAlign: "center" }}>

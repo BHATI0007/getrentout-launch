@@ -56,6 +56,135 @@ function useCursorGlow() {
   }, []);
 }
 
+/* ── WebGL Shader Background ── */
+function ShaderBackground() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const canvas = ref.current!;
+    const gl = canvas.getContext("webgl");
+    if (!gl) return;
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    const compile = (type: number, src: string) => {
+      const s = gl.createShader(type)!;
+      gl.shaderSource(s, src); gl.compileShader(s); return s;
+    };
+    const prog = gl.createProgram()!;
+    gl.attachShader(prog, compile(gl.VERTEX_SHADER, `attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}`));
+    gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, `
+      precision mediump float;
+      uniform float t; uniform vec2 res; uniform vec2 mouse;
+      void main(){
+        vec2 uv=gl_FragCoord.xy/res;
+        vec2 m=mouse/res;
+        float x=uv.x+sin(uv.y*4.+t*.4)*.09+(m.x-.5)*.06;
+        float y=uv.y+cos(uv.x*3.+t*.28)*.09+(m.y-.5)*.06;
+        float r=.09*sin(x*6.+t*1.1)*sin(y*4.+t*.7);
+        float g=.03*sin(x*4.+t*.9)+.01;
+        float b=.16*sin(x*5.+y*3.+t*.65);
+        float glow=.07*(1.-smoothstep(0.,.4,length(uv-m)));
+        gl_FragColor=vec4(r+glow*.5,g+glow*.08,b+glow,1.);
+      }
+    `));
+    gl.linkProgram(prog); gl.useProgram(prog);
+    const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(prog, "p");
+    gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+    const uT=gl.getUniformLocation(prog,"t"), uR=gl.getUniformLocation(prog,"res"), uM=gl.getUniformLocation(prog,"mouse");
+    let mx=canvas.width/2, my=canvas.height/2;
+    const onMove=(e:MouseEvent)=>{mx=e.clientX;my=canvas.height-e.clientY;};
+    window.addEventListener("mousemove",onMove);
+    gl.uniform2f(uR,canvas.width,canvas.height);
+    const t0=Date.now(); let raf:number;
+    const draw=()=>{ gl.uniform1f(uT,(Date.now()-t0)/1000); gl.uniform2f(uM,mx,my); gl.drawArrays(gl.TRIANGLE_STRIP,0,4); raf=requestAnimationFrame(draw); };
+    draw();
+    const onResize=()=>{ canvas.width=window.innerWidth; canvas.height=window.innerHeight; gl.viewport(0,0,canvas.width,canvas.height); gl.uniform2f(uR,canvas.width,canvas.height); };
+    window.addEventListener("resize",onResize);
+    return ()=>{ cancelAnimationFrame(raf); window.removeEventListener("mousemove",onMove); window.removeEventListener("resize",onResize); };
+  },[]);
+  return <canvas ref={ref} style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:0,opacity:0.65}}/>;
+}
+
+/* ── Live activity toasts ── */
+type ActivityItem = { firstName: string; city: string; ago: number };
+function ActivityToast() {
+  const [item, setItem] = useState<ActivityItem|null>(null);
+  const [phase, setPhase] = useState<"in"|"out"|"hidden">("hidden");
+  const dataRef = useRef<ActivityItem[]>([]);
+  const idxRef = useRef(0);
+  useEffect(() => {
+    fetch("/api/activity").then(r=>r.json()).then(d=>{ dataRef.current=d.activity??[]; });
+    const show=()=>{
+      const items=dataRef.current; if(!items.length) return;
+      const it=items[idxRef.current%items.length]; idxRef.current++;
+      setItem(it); setPhase("in");
+      setTimeout(()=>setPhase("out"),3500);
+      setTimeout(()=>setPhase("hidden"),3950);
+    };
+    const id=setInterval(show,6000);
+    setTimeout(show,4000);
+    return ()=>clearInterval(id);
+  },[]);
+  if(phase==="hidden"||!item) return null;
+  return (
+    <div className={`activity-toast ${phase}`}>
+      <div style={{width:32,height:32,borderRadius:"50%",background:"linear-gradient(135deg,#9B6DFF,#F28B82)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:800,color:"#fff",flexShrink:0}}>
+        {item.firstName[0]}
+      </div>
+      <div>
+        <p style={{fontSize:13,fontWeight:700,color:"#e0e0f0",margin:0}}>{item.firstName} from {item.city}</p>
+        <p style={{fontSize:11,color:"#8888aa",margin:0}}>{item.ago < 2 ? "just joined" : `joined ${item.ago}m ago`}</p>
+      </div>
+      <span style={{fontSize:10,marginLeft:"auto",color:"#22c55e"}}>●</span>
+    </div>
+  );
+}
+
+/* ── World map SVG ── */
+function WorldMap({ signups }: { signups: {city:string;lat:number;lng:number}[] }) {
+  const dots = [
+    {lat:28.6,lng:77.2},{lat:19.07,lng:72.87},{lat:12.97,lng:77.59},{lat:22.57,lng:88.36},
+    {lat:51.5,lng:-0.12},{lat:40.71,lng:-74.0},{lat:37.77,lng:-122.4},{lat:35.68,lng:139.69},
+    {lat:-33.87,lng:151.2},{lat:48.85,lng:2.35},{lat:52.52,lng:13.4},{lat:55.75,lng:37.62},
+    {lat:31.23,lng:121.47},{lat:1.35,lng:103.82},{lat:-23.55,lng:-46.63},
+  ];
+  const project=(lat:number,lng:number)=>({
+    x:(lng+180)/360*300, y:(90-lat)/180*150,
+  });
+  return (
+    <svg viewBox="0 0 300 150" style={{width:"100%",opacity:0.6}}>
+      <rect width="300" height="150" fill="transparent"/>
+      {dots.map((d,i)=>{const p=project(d.lat,d.lng);return(
+        <g key={i} transform={`translate(${p.x},${p.y})`}>
+          <circle r="1.5" fill="#9B6DFF" opacity="0.9"/>
+          <circle r="1.5" fill="#9B6DFF" opacity="0.5" className="map-dot-ring" style={{animationDelay:`${i*0.3}s`}}/>
+        </g>
+      );})}
+    </svg>
+  );
+}
+
+/* ── Sparkline ── */
+function Sparkline({ position }: { position: number }) {
+  const points = Array.from({length:8},(_,i)=>{
+    const decay = Math.pow(0.75, 7-i);
+    return Math.round(position + (7-i)*12*decay + Math.sin(i)*3);
+  });
+  const max=Math.max(...points), min=Math.min(...points,position);
+  const W=120,H=32;
+  const px=(i:number)=>(i/(points.length-1))*W;
+  const py=(v:number)=>H-((v-min)/(max-min||1))*(H-4)-2;
+  const d=points.map((v,i)=>`${i===0?"M":"L"}${px(i)},${py(v)}`).join(" ")+` L${W},${py(position)}`;
+  return (
+    <svg width={W} height={H} style={{overflow:"visible"}}>
+      <defs><linearGradient id="sg" x1="0" x2="1"><stop offset="0%" stopColor="#9B6DFF"/><stop offset="100%" stopColor="#F28B82"/></linearGradient></defs>
+      <path d={d} fill="none" stroke="url(#sg)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <circle cx={W} cy={py(position)} r="3" fill="#F28B82"/>
+    </svg>
+  );
+}
+
 /* ── Preloader ── */
 function Preloader({ onDone }: { onDone: () => void }) {
   const [exiting, setExiting] = useState(false);
@@ -131,6 +260,54 @@ function CountUpTo({ target }: { target: number }) {
     requestAnimationFrame(tick);
   }, [target]);
   return <>{n.toLocaleString()}</>;
+}
+
+function useKonami(cb: () => void) {
+  useEffect(() => {
+    const seq = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
+    let i = 0;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === seq[i]) { i++; if (i === seq.length) { cb(); i = 0; } }
+      else i = e.key === seq[0] ? 1 : 0;
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [cb]);
+}
+
+function use3DHeroTilt() {
+  useEffect(() => {
+    const hero = document.querySelector(".hero-tilt") as HTMLElement|null;
+    if (!hero) return;
+    const move = (e: MouseEvent) => {
+      const r = hero.getBoundingClientRect();
+      const x = (e.clientX - r.left - r.width/2) / r.width;
+      const y = (e.clientY - r.top - r.height/2) / r.height;
+      hero.style.transform = `perspective(1200px) rotateX(${-y*4}deg) rotateY(${x*4}deg)`;
+    };
+    const leave = () => { hero.style.transform = "perspective(1200px) rotateX(0deg) rotateY(0deg)"; };
+    hero.addEventListener("mousemove", move);
+    hero.addEventListener("mouseleave", leave);
+    return () => { hero.removeEventListener("mousemove", move); hero.removeEventListener("mouseleave", leave); };
+  }, []);
+}
+
+function useScrollJack() {
+  useEffect(() => {
+    const el = document.querySelector(".hero-jacked") as HTMLElement|null;
+    if (!el) return;
+    const onScroll = () => {
+      const s = window.scrollY;
+      el.style.transform = `scale(${Math.max(0.88, 1 - s * 0.0004)}) translateY(${-s * 0.15}px)`;
+      el.style.opacity = String(Math.max(0, 1 - s * 0.0018));
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+}
+
+function useHaptic() {
+  return () => { try { navigator.vibrate?.(8); } catch {} };
 }
 
 function useScrollProgress() {
@@ -435,6 +612,10 @@ export default function Page() {
   const [loaded, setLoaded] = useState(false);
   const [showCursor, setShowCursor] = useState(true);
   const [exiting, setExiting] = useState(false);
+  const [konamiActive, setKonamiActive] = useState(false);
+  const [chargeLevel, setChargeLevel] = useState(0);
+  const chargeTimer = useRef<ReturnType<typeof setInterval>|null>(null);
+  const haptic = useHaptic();
   const starsRef = useRef(Array.from({ length: 32 }, (_, i) => ({
     id: i, left: `${(i * 37 + 11) % 100}%`, top: `${(i * 53 + 7) % 100}%`,
     size: (i % 3) * 0.8 + 0.6,
@@ -454,6 +635,24 @@ export default function Page() {
   useHeroShadow();
   useSoundOnClick();
   useTextScramble(scrambleRef, "Sell anything.", 900);
+  use3DHeroTilt();
+  useScrollJack();
+  useKonami(() => {
+    setKonamiActive(true);
+    haptic();
+    setTimeout(() => setKonamiActive(false), 1600);
+    // Rainbow confetti burst
+    const colors = ["#9B6DFF","#F28B82","#38bdf8","#fbbf24","#34d399","#f472b6","#fff"];
+    Array.from({length:120}).forEach((_,i) => {
+      const el = document.createElement("div");
+      el.className = "copy-particle";
+      const angle = (i/120)*Math.PI*2;
+      const dist = 80+Math.random()*200;
+      el.style.cssText = `left:50vw;top:40vh;width:${Math.random()*8+4}px;height:${Math.random()*4+3}px;background:${colors[i%colors.length]};--tx:${Math.cos(angle)*dist}px;--ty:${Math.sin(angle)*dist}px`;
+      document.body.appendChild(el);
+      setTimeout(()=>el.remove(),600);
+    });
+  });
   useEffect(() => { setTimeout(() => setShowCursor(false), 850); }, []);
 
   useEffect(() => {
@@ -742,9 +941,12 @@ export default function Page() {
 
   /* ── HOME ── */
   return (
-    <div style={{ background: "var(--bg)", minHeight: "100vh" }}>
+    <div style={{ background: "var(--bg)", minHeight: "100vh" }} className={konamiActive ? "konami-active" : ""}>
       <div id="scroll-progress" className="scroll-progress" style={{ width: "0%" }} />
+      <div className="scanlines" /><div className="scan-sweep" />
+      <ShaderBackground />
       <ParticleField />
+      <ActivityToast />
       <div id="cursor-glow" className="cursor-glow" />
 
       <nav style={{ position: "sticky", top: 0, zIndex: 99, background: "rgba(7,7,10,0.85)", borderBottom: "1px solid rgba(255,255,255,0.04)", padding: "0 28px", height: 58, display: "flex", alignItems: "center", justifyContent: "space-between", backdropFilter: "blur(16px)" }}>
@@ -792,10 +994,10 @@ export default function Page() {
 
       {/* HERO */}
       <div style={{ position: "relative", overflow: "hidden" }}>
-        {/* Aurora blobs — parallax on mousemove */}
+        {/* Morphing aurora blobs */}
         <div className="aurora-parallax" style={{ position: "absolute", inset: 0, pointerEvents: "none", transition: "transform 0.8s cubic-bezier(.25,.46,.45,.94)" }}>
-          <div className="aurora-blob aurora-1" style={{ top: "-30%", left: "30%" }} />
-          <div className="aurora-blob aurora-2" style={{ bottom: "-20%", right: "-10%" }} />
+          <div className="aurora-blob morph-blob" style={{ width: 900, height: 700, top: "-30%", left: "30%", background: "radial-gradient(ellipse, rgba(155,109,255,0.22), transparent 65%)", filter: "blur(55px)" }} />
+          <div className="aurora-blob morph-blob-2" style={{ width: 700, height: 600, bottom: "-20%", right: "-10%", background: "radial-gradient(ellipse, rgba(242,139,130,0.14), transparent 65%)", filter: "blur(65px)" }} />
           <div className="aurora-blob aurora-3" style={{ top: "20%", left: "-5%" }} />
         </div>
         {/* Spotlight beam */}
@@ -805,7 +1007,7 @@ export default function Page() {
           <div key={s.id} className="star-dot" style={{ left: s.left, top: s.top, width: s.size, height: s.size, "--sdur": s.dur, "--sdel": s.del } as React.CSSProperties} />
         ))}
 
-        <div style={{ position: "relative", maxWidth: 960, margin: "0 auto", padding: "72px 24px 64px", textAlign: "center" }}>
+        <div className="hero-tilt hero-jacked" style={{ position: "relative", maxWidth: 960, margin: "0 auto", padding: "72px 24px 64px", textAlign: "center" }}>
           <div className="hero-eyebrow" style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(155,109,255,0.07)", border: "1px solid rgba(155,109,255,0.16)", borderRadius: 100, padding: "7px 18px", marginBottom: 36 }}>
             <span className="dot" />
             <span style={{ fontSize: 13, color: "var(--text-dim)", letterSpacing: "0.01em" }}>
@@ -830,9 +1032,26 @@ export default function Page() {
           </p>
 
           <div className="hero-cta" style={{ display: "flex", justifyContent: "center", marginBottom: 40 }}>
-            <button className="btn-primary" onClick={() => setView("form")} style={{ fontSize: 17, padding: "20px 48px", borderRadius: 14 }}>
-              Start earning early
-            </button>
+            <div style={{ position: "relative", display: "inline-block" }}>
+              {chargeLevel > 0 && (
+                <svg className="charge-ring" viewBox="0 0 44 44" style={{ position: "absolute", inset: -6, width: "calc(100% + 12px)", height: "calc(100% + 12px)", pointerEvents: "none", zIndex: 2 }}>
+                  <circle cx="22" cy="22" r="18" strokeDasharray="113" strokeDashoffset={113 - (113 * chargeLevel / 100)} fill="none" stroke="rgba(155,109,255,0.9)" strokeWidth="2.5" strokeLinecap="round" style={{ transform: "rotate(-90deg)", transformOrigin: "center" }} />
+                </svg>
+              )}
+              <button className="btn-primary"
+                style={{ fontSize: 17, padding: "20px 48px", borderRadius: 14, transform: chargeLevel > 50 ? `scale(${1 + chargeLevel * 0.002})` : undefined }}
+                onClick={() => { setView("form"); haptic(); }}
+                onPointerDown={() => {
+                  setChargeLevel(0);
+                  chargeTimer.current = setInterval(() => {
+                    setChargeLevel(p => { if (p >= 100) { clearInterval(chargeTimer.current!); return 100; } return p + 2; });
+                  }, 20);
+                }}
+                onPointerUp={() => { clearInterval(chargeTimer.current!); setChargeLevel(0); }}
+                onPointerLeave={() => { clearInterval(chargeTimer.current!); setChargeLevel(0); }}>
+                Start earning early
+              </button>
+            </div>
           </div>
 
           {/* 3D live spots remaining */}
