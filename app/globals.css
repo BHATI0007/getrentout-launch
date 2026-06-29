@@ -146,12 +146,12 @@ input, select, textarea, button { font-family: inherit; }
 
 .field {
   width: 100%; padding: 14px 16px;
-  background: #0f0f16; border: 1px solid #25253a;
-  border-radius: 12px; color: #f0f0f8; font-size: 15px;
+  background: #13131f; border: 1px solid #2e2e48;
+  border-radius: 12px; color: #eeeef8; font-size: 15px;
   outline: none; transition: border-color .2s, box-shadow .2s; -webkit-appearance: none;
 }
-.field::placeholder { color: #4a4a62; }
-.field:focus { border-color: rgba(155,109,255,0.55); box-shadow: 0 0 0 3px rgba(155,109,255,0.14); }
+.field::placeholder { color: #52527a; }
+.field:focus { border-color: rgba(155,109,255,0.6); box-shadow: 0 0 0 3px rgba(155,109,255,0.15); }
 
 .chip {
   display: inline-flex; align-items: center; gap: 8px;
@@ -208,15 +208,15 @@ input, select, textarea, button { font-family: inherit; }
 .form-brand {
   display: none;
   padding: 72px 64px;
-  background: var(--surface);
-  border-right: 1px solid #1e1e2e;
+  background: linear-gradient(160deg, #0e0c18 0%, #09090f 100%);
+  border-right: 1px solid #1e1e30;
 }
 .form-panel {
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 56px 32px;
-  background: var(--bg);
+  background: #09090f;
 }
 @media (min-width: 860px) {
   .form-layout { grid-template-columns: 1fr 1fr; }

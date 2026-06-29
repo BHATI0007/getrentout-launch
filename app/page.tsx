@@ -254,14 +254,14 @@ export default function Page() {
 
       <div className="form-layout" style={{ paddingTop: 58, minHeight: "100vh" }}>
         {/* Left — brand */}
-        <div className="form-brand" style={{ position: "relative", overflow: "hidden", background: "linear-gradient(160deg, rgba(155,109,255,0.07) 0%, var(--bg) 60%)" }}>
-          <div style={{ position: "absolute", top: -100, left: -100, width: 600, height: 600, background: "radial-gradient(circle, rgba(155,109,255,0.18), transparent 65%)", pointerEvents: "none" }} />
+        <div className="form-brand" style={{ position: "relative", overflow: "hidden" }}>
+          <div style={{ position: "absolute", top: -100, left: -100, width: 600, height: 600, background: "radial-gradient(circle, rgba(155,109,255,0.2), transparent 65%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", maxWidth: 420 }}>
             <p className="section-label" style={{ marginBottom: 20 }}>Early access</p>
-            <h2 style={{ fontSize: "clamp(32px, 4vw, 52px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.05, marginBottom: 20, color: "var(--text)" }}>
+            <h2 style={{ fontSize: "clamp(32px, 4vw, 52px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.05, marginBottom: 20, color: "#f0f0fa" }}>
               Something new<br />is coming.<br /><span className="g">Start earning early.</span>
             </h2>
-            <p style={{ fontSize: 16, color: "#a0a0b8", lineHeight: 1.75, marginBottom: 40 }}>
+            <p style={{ fontSize: 16, color: "#b0b0cc", lineHeight: 1.75, marginBottom: 40 }}>
               We&apos;re not ready to reveal everything yet. Sign up and be among the first to know when we launch.
             </p>
 
@@ -273,8 +273,8 @@ export default function Page() {
                 "Direct line to the team",
               ].map(text => (
                 <div key={text} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <span style={{ width: 22, height: 22, borderRadius: 6, background: "rgba(155,109,255,0.15)", border: "1px solid rgba(155,109,255,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "var(--accent)", fontWeight: 800, flexShrink: 0 }}>✓</span>
-                  <span style={{ fontSize: 14, color: "#9898b0", lineHeight: 1.5 }}>{text}</span>
+                  <span style={{ width: 22, height: 22, borderRadius: 6, background: "rgba(155,109,255,0.18)", border: "1px solid rgba(155,109,255,0.35)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#b090ff", fontWeight: 800, flexShrink: 0 }}>✓</span>
+                  <span style={{ fontSize: 14, color: "#a8a8c8", lineHeight: 1.5 }}>{text}</span>
                 </div>
               ))}
             </div>
@@ -283,23 +283,23 @@ export default function Page() {
         </div>
 
         {/* Right — form */}
-        <div className="form-panel" style={{ background: "var(--bg)" }}>
+        <div className="form-panel">
           <div style={{ maxWidth: 400, width: "100%" }} className="page-in">
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(155,109,255,0.1)", border: "1px solid rgba(155,109,255,0.25)", borderRadius: 100, padding: "6px 14px", marginBottom: 28 }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(155,109,255,0.12)", border: "1px solid rgba(155,109,255,0.3)", borderRadius: 100, padding: "6px 14px", marginBottom: 28 }}>
               <span className="dot" style={{ background: "var(--accent)" }} />
-              <span style={{ fontSize: 13, color: "var(--accent)", fontWeight: 600 }}>For early earners</span>
+              <span style={{ fontSize: 13, color: "#b090ff", fontWeight: 600 }}>For early earners</span>
             </div>
 
-            <h3 style={{ fontSize: 26, fontWeight: 800, letterSpacing: "-0.03em", marginBottom: 8, color: "var(--text)" }}>
+            <h3 style={{ fontSize: 26, fontWeight: 800, letterSpacing: "-0.03em", marginBottom: 8, color: "#f0f0fa" }}>
               Start earning early
             </h3>
-            <p style={{ fontSize: 14, color: "#9898b0", marginBottom: 28, lineHeight: 1.6 }}>
+            <p style={{ fontSize: 14, color: "#9090b8", marginBottom: 28, lineHeight: 1.6 }}>
               60 seconds. We&apos;ll email you when we&apos;re ready.
             </p>
 
             <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <div>
-                <label style={{ fontSize: 12, fontWeight: 600, color: errors.name ? "#F28B82" : "#9898b0", letterSpacing: "0.04em", display: "block", marginBottom: 7 }}>Full name</label>
+                <label style={{ fontSize: 12, fontWeight: 600, color: errors.name ? "#F28B82" : "#a8a8c8", letterSpacing: "0.04em", display: "block", marginBottom: 7 }}>Full name</label>
                 <input
                   name="fullname" type="text" placeholder="Your name" className="field"
                   value={fields.name}
@@ -309,7 +309,7 @@ export default function Page() {
                 {errors.name && <p style={{ fontSize: 12, color: "#F28B82", marginTop: 6 }}>{errors.name}</p>}
               </div>
               <div>
-                <label style={{ fontSize: 12, fontWeight: 600, color: errors.email ? "#F28B82" : "#9898b0", letterSpacing: "0.04em", display: "block", marginBottom: 7 }}>Email address</label>
+                <label style={{ fontSize: 12, fontWeight: 600, color: errors.email ? "#F28B82" : "#a8a8c8", letterSpacing: "0.04em", display: "block", marginBottom: 7 }}>Email address</label>
                 <input
                   type="email" placeholder="you@email.com" className="field"
                   inputMode="email" name="useremail"
@@ -320,7 +320,7 @@ export default function Page() {
                 {errors.email && <p style={{ fontSize: 12, color: "#F28B82", marginTop: 6 }}>{errors.email}</p>}
               </div>
               <div>
-                <label style={{ fontSize: 12, fontWeight: 600, color: errors.city ? "#F28B82" : "#9898b0", letterSpacing: "0.04em", display: "block", marginBottom: 7 }}>Your city</label>
+                <label style={{ fontSize: 12, fontWeight: 600, color: errors.city ? "#F28B82" : "#a8a8c8", letterSpacing: "0.04em", display: "block", marginBottom: 7 }}>Your city</label>
                 <input
                   type="text" placeholder="City" className="field"
                   name="usercity"
