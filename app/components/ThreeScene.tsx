@@ -136,7 +136,7 @@ export default function ThreeScene() {
 
   return (
     <div ref={mountRef} style={{
-      position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0, opacity: 0.55,
+      position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0, opacity: 0.38,
     }} />
   );
 }

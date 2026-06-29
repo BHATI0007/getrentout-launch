@@ -451,6 +451,17 @@ input, select, textarea, button { font-family: inherit; }
   will-change: transform;
 }
 
+/* ── Ensure all content sits above background layers ── */
+nav, main, section, footer,
+.hero-tilt, .hero-jacked,
+.hero-eyebrow, .hero-line-1, .hero-line-2, .hero-sub, .hero-cta, .hero-note,
+.form-layout, .form-brand, .form-panel,
+.view-transition, .page-in,
+.card, .counter-3d, .reveal {
+  position: relative;
+  z-index: 2;
+}
+
 /* ── Scroll progress bar ── */
 .scroll-progress {
   position: fixed; top: 0; left: 0; height: 2px; z-index: 99998;
@@ -686,19 +697,22 @@ input, select, textarea, button { font-family: inherit; }
 *, *::before, *::after { cursor: none !important; }
 .cursor-dot {
   position: fixed; pointer-events: none; z-index: 999999;
-  width: 8px; height: 8px; border-radius: 50%; background: #9B6DFF;
-  transform: translate(-50%,-50%); transition: transform 0.15s ease, opacity 0.2s, background 0.2s;
-  mix-blend-mode: screen;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: radial-gradient(circle, #c87dff, #9B6DFF);
+  transform: translate(-50%,-50%);
+  transition: transform 0.12s ease, opacity 0.2s, width 0.2s, height 0.2s;
+  box-shadow: 0 0 12px rgba(155,109,255,0.7), 0 0 24px rgba(155,109,255,0.3);
 }
-.cursor-dot.hovered { transform: translate(-50%,-50%) scale(0); opacity: 0; }
+.cursor-dot.hovered { width: 8px; height: 8px; opacity: 0.6; }
 .cursor-ring {
   position: fixed; pointer-events: none; z-index: 999998;
-  width: 34px; height: 34px; border-radius: 50%;
-  border: 1.5px solid rgba(155,109,255,0.65);
-  transform: translate(-50%,-50%); transition: width 0.2s ease, height 0.2s ease, border-color 0.2s, opacity 0.2s;
+  width: 52px; height: 52px; border-radius: 50%;
+  border: 2px solid rgba(155,109,255,0.55);
+  transform: translate(-50%,-50%);
+  transition: width 0.25s ease, height 0.25s ease, border-color 0.2s;
 }
-.cursor-ring.hovered { width: 52px; height: 52px; border-color: rgba(155,109,255,0.35); }
-.cursor-ring.clicking { width: 24px; height: 24px; border-color: rgba(242,139,130,0.9); }
+.cursor-ring.hovered { width: 72px; height: 72px; border-color: rgba(155,109,255,0.3); border-width: 1.5px; }
+.cursor-ring.clicking { width: 32px; height: 32px; border-color: rgba(242,139,130,0.9); border-width: 2.5px; }
 
 /* ── Rotating gradient border on CTA ── */
 .cta-border-wrap { position: relative; display: inline-flex; border-radius: 16px; padding: 2px; }
