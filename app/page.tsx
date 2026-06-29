@@ -87,12 +87,14 @@ function Ticker({ value }: { value: number }) {
 }
 
 const SERVICES = [
-  { who: "Alex", what: "FIFA gaming partner", price: "$15/hr", tag: "Gaming", c: "#9B6DFF" },
-  { who: "Maya", what: "Portrait photographer", price: "$45/hr", tag: "Photography", c: "#F28B82" },
-  { who: "Sam", what: "Spanish conversation", price: "$20/hr", tag: "Language", c: "#38bdf8" },
-  { who: "Priya", what: "Watch-party companion", price: "$25/hr", tag: "Social", c: "#9B6DFF" },
-  { who: "Leo", what: "City photo walk", price: "$30/hr", tag: "Travel", c: "#fb923c" },
-  { who: "Nina", what: "Home-cooked dinner", price: "$40/session", tag: "Food", c: "#F28B82" },
+  { who: "Arjun", what: "FIFA gaming partner", price: "₹499/hr", tag: "Gaming", c: "#9B6DFF" },
+  { who: "Priya", what: "Portrait photographer", price: "₹1,499/hr", tag: "Photography", c: "#F28B82" },
+  { who: "Rohan", what: "Spanish conversation", price: "₹699/hr", tag: "Language", c: "#38bdf8" },
+  { who: "Sneha", what: "Watch-party companion", price: "₹899/hr", tag: "Social", c: "#9B6DFF" },
+  { who: "Karan", what: "City photo walk", price: "₹999/hr", tag: "Travel", c: "#fb923c" },
+  { who: "Ananya", what: "Fitness coach", price: "₹799/session", tag: "Fitness", c: "#F28B82" },
+  { who: "Dev", what: "Guitar lessons", price: "₹599/hr", tag: "Music", c: "#9B6DFF" },
+  { who: "Meera", what: "Study partner", price: "₹399/hr", tag: "Tutoring", c: "#38bdf8" },
 ];
 
 type V = "home" | "provider" | "customer" | "done-p" | "done-c";
@@ -255,40 +257,38 @@ export default function Page() {
 
       {/* HERO */}
       <div style={{ position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", top: -160, left: "50%", transform: "translateX(-50%)", width: 800, height: 600, background: "radial-gradient(ellipse at center, rgba(155,109,255,0.18), transparent 65%)", pointerEvents: "none" }} />
-        <div style={{ position: "absolute", bottom: -80, right: "10%", width: 400, height: 300, background: "radial-gradient(ellipse at center, rgba(242,139,130,0.07), transparent 65%)", pointerEvents: "none" }} />
-        <div style={{ position: "relative", maxWidth: 820, margin: "0 auto", padding: "80px 20px 72px", textAlign: "center" }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(155,109,255,0.1)", border: "1px solid rgba(155,109,255,0.22)", borderRadius: 100, padding: "7px 16px", marginBottom: 36 }}>
+        <div style={{ position: "absolute", top: -200, left: "50%", transform: "translateX(-50%)", width: 900, height: 700, background: "radial-gradient(ellipse at center, rgba(155,109,255,0.15), transparent 62%)", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", bottom: -100, right: "5%", width: 500, height: 400, background: "radial-gradient(ellipse at center, rgba(242,139,130,0.06), transparent 60%)", pointerEvents: "none" }} />
+
+        <div style={{ position: "relative", maxWidth: 900, margin: "0 auto", padding: "96px 24px 88px", textAlign: "center" }}>
+
+          <div className="hero-eyebrow" style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(155,109,255,0.08)", border: "1px solid rgba(155,109,255,0.18)", borderRadius: 100, padding: "7px 18px", marginBottom: 48 }}>
             <span className="dot" />
-            <span style={{ fontSize: 13, color: "var(--text-dim)" }}>Founding offer closes in <span style={{ color: "var(--text)", fontWeight: 600 }}>{cd.d}d {cd.h}h</span></span>
+            <span style={{ fontSize: 13, color: "var(--text-dim)", letterSpacing: "0.01em" }}>Founding offer — <span style={{ color: "var(--text)", fontWeight: 600 }}>{cd.d}d {cd.h}h left</span></span>
           </div>
 
-          <div style={{ marginBottom: 36 }}>
-            <div style={{ width: 96, height: 96, borderRadius: 26, overflow: "hidden", margin: "0 auto", animation: "float 5s ease-in-out infinite", background: "linear-gradient(135deg, #1a1228, #120d1e)", boxShadow: "0 0 0 1px rgba(155,109,255,0.25), 0 32px 80px rgba(155,109,255,0.4)" }}>
-              <Image src="/logo.png" alt="RentOut" width={96} height={96} priority />
-            </div>
-          </div>
-
-          <h1 style={{ fontSize: "clamp(56px, 11vw, 112px)", fontWeight: 900, lineHeight: 0.95, letterSpacing: "-0.05em", marginBottom: 28 }}>
+          <h1 className="hero-h1" style={{ fontSize: "clamp(60px, 13vw, 140px)", fontWeight: 900, lineHeight: 0.9, letterSpacing: "-0.055em", marginBottom: 32 }}>
             Hire anyone.<br /><span className="g">For anything.</span>
           </h1>
-          <p style={{ fontSize: "clamp(16px, 2vw, 20px)", color: "var(--text-body)", lineHeight: 1.75, maxWidth: 520, margin: "0 auto 44px" }}>
+
+          <p className="hero-sub" style={{ fontSize: "clamp(17px, 2vw, 21px)", color: "var(--text-body)", lineHeight: 1.7, maxWidth: 540, margin: "0 auto 52px" }}>
             The first marketplace where anyone can offer any service — on their own terms, at their own price.
           </p>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 10, alignItems: "center", marginBottom: 32 }}>
-            <button className="btn-primary" onClick={() => setView("provider")} style={{ width: "100%", maxWidth: 360, fontSize: 16, padding: "17px 32px", borderRadius: 14 }}>Start earning — it&apos;s free</button>
-            <button className="btn-secondary" onClick={() => setView("customer")} style={{ width: "100%", maxWidth: 360, fontSize: 15, padding: "16px 32px", borderRadius: 14 }}>I want to hire someone</button>
+          <div className="hero-cta" style={{ display: "flex", flexDirection: "column", gap: 12, alignItems: "center", marginBottom: 36 }}>
+            <button className="btn-primary" onClick={() => setView("provider")} style={{ width: "100%", maxWidth: 380, fontSize: 16, padding: "18px 32px", borderRadius: 14 }}>Start earning — it&apos;s free</button>
+            <button className="btn-secondary" onClick={() => setView("customer")} style={{ width: "100%", maxWidth: 380, fontSize: 15, padding: "17px 32px", borderRadius: 14 }}>I want to hire someone</button>
           </div>
-          <p style={{ fontSize: 13, color: "var(--text-faint)" }}>Zero commission for the first 100,000 providers. Forever.</p>
+
+          <p className="hero-note" style={{ fontSize: 13, color: "var(--text-faint)", letterSpacing: "0.01em" }}>Zero commission for the first 100,000 providers. Forever.</p>
         </div>
       </div>
 
-      {/* MARKETPLACE PREVIEW — shows the product */}
-      <div style={{ overflow: "hidden", padding: "12px 0 8px", maskImage: "linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent)", WebkitMaskImage: "linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent)" }}>
-        <div style={{ display: "flex", gap: 12, width: "max-content", animation: "marquee 38s linear infinite" }}>
+      {/* MARKETPLACE PREVIEW */}
+      <div style={{ overflow: "hidden", padding: "16px 0", maskImage: "linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent)", WebkitMaskImage: "linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent)" }}>
+        <div style={{ display: "flex", gap: 14, width: "max-content", animation: "marquee 55s linear infinite" }}>
           {[...SERVICES, ...SERVICES].map((s, i) => (
-            <div key={i} className="card" style={{ width: 248, padding: "16px 18px", flexShrink: 0 }}>
+            <div key={i} className="card" style={{ width: 268, padding: "20px 22px", flexShrink: 0 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: 12 }}>
                 <div style={{ width: 38, height: 38, borderRadius: 11, background: `${s.c}1f`, border: `1px solid ${s.c}33`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, fontWeight: 700, color: s.c, flexShrink: 0 }}>{s.who[0]}</div>
                 <div style={{ minWidth: 0 }}>
@@ -307,21 +307,25 @@ export default function Page() {
       </div>
 
       {/* STATS */}
-      <div style={{ maxWidth: 760, margin: "0 auto", padding: "56px 20px 12px" }}>
+      <div style={{ maxWidth: 880, margin: "0 auto", padding: "72px 24px 16px" }}>
         <div className="stats reveal">
-          {[{ l: "Founding spots", v: 100000, s: "" }, { l: "Countries at launch", v: 160, s: "+" }, { l: "Commission for founders", v: -1, s: "" }].map(({ l, v, s }) => (
+          {[
+            { l: "Founding spots", v: 100000, s: "" },
+            { l: "Indian cities at launch", v: 20, s: "+" },
+            { l: "Commission for founders", v: -1, s: "" },
+          ].map(({ l, v, s }) => (
             <div className="stat" key={l}>
               <div className="stat-num">{v === -1 ? <span className="g">0%</span> : <><CountUp to={v} />{s}</>}</div>
-              <div style={{ fontSize: 13, color: "var(--text-faint)", marginTop: 6, letterSpacing: "0.02em" }}>{l}</div>
+              <div style={{ fontSize: 13, color: "var(--text-faint)", marginTop: 8, letterSpacing: "0.02em" }}>{l}</div>
             </div>
           ))}
         </div>
       </div>
 
-      <div style={{ height: 1, background: "var(--border)", margin: "56px 20px 0" }} />
+      <hr className="hr" style={{ marginTop: 72 }} />
 
       {/* HOW IT WORKS */}
-      <div style={{ maxWidth: 920, margin: "0 auto", padding: "72px 20px" }}>
+      <div style={{ maxWidth: 960, margin: "0 auto", padding: "100px 24px" }}>
         <div className="reveal" style={{ textAlign: "center", marginBottom: 52 }}>
           <p className="section-label">01 — How it works</p>
           <h2 style={{ fontSize: "clamp(30px, 4.5vw, 48px)", fontWeight: 900, letterSpacing: "-1.5px" }}>Earn in three steps</h2>
@@ -364,22 +368,22 @@ export default function Page() {
         </div>
       </div>
 
-      <div style={{ height: 1, background: "var(--border)", margin: "0 20px" }} />
+      <hr className="hr" />
 
       {/* TRUST */}
-      <div style={{ maxWidth: 760, margin: "0 auto", padding: "44px 20px" }}>
-        <p className="reveal" style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.16em", color: "var(--text-faint)", textTransform: "uppercase", textAlign: "center", marginBottom: 22 }}>Built on trusted infrastructure</p>
-        <div className="reveal d1" style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center" }}>
-          {["Razorpay", "Payoneer", "Firebase", "256-bit SSL", "GDPR compliant"].map(t => (
-            <span key={t} className="chip" style={{ color: "var(--text-dim)", fontSize: 13 }}>{t}</span>
+      <div style={{ maxWidth: 880, margin: "0 auto", padding: "56px 24px" }}>
+        <p className="reveal" style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", color: "var(--text-faint)", textTransform: "uppercase", textAlign: "center", marginBottom: 28 }}>Built on trusted infrastructure</p>
+        <div className="trust-row reveal d1">
+          {["Razorpay", "Payoneer", "Firebase", "256-bit SSL", "GDPR ready"].map(t => (
+            <span key={t} className="trust-item">{t}</span>
           ))}
         </div>
       </div>
 
-      <div style={{ height: 1, background: "var(--border)", margin: "0 20px" }} />
+      <hr className="hr" />
 
       {/* BOTTOM CTA */}
-      <div style={{ maxWidth: 760, margin: "0 auto", padding: "72px 20px 92px" }}>
+      <div style={{ maxWidth: 820, margin: "0 auto", padding: "100px 24px 120px" }}>
         <div className="card reveal" style={{ borderRadius: 24, padding: "clamp(48px, 7vw, 80px) clamp(24px, 6vw, 64px)", textAlign: "center", position: "relative", overflow: "hidden", border: "1px solid rgba(155,109,255,0.18)", background: "linear-gradient(160deg, rgba(155,109,255,0.07) 0%, var(--surface) 60%)" }}>
           <div style={{ position: "absolute", top: -120, left: "50%", transform: "translateX(-50%)", width: 480, height: 480, borderRadius: "50%", background: "radial-gradient(circle, rgba(155,109,255,0.14), transparent 60%)", pointerEvents: "none" }} />
           <div style={{ position: "absolute", bottom: -60, right: "5%", width: 280, height: 280, borderRadius: "50%", background: "radial-gradient(circle, rgba(242,139,130,0.07), transparent 60%)", pointerEvents: "none" }} />
@@ -401,10 +405,18 @@ export default function Page() {
         </div>
       </div>
 
-      <div style={{ borderTop: "1px solid var(--border)", padding: "20px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
+      <hr className="hr" />
+      <div style={{ padding: "28px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16 }}>
         <Logo />
-        <div style={{ display: "flex", gap: 20 }}>
-          {["Privacy", "Terms"].map(t => <a key={t} href={`/${t.toLowerCase()}`} style={{ fontSize: 13, color: "var(--text-faint)", textDecoration: "none" }}>{t}</a>)}
+        <div style={{ display: "flex", gap: 24, alignItems: "center", flexWrap: "wrap" }}>
+          {["Privacy", "Terms"].map(t => (
+            <a key={t} href={`/${t.toLowerCase()}`} style={{ fontSize: 13, color: "var(--text-faint)", textDecoration: "none", transition: "color .2s" }}
+              onMouseEnter={e => (e.currentTarget.style.color = "var(--text-dim)")}
+              onMouseLeave={e => (e.currentTarget.style.color = "var(--text-faint)")}>{t}</a>
+          ))}
+          <a href="mailto:hello@getrentout.me" style={{ fontSize: 13, color: "var(--text-faint)", textDecoration: "none", transition: "color .2s" }}
+            onMouseEnter={e => (e.currentTarget.style.color = "var(--text-dim)")}
+            onMouseLeave={e => (e.currentTarget.style.color = "var(--text-faint)")}>hello@getrentout.me</a>
         </div>
         <span style={{ fontSize: 13, color: "var(--text-faint)" }}>© 2026 RentOut</span>
       </div>
