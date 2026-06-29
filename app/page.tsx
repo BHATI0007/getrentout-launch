@@ -143,50 +143,66 @@ export default function Page() {
   if (view === "done") return (
     <div style={{ background: "var(--bg)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 20px", position: "relative", overflow: "hidden" }}>
       <div id="cursor-glow" className="cursor-glow" />
-      <div style={{ position: "absolute", top: "15%", left: "50%", transform: "translateX(-50%)", width: 600, height: 500, background: "radial-gradient(ellipse, rgba(155,109,255,0.12), transparent 65%)", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 800, height: 600, background: "radial-gradient(ellipse, rgba(155,109,255,0.13), transparent 60%)", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", bottom: 0, right: 0, width: 500, height: 400, background: "radial-gradient(ellipse, rgba(242,139,130,0.06), transparent 60%)", pointerEvents: "none" }} />
 
-      <div style={{ maxWidth: 440, width: "100%", textAlign: "center", position: "relative" }} className="page-in">
-        <div style={{ width: 80, height: 80, borderRadius: 22, overflow: "hidden", margin: "0 auto 32px", background: "linear-gradient(135deg, #1a1228, #120d1e)", boxShadow: "0 0 0 1px rgba(155,109,255,0.3), 0 20px 60px rgba(155,109,255,0.5)" }}>
-          <Image src="/logo.png" alt="RentOut" width={80} height={80} />
+      <div style={{ maxWidth: 520, width: "100%", textAlign: "center", position: "relative" }} className="page-in">
+
+        {/* Position badge */}
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(155,109,255,0.1)", border: "1px solid rgba(155,109,255,0.2)", borderRadius: 100, padding: "7px 18px", marginBottom: 40 }}>
+          <span className="dot" />
+          <span style={{ fontSize: 13, color: "var(--accent)", fontWeight: 600, letterSpacing: "0.02em" }}>You&apos;re in</span>
         </div>
 
-        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.16em", color: "var(--text-faint)", textTransform: "uppercase", marginBottom: 12 }}>
-          Early Access
-        </p>
-        <div style={{ fontSize: "clamp(72px, 14vw, 100px)", fontWeight: 900, letterSpacing: "-0.05em", lineHeight: 0.95, marginBottom: 10 }}>
+        {/* Big number */}
+        <div style={{ fontSize: "clamp(80px, 18vw, 160px)", fontWeight: 900, letterSpacing: "-0.06em", lineHeight: 0.88, marginBottom: 20 }}>
           <span className="g">#{position.toLocaleString()}</span>
         </div>
-        <p style={{ fontSize: 16, color: "var(--text-dim)", marginBottom: 40, lineHeight: 1.6 }}>
-          You&apos;re one of the first.
+
+        <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.1em", color: "var(--text-faint)", textTransform: "uppercase", marginBottom: 8 }}>
+          Early access
         </p>
 
-        <div className="card" style={{ padding: "24px 28px", marginBottom: 24, textAlign: "left", borderRadius: 16 }}>
-          <p style={{ fontSize: 15, color: "var(--text-body)", lineHeight: 1.75, marginBottom: 16 }}>
-            You&apos;re in. We&apos;ll email you when the app is ready. Something big is coming — watch your inbox.
-          </p>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-            <span className="dot" />
-            <span style={{ fontSize: 13, color: "var(--text-dim)" }}>
-              <Ticker value={taken} /> people ahead of you
-            </span>
-          </div>
+        <p style={{ fontSize: 17, color: "var(--text-dim)", lineHeight: 1.7, maxWidth: 380, margin: "0 auto 48px" }}>
+          Watch your inbox. We&apos;ll email you when it&apos;s time.
+        </p>
+
+        {/* Live counter */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 48 }}>
+          <span className="dot" />
+          <span style={{ fontSize: 14, color: "var(--text-dim)" }}>
+            <Ticker value={taken} /> {taken === 1 ? "person" : "people"} signed up
+          </span>
         </div>
 
-        <p style={{ fontSize: 13, color: "var(--text-faint)", marginBottom: 16 }}>
-          Share with others
+        {/* Share section */}
+        <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", color: "var(--text-faint)", textTransform: "uppercase", marginBottom: 16 }}>
+          Spread the word
         </p>
-        <div style={{ display: "flex", gap: 10 }}>
-          <a href={`https://wa.me/?text=I just got early access to RentOut — something big is coming. Get your spot: https://getrentout.me`}
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 10 }}>
+          <a href={`https://wa.me/?text=Just got early access to RentOut — something big is coming. Get yours: https://getrentout.me`}
             target="_blank" rel="noopener"
-            style={{ flex: 1, background: "#128C7E", borderRadius: 13, padding: "14px 8px", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none", textAlign: "center" }}>
+            style={{ background: "#128C7E", borderRadius: 13, padding: "14px 8px", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none", textAlign: "center", display: "block" }}>
             WhatsApp
           </a>
-          <a href={`https://twitter.com/intent/tweet?text=Just got early access to %40RentOut — something big is coming: https://getrentout.me`}
+          <a href={`https://twitter.com/intent/tweet?text=Just got early access to RentOut — something big is coming: https://getrentout.me`}
             target="_blank" rel="noopener"
-            style={{ flex: 1, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 13, padding: "14px 8px", fontSize: 14, fontWeight: 700, color: "var(--text)", textDecoration: "none", textAlign: "center" }}>
-            Post on X
+            style={{ background: "#000", border: "1px solid #333", borderRadius: 13, padding: "14px 8px", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none", textAlign: "center", display: "block" }}>
+            X / Twitter
           </a>
+          <a href={`https://www.linkedin.com/sharing/share-offsite/?url=https://getrentout.me`}
+            target="_blank" rel="noopener"
+            style={{ background: "#0A66C2", borderRadius: 13, padding: "14px 8px", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none", textAlign: "center", display: "block" }}>
+            LinkedIn
+          </a>
+          <button
+            onClick={() => { navigator.clipboard.writeText("https://getrentout.me"); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
+            style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 13, padding: "14px 8px", fontSize: 14, fontWeight: 700, color: copied ? "var(--accent)" : "var(--text)", cursor: "pointer", textAlign: "center", display: "block", width: "100%" }}>
+            {copied ? "✓ Copied" : "Copy link"}
+          </button>
         </div>
+
       </div>
     </div>
   );
