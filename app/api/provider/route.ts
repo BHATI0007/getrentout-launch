@@ -40,26 +40,7 @@ export async function POST(req: NextRequest) {
       created_at: new Date().toISOString(),
     });
 
-    // Notify admin only for first 100 signups — after that check Supabase directly
-    if (position > 100) return NextResponse.json({ success: true, position });
-
-    await resend.emails.send({
-      from: "RentOut <noreply@getrentout.me>",
-      to: "vineet.bhati.ug24@nsut.ac.in",
-      subject: `#${position} — ${name} (${category}) from ${city}`,
-      html: `
-        <div style="font-family:sans-serif;padding:20px;max-width:480px;">
-          <h2 style="margin-bottom:16px;">New provider #${position}</h2>
-          <p><strong>Name:</strong> ${name}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>City:</strong> ${city}</p>
-          <p><strong>Category:</strong> ${category}</p>
-          <p><strong>Time:</strong> ${new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}</p>
-          <hr style="margin:16px 0;"/>
-          <p style="color:#666;font-size:13px;">Stored in Supabase. Email will be sent when beta is ready.</p>
-        </div>
-      `,
-    });
+    // Admin notifications off — check Supabase dashboard directly
 
     return NextResponse.json({ success: true, position });
   } catch (err) {
