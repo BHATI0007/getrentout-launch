@@ -190,36 +190,31 @@ export default function Page() {
         <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", color: "var(--text-faint)", textTransform: "uppercase", marginBottom: 20, textAlign: "center" }}>
           Spread the word
         </p>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-            <a href="https://wa.me/?text=Just got early access to RentOut — something big is coming. Get yours: https://getrentout.me"
-              target="_blank" rel="noopener"
-              style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#128C7E", borderRadius: 14, padding: "16px", fontSize: 15, fontWeight: 700, color: "#fff", textDecoration: "none", letterSpacing: "-0.01em" }}>
-              WhatsApp
+        {/* Share grid — icon + label style */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 10 }}>
+          {[
+            { label: "WhatsApp", bg: "#128C7E", href: "https://wa.me/?text=Just got early access to RentOut — something big is coming. Get yours: https://getrentout.me", icon: "💬" },
+            { label: "Facebook", bg: "#1877F2", href: "https://www.facebook.com/sharer/sharer.php?u=https://getrentout.me", icon: "f" },
+            { label: "X", bg: "#0f0f0f", border: "1px solid #2a2a2a", href: "https://twitter.com/intent/tweet?text=Just got early access to RentOut — something big is coming: https://getrentout.me", icon: "𝕏" },
+            { label: "Telegram", bg: "#229ED9", href: "https://t.me/share/url?url=https://getrentout.me&text=Just got early access to RentOut — something big is coming", icon: "✈" },
+            { label: "Reddit", bg: "#FF4500", href: "https://www.reddit.com/submit?url=https://getrentout.me&title=Just got early access to RentOut — something big is coming", icon: "👾" },
+            { label: "LinkedIn", bg: "#0A66C2", href: "https://www.linkedin.com/sharing/share-offsite/?url=https://getrentout.me", icon: "in" },
+            { label: "Email", bg: "#1a1a2e", border: "1px solid #2a2a40", href: "mailto:?subject=Something big is coming&body=Just got early access to RentOut — something big is coming. Get yours: https://getrentout.me", icon: "✉" },
+            { label: "Pinterest", bg: "#E60023", href: "https://pinterest.com/pin/create/button/?url=https://getrentout.me&description=Something+big+is+coming", icon: "P" },
+          ].map(({ label, bg, border, href, icon }) => (
+            <a key={label} href={href} target="_blank" rel="noopener"
+              style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, background: bg, border: border || "none", borderRadius: 16, padding: "16px 8px", textDecoration: "none", transition: "opacity .15s" }}
+              onMouseEnter={e => (e.currentTarget.style.opacity = "0.85")}
+              onMouseLeave={e => (e.currentTarget.style.opacity = "1")}>
+              <span style={{ fontSize: 22, lineHeight: 1 }}>{icon}</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#fff", letterSpacing: "0.04em" }}>{label}</span>
             </a>
-            <a href="https://www.facebook.com/sharer/sharer.php?u=https://getrentout.me"
-              target="_blank" rel="noopener"
-              style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#1877F2", borderRadius: 14, padding: "16px", fontSize: 15, fontWeight: 700, color: "#fff", textDecoration: "none", letterSpacing: "-0.01em" }}>
-              Facebook
-            </a>
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-            <a href="https://twitter.com/intent/tweet?text=Just got early access to RentOut — something big is coming: https://getrentout.me"
-              target="_blank" rel="noopener"
-              style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#0f0f0f", border: "1px solid #2a2a2a", borderRadius: 14, padding: "16px", fontSize: 15, fontWeight: 700, color: "#fff", textDecoration: "none", letterSpacing: "-0.01em" }}>
-              X / Twitter
-            </a>
-            <a href="https://t.me/share/url?url=https://getrentout.me&text=Just got early access to RentOut — something big is coming"
-              target="_blank" rel="noopener"
-              style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#229ED9", borderRadius: 14, padding: "16px", fontSize: 15, fontWeight: 700, color: "#fff", textDecoration: "none", letterSpacing: "-0.01em" }}>
-              Telegram
-            </a>
-          </div>
-          <button onClick={() => { navigator.clipboard.writeText("https://getrentout.me"); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
-            style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: "16px", fontSize: 15, fontWeight: 700, color: copied ? "var(--accent)" : "var(--text-dim)", cursor: "pointer", width: "100%", letterSpacing: "-0.01em" }}>
-            {copied ? "✓ Link copied" : "Copy link"}
-          </button>
+          ))}
         </div>
+        <button onClick={() => { navigator.clipboard.writeText("https://getrentout.me"); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
+          style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, background: copied ? "rgba(155,109,255,0.1)" : "var(--surface)", border: `1px solid ${copied ? "rgba(155,109,255,0.3)" : "var(--border)"}`, borderRadius: 14, padding: "16px", fontSize: 15, fontWeight: 700, color: copied ? "var(--accent)" : "var(--text-dim)", cursor: "pointer", width: "100%", transition: "all .2s" }}>
+          {copied ? "✓ Link copied to clipboard" : "🔗 Copy link — getrentout.me"}
+        </button>
 
       </div>
     </div>
