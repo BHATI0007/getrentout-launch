@@ -156,37 +156,37 @@ export default function Page() {
         </div>
 
         <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.16em", color: "var(--text-faint)", textTransform: "uppercase", marginBottom: 12 }}>
-          Founding Provider
+          Early Access
         </p>
         <div style={{ fontSize: "clamp(72px, 14vw, 100px)", fontWeight: 900, letterSpacing: "-0.05em", lineHeight: 0.95, marginBottom: 10 }}>
           <span className="g">#{position.toLocaleString()}</span>
         </div>
         <p style={{ fontSize: 16, color: "var(--text-dim)", marginBottom: 40, lineHeight: 1.6 }}>
-          of 100,000 founding providers worldwide
+          You&apos;re one of the first.
         </p>
 
         <div className="card" style={{ padding: "24px 28px", marginBottom: 24, textAlign: "left", borderRadius: 16 }}>
           <p style={{ fontSize: 15, color: "var(--text-body)", lineHeight: 1.75, marginBottom: 16 }}>
-            You&apos;re in. We&apos;ll email you directly when the beta app is ready to download — <span style={{ color: "var(--text)", fontWeight: 600 }}>no confirmation email for now.</span>
+            You&apos;re in. We&apos;ll email you when the app is ready. Something big is coming — watch your inbox.
           </p>
           <div style={{ display: "flex", alignItems: "center", gap: 8, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
             <span className="dot" />
             <span style={{ fontSize: 13, color: "var(--text-dim)" }}>
-              <Ticker value={taken} /> founders signed up so far
+              <Ticker value={taken} /> people ahead of you
             </span>
           </div>
         </div>
 
         <p style={{ fontSize: 13, color: "var(--text-faint)", marginBottom: 16 }}>
-          Share with other providers while spots are free
+          Share with others
         </p>
         <div style={{ display: "flex", gap: 10 }}>
-          <a href={`https://wa.me/?text=I just claimed founding provider spot %23${position.toLocaleString()} on RentOut — sell ANY service, set YOUR price, zero commission for life. Sign up free: https://getrentout.me`}
+          <a href={`https://wa.me/?text=I just got early access to RentOut — something big is coming. Get your spot: https://getrentout.me`}
             target="_blank" rel="noopener"
             style={{ flex: 1, background: "#128C7E", borderRadius: 13, padding: "14px 8px", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none", textAlign: "center" }}>
             WhatsApp
           </a>
-          <a href={`https://twitter.com/intent/tweet?text=Just claimed founding provider spot %23${position.toLocaleString()} on %40RentOut — any service, your price, zero commission for life: https://getrentout.me`}
+          <a href={`https://twitter.com/intent/tweet?text=Just got early access to %40RentOut — something big is coming: https://getrentout.me`}
             target="_blank" rel="noopener"
             style={{ flex: 1, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 13, padding: "14px 8px", fontSize: 14, fontWeight: 700, color: "var(--text)", textDecoration: "none", textAlign: "center" }}>
             Post on X
@@ -214,20 +214,20 @@ export default function Page() {
         <div className="form-brand" style={{ position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", top: -100, left: -100, width: 500, height: 500, background: "radial-gradient(circle, rgba(155,109,255,0.15), transparent 65%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", maxWidth: 420 }}>
-            <p className="section-label" style={{ marginBottom: 20 }}>Founding offer</p>
+            <p className="section-label" style={{ marginBottom: 20 }}>Early access</p>
             <h2 style={{ fontSize: "clamp(32px, 4vw, 52px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.05, marginBottom: 20 }}>
-              Your service.<br />Your price.<br /><span className="g">Zero cut. Forever.</span>
+              Something big<br />is coming.<br /><span className="g">Get in early.</span>
             </h2>
             <p style={{ fontSize: 16, color: "var(--text-body)", lineHeight: 1.75, marginBottom: 40 }}>
-              The first 100,000 providers keep 100% of everything they earn — for life. After that, this offer is gone forever.
+              We&apos;re not ready to reveal everything yet. Sign up and be among the first to know when we launch.
             </p>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 40 }}>
               {[
-                "100% of every booking — forever",
-                "Early access before public launch",
-                "Founding provider badge, locked in",
-                "First in line when we go live",
+                "Early access before anyone else",
+                "First in line on launch day",
+                "Exclusive early member benefits",
+                "Direct line to the founding team",
               ].map(text => (
                 <div key={text} style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   <span style={{ width: 22, height: 22, borderRadius: 6, background: "rgba(155,109,255,0.12)", border: "1px solid rgba(155,109,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "var(--accent)", fontWeight: 800, flexShrink: 0 }}>✓</span>
@@ -239,7 +239,7 @@ export default function Page() {
             <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px 18px", background: "rgba(155,109,255,0.07)", border: "1px solid rgba(155,109,255,0.15)", borderRadius: 12 }}>
               <span className="dot" />
               <span style={{ fontSize: 13, color: "var(--text-dim)" }}>
-                <Ticker value={taken} /> of 100,000 founding spots taken
+                <Ticker value={taken} /> people already signed up
               </span>
             </div>
           </div>
@@ -250,14 +250,14 @@ export default function Page() {
           <div style={{ maxWidth: 400, width: "100%" }} className="page-in">
             <div style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(155,109,255,0.08)", border: "1px solid rgba(155,109,255,0.18)", borderRadius: 100, padding: "6px 14px", marginBottom: 28 }}>
               <span className="dot" style={{ background: "var(--accent)" }} />
-              <span style={{ fontSize: 13, color: "var(--accent)", fontWeight: 600 }}>Closes in {cd.d}d {cd.h}h</span>
+              <span style={{ fontSize: 13, color: "var(--accent)", fontWeight: 600 }}>Early access open now</span>
             </div>
 
             <h3 style={{ fontSize: 24, fontWeight: 800, letterSpacing: "-0.03em", marginBottom: 6 }}>
-              Claim your founding spot
+              Get early access
             </h3>
             <p style={{ fontSize: 14, color: "var(--text-dim)", marginBottom: 28, lineHeight: 1.6 }}>
-              Free. 60 seconds. We&apos;ll email you when the beta is ready.
+              60 seconds. We&apos;ll email you when we&apos;re ready.
             </p>
 
             <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -277,10 +277,10 @@ export default function Page() {
               ))}
               <div style={{ height: 4 }} />
               <button type="submit" disabled={loading} className="btn-primary" style={{ width: "100%", fontSize: 15, padding: "17px", borderRadius: 13 }}>
-                {loading ? "Saving your spot…" : "Claim founding spot"}
+                {loading ? "Just a moment…" : "Get early access"}
               </button>
               <p style={{ textAlign: "center", fontSize: 12, color: "var(--text-faint)" }}>
-                Free forever. No credit card. No spam.
+                No credit card. No spam.
               </p>
             </form>
           </div>
@@ -297,7 +297,7 @@ export default function Page() {
       <nav style={{ position: "sticky", top: 0, zIndex: 99, background: "rgba(7,7,10,0.85)", borderBottom: "1px solid rgba(255,255,255,0.04)", padding: "0 28px", height: 58, display: "flex", alignItems: "center", justifyContent: "space-between", backdropFilter: "blur(16px)" }}>
         <Logo />
         <button className="btn-primary" onClick={() => setView("form")} style={{ padding: "9px 20px", fontSize: 14, borderRadius: 100 }}>
-          Start earning
+          Get early access
         </button>
       </nav>
 
@@ -310,7 +310,7 @@ export default function Page() {
           <div className="hero-eyebrow" style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(155,109,255,0.07)", border: "1px solid rgba(155,109,255,0.16)", borderRadius: 100, padding: "7px 18px", marginBottom: 52 }}>
             <span className="dot" />
             <span style={{ fontSize: 13, color: "var(--text-dim)", letterSpacing: "0.01em" }}>
-              Founding offer — <span style={{ color: "var(--text)", fontWeight: 600 }}>{cd.d}d {cd.h}h left</span>
+              <span style={{ color: "var(--text)", fontWeight: 600 }}>Early access open</span>
             </span>
           </div>
 
@@ -319,17 +319,17 @@ export default function Page() {
           </h1>
 
           <p className="hero-sub" style={{ fontSize: "clamp(17px, 2vw, 21px)", color: "var(--text-body)", lineHeight: 1.7, maxWidth: 520, margin: "0 auto 56px" }}>
-            Something new is coming. The first 100,000 providers get in free — and keep 100% of everything they earn. Forever.
+            Something new is coming. Sign up now and be among the first to know.
           </p>
 
           <div className="hero-cta" style={{ display: "flex", justifyContent: "center", marginBottom: 40 }}>
             <button className="btn-primary" onClick={() => setView("form")} style={{ fontSize: 17, padding: "20px 48px", borderRadius: 14 }}>
-              Claim your founding spot — free
+              Get early access
             </button>
           </div>
 
           <p className="hero-note" style={{ fontSize: 13, color: "var(--text-faint)", letterSpacing: "0.01em" }}>
-            <Ticker value={taken} /> of 100,000 founding spots taken · Zero commission forever
+            <Ticker value={taken} /> people already signed up
           </p>
         </div>
       </div>
@@ -338,12 +338,12 @@ export default function Page() {
       <div style={{ maxWidth: 880, margin: "0 auto", padding: "80px 24px 20px" }}>
         <div className="stats reveal">
           {[
-            { l: "Founding spots", v: 100000, s: "" },
+            { l: "Early access spots", v: 100000, s: "" },
             { l: "Countries at launch", v: 160, s: "+" },
-            { l: "Commission for founders", v: -1, s: "" },
+            { l: "Cost to join", v: -1, s: "" },
           ].map(({ l, v, s }) => (
             <div className="stat" key={l}>
-              <div className="stat-num">{v === -1 ? <span className="g">0%</span> : <><CountUp to={v} />{s}</>}</div>
+              <div className="stat-num">{v === -1 ? <span className="g">$0</span> : <><CountUp to={v} />{s}</>}</div>
               <div style={{ fontSize: 13, color: "var(--text-faint)", marginTop: 8, letterSpacing: "0.02em" }}>{l}</div>
             </div>
           ))}
@@ -359,16 +359,16 @@ export default function Page() {
           <div style={{ position: "absolute", bottom: -80, right: "0%", width: 360, height: 360, borderRadius: "50%", background: "radial-gradient(circle, rgba(242,139,130,0.06), transparent 60%)", pointerEvents: "none" }} />
           <div style={{ position: "relative" }}>
             <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 24, fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "var(--accent)", textTransform: "uppercase", background: "rgba(155,109,255,0.08)", border: "1px solid rgba(155,109,255,0.18)", borderRadius: 100, padding: "6px 16px" }}>
-              <span className="dot" style={{ background: "var(--accent)", width: 6, height: 6 }} /> Offer closes in {cd.d}d {cd.h}h
+              <span className="dot" style={{ background: "var(--accent)", width: 6, height: 6 }} /> Early access open
             </div>
             <h2 style={{ fontSize: "clamp(32px, 5.5vw, 60px)", fontWeight: 900, letterSpacing: "-0.045em", lineHeight: 1.02, marginBottom: 18 }}>
-              Be a founding provider.<br /><span className="g">Zero commission. Forever.</span>
+              Don&apos;t wait.<br /><span className="g">Get in early.</span>
             </h2>
             <p style={{ fontSize: 16, color: "var(--text-dim)", lineHeight: 1.7, maxWidth: 460, margin: "0 auto 40px" }}>
-              The first 100,000 providers keep 100% of every booking — for life. After launch, this never comes back.
+              We&apos;re building something new. Sign up now and be among the first to experience it.
             </p>
             <button className="btn-primary" onClick={() => setView("form")} style={{ fontSize: 16, padding: "18px 48px", borderRadius: 14 }}>
-              Claim my founding spot
+              Get early access
             </button>
           </div>
         </div>
