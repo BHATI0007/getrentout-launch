@@ -89,20 +89,20 @@ function Ticker({ value }: { value: number }) {
 }
 
 const SERVICES = [
-  { who: "Arjun", what: "FIFA gaming partner", price: "₹499/hr", tag: "Gaming", c: "#9B6DFF" },
-  { who: "Priya", what: "Portrait photographer", price: "₹1,499/hr", tag: "Photography", c: "#F28B82" },
-  { who: "Rohan", what: "Spanish conversation", price: "₹699/hr", tag: "Language", c: "#38bdf8" },
-  { who: "Sneha", what: "Watch-party companion", price: "₹899/hr", tag: "Social", c: "#9B6DFF" },
-  { who: "Karan", what: "City photo walk", price: "₹999/hr", tag: "Travel", c: "#fb923c" },
-  { who: "Ananya", what: "Fitness coach", price: "₹799/session", tag: "Fitness", c: "#F28B82" },
-  { who: "Dev", what: "Guitar lessons", price: "₹599/hr", tag: "Music", c: "#9B6DFF" },
-  { who: "Meera", what: "Study partner", price: "₹399/hr", tag: "Tutoring", c: "#38bdf8" },
+  { who: "Arjun", what: "FIFA gaming partner", price: "$6/hr", tag: "Gaming", c: "#9B6DFF" },
+  { who: "Priya", what: "Portrait photographer", price: "$18/hr", tag: "Photography", c: "#F28B82" },
+  { who: "Rohan", what: "Spanish conversation", price: "$8/hr", tag: "Language", c: "#38bdf8" },
+  { who: "Sneha", what: "Watch-party companion", price: "$11/hr", tag: "Social", c: "#9B6DFF" },
+  { who: "Karan", what: "City photo walk", price: "$12/hr", tag: "Travel", c: "#fb923c" },
+  { who: "Ananya", what: "Fitness coach", price: "$10/session", tag: "Fitness", c: "#F28B82" },
+  { who: "Dev", what: "Guitar lessons", price: "$7/hr", tag: "Music", c: "#9B6DFF" },
+  { who: "Meera", what: "Study partner", price: "$5/hr", tag: "Tutoring", c: "#38bdf8" },
 ];
 
 const TESTIMONIALS = [
-  { quote: "Made ₹18,000 in my first two weeks just playing FIFA with people. Zero commission means I actually keep it all.", name: "Arjun S.", role: "Gaming partner, Delhi" },
-  { quote: "Finally a platform that doesn't take 30% of everything. Set my own rates, work when I want.", name: "Priya M.", role: "Photographer, Mumbai" },
-  { quote: "Listed my guitar lessons and got 3 bookings the same week. The setup took 5 minutes.", name: "Dev K.", role: "Music teacher, Bangalore" },
+  { quote: "Made $400 in my first two weeks just playing FIFA with people. Zero commission means I actually keep it all.", name: "Arjun S.", role: "Gaming partner, London" },
+  { quote: "Finally a platform that doesn't take 30% of everything. Set my own rates, work when I want.", name: "Priya M.", role: "Photographer, New York" },
+  { quote: "Listed my guitar lessons and got 3 bookings the same week. The setup took 5 minutes.", name: "Dev K.", role: "Music teacher, Toronto" },
 ];
 
 const Logo = () => (
@@ -120,7 +120,7 @@ export default function Page() {
   const [view, setView] = useState<V>("home");
   const [loading, setLoading] = useState(false);
   const [position, setPosition] = useState(0);
-  const [form, setForm] = useState({ name: "", email: "", city: "", category: "" });
+  const [form, setForm] = useState({ name: "", email: "", city: "" });
   const spots = useSpots();
   const cd = useCountdown();
   const taken = TOTAL - spots;
@@ -219,7 +219,7 @@ export default function Page() {
               Your service.<br />Your price.<br /><span className="g">Zero cut. Forever.</span>
             </h2>
             <p style={{ fontSize: 16, color: "var(--text-body)", lineHeight: 1.75, marginBottom: 40 }}>
-              The first 100,000 providers on RentOut keep every rupee they earn — for life. Offer closes in {cd.d} days.
+              The first 100,000 providers on RentOut keep every dollar they earn — for life. Offer closes in {cd.d} days.
             </p>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 40 }}>
@@ -265,8 +265,7 @@ export default function Page() {
               {[
                 { label: "Full name", key: "name", placeholder: "Your name", type: "text" },
                 { label: "Email address", key: "email", placeholder: "you@email.com", type: "email" },
-                { label: "Your city", key: "city", placeholder: "Delhi, Mumbai, Bangalore…", type: "text" },
-                { label: "What will you offer?", key: "category", placeholder: "Gaming, Photography, Fitness…", type: "text" },
+                { label: "Your city", key: "city", placeholder: "New York, London, Tokyo…", type: "text" },
               ].map(({ label, key, placeholder, type }) => (
                 <div key={key}>
                   <label style={{ fontSize: 12, fontWeight: 600, color: "var(--text-dim)", letterSpacing: "0.04em", display: "block", marginBottom: 7 }}>{label}</label>
@@ -321,7 +320,7 @@ export default function Page() {
           </h1>
 
           <p className="hero-sub" style={{ fontSize: "clamp(17px, 2vw, 21px)", color: "var(--text-body)", lineHeight: 1.7, maxWidth: 520, margin: "0 auto 56px" }}>
-            RentOut is India&apos;s first marketplace where you can offer any service — gaming, photography, tutoring, fitness, anything — and keep 100% of every booking. Forever.
+            The first marketplace where anyone can offer any service — gaming, photography, tutoring, fitness, anything — and keep 100% of every booking. Forever.
           </p>
 
           <div className="hero-cta" style={{ display: "flex", justifyContent: "center", marginBottom: 40 }}>
@@ -363,7 +362,7 @@ export default function Page() {
         <div className="stats reveal">
           {[
             { l: "Founding spots available", v: 100000, s: "" },
-            { l: "Indian cities at launch", v: 20, s: "+" },
+            { l: "Countries at launch", v: 160, s: "+" },
             { l: "Commission for founders", v: -1, s: "" },
           ].map(({ l, v, s }) => (
             <div className="stat" key={l}>

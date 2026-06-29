@@ -9,8 +9,8 @@ const supabase = createClient(
 export async function POST(req: NextRequest) {
   try {
     const { name, email, city, category } = await req.json();
-    if (!name || !email || !city || !category) {
-      return NextResponse.json({ error: "Missing fields", fields: { name, email, city, category } }, { status: 400 });
+    if (!name || !email || !city) {
+      return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
 
     // Check duplicate
