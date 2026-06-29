@@ -56,6 +56,20 @@ function useCursorGlow() {
   }, []);
 }
 
+function useParallax() {
+  useEffect(() => {
+    const blobs = document.querySelector(".aurora-parallax") as HTMLElement | null;
+    if (!blobs) return;
+    const move = (e: MouseEvent) => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 30;
+      const y = (e.clientY / window.innerHeight - 0.5) * 20;
+      blobs.style.transform = `translate(${x}px, ${y}px)`;
+    };
+    window.addEventListener("mousemove", move);
+    return () => window.removeEventListener("mousemove", move);
+  }, []);
+}
+
 function useCountdown() {
   const [t, setT] = useState({ d: 0, h: 0, m: 0 });
   useEffect(() => {
@@ -147,6 +161,7 @@ export default function Page() {
   const taken = TOTAL - spots;
   useReveal();
   useCursorGlow();
+  useParallax();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -473,8 +488,12 @@ export default function Page() {
 
       {/* HERO */}
       <div style={{ position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", top: -200, left: "50%", transform: "translateX(-50%)", width: 1000, height: 700, background: "radial-gradient(ellipse at center, rgba(155,109,255,0.14), transparent 60%)", pointerEvents: "none" }} />
-        <div style={{ position: "absolute", bottom: -80, right: "0%", width: 600, height: 500, background: "radial-gradient(ellipse at center, rgba(242,139,130,0.05), transparent 60%)", pointerEvents: "none" }} />
+        {/* Aurora blobs — parallax on mousemove */}
+        <div className="aurora-parallax" style={{ position: "absolute", inset: 0, pointerEvents: "none", transition: "transform 0.8s cubic-bezier(.25,.46,.45,.94)" }}>
+          <div className="aurora-blob aurora-1" style={{ top: "-30%", left: "30%" }} />
+          <div className="aurora-blob aurora-2" style={{ bottom: "-20%", right: "-10%" }} />
+          <div className="aurora-blob aurora-3" style={{ top: "20%", left: "-5%" }} />
+        </div>
 
         <div style={{ position: "relative", maxWidth: 960, margin: "0 auto", padding: "72px 24px 64px", textAlign: "center" }}>
           <div className="hero-eyebrow" style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(155,109,255,0.07)", border: "1px solid rgba(155,109,255,0.16)", borderRadius: 100, padding: "7px 18px", marginBottom: 36 }}>
@@ -484,9 +503,14 @@ export default function Page() {
             </span>
           </div>
 
-          <h1 className="hero-h1" style={{ fontSize: "clamp(52px, 10vw, 118px)", fontWeight: 900, lineHeight: 0.9, letterSpacing: "-0.055em", marginBottom: 28 }}>
-            Sell anything.<br /><span className="g">Keep everything.</span>
-          </h1>
+          <div style={{ marginBottom: 28 }}>
+            <div className="hero-line-1" style={{ fontSize: "clamp(52px, 10vw, 118px)", fontWeight: 900, lineHeight: 0.92, letterSpacing: "-0.055em", color: "#f8f8fa" }}>
+              Sell anything.
+            </div>
+            <div className="hero-line-2" style={{ fontSize: "clamp(52px, 10vw, 118px)", fontWeight: 900, lineHeight: 0.92, letterSpacing: "-0.055em" }}>
+              <span className="g">Keep everything.</span>
+            </div>
+          </div>
 
           <p className="hero-sub" style={{ fontSize: "clamp(17px, 2vw, 21px)", color: "var(--text-body)", lineHeight: 1.7, maxWidth: 520, margin: "0 auto 40px" }}>
             Something new is coming. Sign up to earn — before anyone else.

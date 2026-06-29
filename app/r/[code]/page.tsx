@@ -99,8 +99,10 @@ export default function StatusPage() {
             </p>
 
             {/* Big position number */}
-            <div style={{ fontSize: "clamp(100px, 25vw, 220px)", fontWeight: 900, letterSpacing: "-0.06em", lineHeight: 0.85, textAlign: "center", marginBottom: 32, background: "linear-gradient(135deg,#9B6DFF,#F28B82)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-              #{status.position.toLocaleString()}
+            <div style={{ textAlign: "center", marginBottom: 32 }}>
+              <span className="position-3d" style={{ fontSize: "clamp(100px, 25vw, 220px)", fontWeight: 900, letterSpacing: "-0.06em", lineHeight: 0.85, background: "linear-gradient(135deg,#9B6DFF,#F28B82)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+                #{status.position.toLocaleString()}
+              </span>
             </div>
 
             <p style={{ textAlign: "center", fontSize: 20, fontWeight: 700, marginBottom: 6 }}>

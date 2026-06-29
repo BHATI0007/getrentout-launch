@@ -77,12 +77,27 @@ export default function LeaderboardPage() {
               const isTop3 = l.rank <= 3;
               return (
                 <div key={l.referralCode}
+                  className="leader-row"
                   style={{
                     display: "flex", alignItems: "center", gap: 16,
                     background: isMe ? "rgba(155,109,255,0.1)" : isTop3 ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.02)",
                     border: `1px solid ${isMe ? "rgba(155,109,255,0.35)" : isTop3 ? "rgba(255,255,255,0.07)" : "rgba(255,255,255,0.04)"}`,
                     borderRadius: 16, padding: "16px 20px",
-                    transition: "all .2s",
+                    transition: "transform 0.15s ease, box-shadow 0.15s ease, border-color 0.2s",
+                    animationDelay: `${l.rank * 0.07}s`, animationFillMode: "both",
+                  }}
+                  onMouseMove={e => {
+                    const r = e.currentTarget.getBoundingClientRect();
+                    const x = (e.clientX - r.left) / r.width - 0.5;
+                    const y = (e.clientY - r.top) / r.height - 0.5;
+                    e.currentTarget.style.transform = `perspective(700px) rotateX(${-y * 7}deg) rotateY(${x * 7}deg) translateZ(6px)`;
+                    e.currentTarget.style.boxShadow = isMe ? `0 8px 32px rgba(155,109,255,0.25)` : `0 8px 24px rgba(0,0,0,0.3)`;
+                    e.currentTarget.style.borderColor = isMe ? "rgba(155,109,255,0.5)" : "rgba(255,255,255,0.12)";
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.transform = "perspective(700px) rotateX(0deg) rotateY(0deg) translateZ(0px)";
+                    e.currentTarget.style.boxShadow = "none";
+                    e.currentTarget.style.borderColor = isMe ? "rgba(155,109,255,0.35)" : isTop3 ? "rgba(255,255,255,0.07)" : "rgba(255,255,255,0.04)";
                   }}>
 
                   {/* Rank */}
@@ -122,9 +137,19 @@ export default function LeaderboardPage() {
         )}
 
         {!loading && leaders.length > 0 && (
-          <p style={{ textAlign: "center", fontSize: 13, color: "#444466", marginTop: 32 }}>
-            Only showing earners with at least 1 referral.
-          </p>
+          <>
+            <p style={{ textAlign: "center", fontSize: 13, color: "#444466", marginTop: 32, marginBottom: 40 }}>
+              Only showing earners with at least 1 referral.
+            </p>
+            <div style={{ background: "linear-gradient(160deg, rgba(155,109,255,0.07), rgba(242,139,130,0.04))", border: "1px solid rgba(155,109,255,0.15)", borderRadius: 20, padding: "32px 24px", textAlign: "center" }}>
+              <p style={{ fontSize: 22, marginBottom: 10 }}>🚀</p>
+              <p style={{ fontSize: 16, fontWeight: 700, color: "#e0e0f0", marginBottom: 6 }}>Want to climb higher?</p>
+              <p style={{ fontSize: 13, color: "#8888aa", marginBottom: 20, lineHeight: 1.6 }}>Each friend you refer moves you 5 spots up the queue.</p>
+              <a href="https://getrentout.me" style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "linear-gradient(110deg,#9B6DFF,#b57dff)", color: "#fff", fontWeight: 700, fontSize: 14, padding: "12px 28px", borderRadius: 100, textDecoration: "none", boxShadow: "0 8px 28px rgba(155,109,255,0.35)" }}>
+                Share your link →
+              </a>
+            </div>
+          </>
         )}
       </div>
     </div>
