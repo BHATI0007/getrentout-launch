@@ -56,6 +56,109 @@ function useCursorGlow() {
   }, []);
 }
 
+function useMagneticButtons() {
+  useEffect(() => {
+    const btns = Array.from(document.querySelectorAll<HTMLElement>(".btn-primary"));
+    const cleanup: (() => void)[] = [];
+    btns.forEach(btn => {
+      const move = (e: MouseEvent) => {
+        const r = btn.getBoundingClientRect();
+        const x = e.clientX - r.left - r.width / 2;
+        const y = e.clientY - r.top - r.height / 2;
+        const dist = Math.sqrt(x * x + y * y);
+        if (dist < 90) {
+          const pull = (1 - dist / 90) * 0.45;
+          btn.style.transform = `translate(${x * pull}px,${y * pull}px)`;
+          btn.style.transition = "transform 0.1s ease";
+        }
+      };
+      const leave = () => {
+        btn.style.transform = "";
+        btn.style.transition = "transform 0.5s cubic-bezier(.16,1,.3,1)";
+      };
+      window.addEventListener("mousemove", move);
+      btn.addEventListener("mouseleave", leave);
+      cleanup.push(() => { window.removeEventListener("mousemove", move); btn.removeEventListener("mouseleave", leave); });
+    });
+    return () => cleanup.forEach(fn => fn());
+  }, []);
+}
+
+function useNavGlass() {
+  useEffect(() => {
+    const nav = document.querySelector("nav");
+    if (!nav) return;
+    const onScroll = () => nav.classList.toggle("nav-scrolled", window.scrollY > 20);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+}
+
+function useTextScramble(ref: React.RefObject<HTMLElement | null>, text: string, delay = 600) {
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&";
+    let frame = 0;
+    const total = text.length * 3 + 8;
+    let raf: number;
+    const timer = setTimeout(() => {
+      const tick = () => {
+        el.textContent = text.split("").map((ch, i) => {
+          if (ch === " " || ch === ".") return ch;
+          if (i < Math.floor(frame / 3)) return ch;
+          return chars[Math.floor(Math.random() * chars.length)];
+        }).join("");
+        frame++;
+        if (frame < total) raf = requestAnimationFrame(tick);
+        else el.textContent = text;
+      };
+      raf = requestAnimationFrame(tick);
+    }, delay);
+    return () => { clearTimeout(timer); cancelAnimationFrame(raf); };
+  }, [text, delay, ref]);
+}
+
+function Confetti() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const colors = ["#9B6DFF", "#F28B82", "#c87dff", "#ffffff", "#38bdf8", "#fbbf24"];
+    const particles = Array.from({ length: 90 }, () => ({
+      x: Math.random() * canvas.width, y: -20 - Math.random() * 100,
+      vx: (Math.random() - 0.5) * 4, vy: Math.random() * 3 + 1.5,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      w: Math.random() * 8 + 4, h: Math.random() * 4 + 2,
+      rot: Math.random() * 360, rotV: (Math.random() - 0.5) * 12,
+      opacity: 1,
+    }));
+    let frame = 0; let raf: number;
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.x += p.vx; p.y += p.vy; p.vy += 0.04; p.rot += p.rotV;
+        if (frame > 80) p.opacity = Math.max(0, p.opacity - 0.012);
+        ctx.save();
+        ctx.globalAlpha = p.opacity;
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot * Math.PI / 180);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      });
+      frame++;
+      if (frame < 220) raf = requestAnimationFrame(draw);
+    };
+    raf = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  return <canvas ref={canvasRef} style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 997 }} />;
+}
+
 function useParallax() {
   useEffect(() => {
     const blobs = document.querySelector(".aurora-parallax") as HTMLElement | null;
@@ -107,9 +210,12 @@ function CountUp({ to }: { to: number }) {
 
 function Ticker({ value }: { value: number }) {
   const [d, setD] = useState(value);
+  const [flash, setFlash] = useState(false);
   const prev = useRef(value);
   useEffect(() => {
     if (value === prev.current) return;
+    setFlash(true);
+    setTimeout(() => setFlash(false), 350);
     const diff = prev.current - value; let i = 0;
     const id = setInterval(() => {
       i++; setD(Math.round(prev.current - diff * (1 - Math.pow(1 - i / 40, 3))));
@@ -117,7 +223,7 @@ function Ticker({ value }: { value: number }) {
     }, 16);
     return () => clearInterval(id);
   }, [value]);
-  return <>{d.toLocaleString()}</>;
+  return <span key={flash ? "f" : "n"} className={flash ? "counter-flash" : ""}>{d.toLocaleString()}</span>;
 }
 
 const SERVICES = [
@@ -156,12 +262,16 @@ export default function Page() {
   const [rankEmail, setRankEmail] = useState("");
   const [rankLoading, setRankLoading] = useState(false);
   const [rankError, setRankError] = useState("");
+  const scrambleRef = useRef<HTMLDivElement>(null);
   const spots = useSpots();
   const cd = useCountdown();
   const taken = TOTAL - spots;
   useReveal();
   useCursorGlow();
   useParallax();
+  useMagneticButtons();
+  useNavGlass();
+  useTextScramble(scrambleRef, "Sell anything.", 800);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -222,6 +332,7 @@ export default function Page() {
   /* ── DONE ── */
   if (view === "done") return (
     <div className="view-transition" style={{ background: "var(--bg)", minHeight: "100vh", display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
+      <Confetti />
       <div id="cursor-glow" className="cursor-glow" />
       <div style={{ position: "absolute", top: "-20%", left: "50%", transform: "translateX(-50%)", width: 1000, height: 800, background: "radial-gradient(ellipse, rgba(155,109,255,0.12), transparent 55%)", pointerEvents: "none" }} />
       <div style={{ position: "absolute", bottom: "-10%", right: "-10%", width: 700, height: 600, background: "radial-gradient(ellipse, rgba(242,139,130,0.06), transparent 55%)", pointerEvents: "none" }} />
@@ -308,11 +419,12 @@ export default function Page() {
                   { label: "TikTok", bg: "#010101", border: "1px solid #333", href: "https://www.tiktok.com/", icon: Icons.tiktok },
                   { label: "Reddit", bg: "#FF4500", href: `https://www.reddit.com/submit?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(shareText)}`, icon: Icons.reddit },
                   { label: "LinkedIn", bg: "#0A66C2", href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`, icon: Icons.linkedin },
-                ].map(({ label, bg, border, href, icon }) => (
+                ].map(({ label, bg, border, href, icon }, i) => (
                   <a key={label} href={href} target="_blank" rel="noopener"
-                    style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, background: bg, border: border || "none", borderRadius: 16, padding: "18px 8px", textDecoration: "none", transition: "opacity .15s" }}
-                    onMouseEnter={e => (e.currentTarget.style.opacity = "0.8")}
-                    onMouseLeave={e => (e.currentTarget.style.opacity = "1")}>
+                    className="share-btn"
+                    style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, background: bg, border: border || "none", borderRadius: 16, padding: "18px 8px", textDecoration: "none", transition: "opacity .15s, transform .15s", animationDelay: `${i * 0.06}s` }}
+                    onMouseEnter={e => { e.currentTarget.style.opacity = "0.85"; e.currentTarget.style.transform = "translateY(-3px) scale(1.04)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.opacity = "1"; e.currentTarget.style.transform = ""; }}>
                     {icon}
                     <span style={{ fontSize: 11, fontWeight: 700, color: "#fff", letterSpacing: "0.04em" }}>{label}</span>
                   </a>
@@ -494,6 +606,8 @@ export default function Page() {
           <div className="aurora-blob aurora-2" style={{ bottom: "-20%", right: "-10%" }} />
           <div className="aurora-blob aurora-3" style={{ top: "20%", left: "-5%" }} />
         </div>
+        {/* Spotlight beam */}
+        <div className="spotlight" style={{ zIndex: 1 }} />
 
         <div style={{ position: "relative", maxWidth: 960, margin: "0 auto", padding: "72px 24px 64px", textAlign: "center" }}>
           <div className="hero-eyebrow" style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(155,109,255,0.07)", border: "1px solid rgba(155,109,255,0.16)", borderRadius: 100, padding: "7px 18px", marginBottom: 36 }}>
@@ -504,11 +618,11 @@ export default function Page() {
           </div>
 
           <div style={{ marginBottom: 28 }}>
-            <div className="hero-line-1" style={{ fontSize: "clamp(52px, 10vw, 118px)", fontWeight: 900, lineHeight: 0.92, letterSpacing: "-0.055em", color: "#f8f8fa" }}>
+            <div ref={scrambleRef} className="hero-line-1" style={{ fontSize: "clamp(52px, 10vw, 118px)", fontWeight: 900, lineHeight: 0.92, letterSpacing: "-0.055em", color: "#f8f8fa" }}>
               Sell anything.
             </div>
             <div className="hero-line-2" style={{ fontSize: "clamp(52px, 10vw, 118px)", fontWeight: 900, lineHeight: 0.92, letterSpacing: "-0.055em" }}>
-              <span className="g">Keep everything.</span>
+              <span className="g hero-glitch">Keep everything.</span>
             </div>
           </div>
 

@@ -1,6 +1,67 @@
 @import "tailwindcss";
 
 @keyframes cursor-fade { from { opacity: 0; } to { opacity: 1; } }
+
+/* ── Spotlight beam sweeps across hero ── */
+@keyframes spotlight-sweep {
+  0%,100% { left: -30%; opacity: 0; }
+  3%  { opacity: 1; }
+  48% { opacity: 0.5; }
+  50% { left: 130%; opacity: 0; }
+  51%,99% { left: 130%; opacity: 0; }
+}
+.spotlight {
+  position: absolute; top: -20%; bottom: -20%; width: 120px;
+  background: linear-gradient(90deg, transparent, rgba(155,109,255,0.07), rgba(255,255,255,0.05), rgba(155,109,255,0.07), transparent);
+  transform: skewX(-18deg); pointer-events: none;
+  animation: spotlight-sweep 9s ease-in-out 1.5s infinite;
+}
+
+/* ── Glitch on gradient headline ── */
+@keyframes glitch {
+  0%,90%,100% { transform: none; }
+  91% { transform: translateX(-4px) skewX(-4deg); opacity: 0.85; }
+  92% { transform: translateX(4px) skewX(3deg); opacity: 0.9; }
+  93% { transform: translateX(-2px); }
+  94% { transform: translateX(3px) skewX(-1deg); opacity: 0.95; }
+  95% { transform: none; }
+}
+.hero-glitch { animation: glitch 7s ease-in-out 2s infinite; display: inline-block; }
+
+/* ── Gradient flow on .g text ── */
+@keyframes gradient-flow {
+  0%,100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ── Glassmorphism nav on scroll ── */
+.nav-scrolled {
+  border-bottom-color: rgba(155,109,255,0.18) !important;
+  box-shadow: 0 0 60px rgba(155,109,255,0.1), 0 1px 0 rgba(155,109,255,0.12) !important;
+  backdrop-filter: blur(28px) saturate(200%) !important;
+}
+
+/* ── Share button stagger on done screen ── */
+@keyframes share-pop {
+  from { opacity: 0; transform: translateY(16px) scale(0.88); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.share-btn { animation: share-pop 0.5s cubic-bezier(.16,1,.3,1) both; }
+
+/* ── Digit flash when counter updates ── */
+@keyframes digit-flash {
+  0%   { opacity: 0.4; transform: scale(0.96); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.counter-flash { animation: digit-flash 0.35s cubic-bezier(.16,1,.3,1) both; }
+
+/* ── Morphing background ── */
+@keyframes bg-breathe {
+  0%,100% { background-color: #07070a; }
+  40%     { background-color: #080711; }
+  70%     { background-color: #08070f; }
+}
+body { animation: bg-breathe 14s ease-in-out infinite; }
 @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @keyframes pulse-dot {
@@ -112,10 +173,12 @@ body {
 input, select, textarea, button { font-family: inherit; }
 
 .g {
-  background: linear-gradient(110deg, #9B6DFF 0%, #c87dff 45%, #F28B82 100%);
+  background: linear-gradient(110deg, #9B6DFF 0%, #c87dff 25%, #F28B82 50%, #c87dff 75%, #9B6DFF 100%);
+  background-size: 200% 100%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  animation: gradient-flow 5s ease-in-out infinite;
 }
 
 .dot {
