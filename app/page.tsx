@@ -209,6 +209,14 @@ export default function Page() {
         <p style={{ fontSize: 16, color: "#8888aa", maxWidth: 360, textAlign: "center", lineHeight: 1.6 }}>
           We&apos;ll email you when it&apos;s time.<br />Watch your inbox.
         </p>
+
+        {myRefCode && (
+          <a href={`/r/${myRefCode}`} target="_blank" rel="noopener"
+            style={{ marginTop: 20, display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 600, color: "#9B6DFF", textDecoration: "none", background: "rgba(155,109,255,0.08)", border: "1px solid rgba(155,109,255,0.2)", borderRadius: 100, padding: "8px 18px" }}>
+            <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#9B6DFF", display: "inline-block" }} />
+            Check your position anytime →
+          </a>
+        )}
       </div>
 
       {/* Bottom share section — pinned to bottom like Robinhood */}
