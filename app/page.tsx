@@ -180,27 +180,22 @@ export default function Page() {
           Spread the word
         </p>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 10 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 10 }}>
           <a href={`https://wa.me/?text=Just got early access to RentOut — something big is coming. Get yours: https://getrentout.me`}
             target="_blank" rel="noopener"
             style={{ background: "#128C7E", borderRadius: 13, padding: "14px 8px", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none", textAlign: "center", display: "block" }}>
             WhatsApp
           </a>
+          <a href={`https://www.instagram.com/`}
+            target="_blank" rel="noopener"
+            style={{ background: "linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045)", borderRadius: 13, padding: "14px 8px", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none", textAlign: "center", display: "block" }}>
+            Instagram
+          </a>
           <a href={`https://twitter.com/intent/tweet?text=Just got early access to RentOut — something big is coming: https://getrentout.me`}
             target="_blank" rel="noopener"
             style={{ background: "#000", border: "1px solid #333", borderRadius: 13, padding: "14px 8px", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none", textAlign: "center", display: "block" }}>
-            X / Twitter
+            X
           </a>
-          <a href={`https://www.linkedin.com/sharing/share-offsite/?url=https://getrentout.me`}
-            target="_blank" rel="noopener"
-            style={{ background: "#0A66C2", borderRadius: 13, padding: "14px 8px", fontSize: 14, fontWeight: 700, color: "#fff", textDecoration: "none", textAlign: "center", display: "block" }}>
-            LinkedIn
-          </a>
-          <button
-            onClick={() => { navigator.clipboard.writeText("https://getrentout.me"); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
-            style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 13, padding: "14px 8px", fontSize: 14, fontWeight: 700, color: copied ? "var(--accent)" : "var(--text)", cursor: "pointer", textAlign: "center", display: "block", width: "100%" }}>
-            {copied ? "✓ Copied" : "Copy link"}
-          </button>
         </div>
 
       </div>
