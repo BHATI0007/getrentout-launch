@@ -311,3 +311,15 @@ input, select, textarea, button { font-family: inherit; }
   .trust-row { flex-direction: column; align-items: center; }
   .trust-item { border-left: none !important; padding: 4px 0; }
 }
+
+/* Mobile nav — hide secondary buttons on small screens */
+@media (max-width: 600px) {
+  .nav-hide-mobile { display: none !important; }
+}
+
+/* Leaderboard top glow */
+.leaderboard-glow {
+  position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+  width: 700px; height: 500px; pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse at top, rgba(155,109,255,0.09), transparent 65%);
+}
