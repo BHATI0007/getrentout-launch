@@ -26,6 +26,16 @@ function useReveal() {
   }, []);
 }
 
+function useCursorGlow() {
+  useEffect(() => {
+    const el = document.getElementById("cursor-glow");
+    if (!el) return;
+    const move = (e: MouseEvent) => { el.style.left = e.clientX + "px"; el.style.top = e.clientY + "px"; };
+    window.addEventListener("mousemove", move);
+    return () => window.removeEventListener("mousemove", move);
+  }, []);
+}
+
 function useCountdown() {
   const [t, setT] = useState({ d: 0, h: 0, m: 0 });
   useEffect(() => {
@@ -88,11 +98,11 @@ const SERVICES = [
 type V = "home" | "provider" | "customer" | "done-p" | "done-c";
 
 const Logo = () => (
-  <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
-    <div style={{ width: 32, height: 32, borderRadius: 8, overflow: "hidden", flexShrink: 0 }}>
-      <Image src="/logo.png" alt="RentOut" width={32} height={32} />
+  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+    <div style={{ width: 32, height: 32, borderRadius: 9, overflow: "hidden", flexShrink: 0, background: "linear-gradient(135deg, #9B6DFF22, #F28B8222)", border: "1px solid rgba(155,109,255,0.2)" }}>
+      <Image src="/logo.png" alt="RentOut" width={32} height={32} style={{ borderRadius: 8 }} />
     </div>
-    <span style={{ fontSize: 16, fontWeight: 700, letterSpacing: "-0.3px", color: "var(--text)" }}>RentOut</span>
+    <span className="logo-text">RentOut</span>
   </div>
 );
 
@@ -108,6 +118,7 @@ export default function Page() {
   const { spots, setSpots } = useSpots();
   const cd = useCountdown();
   useReveal();
+  useCursorGlow();
 
   useEffect(() => {
     const r = new URLSearchParams(window.location.search).get("ref");
@@ -233,6 +244,7 @@ export default function Page() {
   /* HOME */
   return (
     <div style={{ background: "var(--bg)", minHeight: "100vh" }}>
+      <div id="cursor-glow" className="cursor-glow" />
       <nav style={{ position: "sticky", top: 0, zIndex: 99, background: "rgba(8,8,11,0.82)", borderBottom: "1px solid var(--border)", padding: "0 20px", height: 58, display: "flex", alignItems: "center", justifyContent: "space-between", backdropFilter: "blur(12px)" }}>
         <Logo />
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -251,22 +263,22 @@ export default function Page() {
             <span style={{ fontSize: 13, color: "var(--text-dim)" }}>Founding offer closes in <span style={{ color: "var(--text)", fontWeight: 600 }}>{cd.d}d {cd.h}h</span></span>
           </div>
 
-          <div style={{ marginBottom: 32 }}>
-            <div style={{ width: 90, height: 90, borderRadius: 24, overflow: "hidden", margin: "0 auto", animation: "float 5s ease-in-out infinite", boxShadow: "0 0 0 1px rgba(155,109,255,0.2), 0 24px 60px rgba(155,109,255,0.35)" }}>
-              <Image src="/logo.png" alt="RentOut" width={90} height={90} priority />
+          <div style={{ marginBottom: 36 }}>
+            <div style={{ width: 96, height: 96, borderRadius: 26, overflow: "hidden", margin: "0 auto", animation: "float 5s ease-in-out infinite", background: "linear-gradient(135deg, #1a1228, #120d1e)", boxShadow: "0 0 0 1px rgba(155,109,255,0.25), 0 32px 80px rgba(155,109,255,0.4)" }}>
+              <Image src="/logo.png" alt="RentOut" width={96} height={96} priority />
             </div>
           </div>
 
-          <h1 style={{ fontSize: "clamp(52px, 10vw, 100px)", fontWeight: 900, lineHeight: 0.97, letterSpacing: "-0.045em", marginBottom: 24 }}>
+          <h1 style={{ fontSize: "clamp(56px, 11vw, 112px)", fontWeight: 900, lineHeight: 0.95, letterSpacing: "-0.05em", marginBottom: 28 }}>
             Hire anyone.<br /><span className="g">For anything.</span>
           </h1>
-          <p style={{ fontSize: "clamp(16px, 2vw, 19px)", color: "var(--text-body)", lineHeight: 1.75, maxWidth: 500, margin: "0 auto 40px" }}>
+          <p style={{ fontSize: "clamp(16px, 2vw, 20px)", color: "var(--text-body)", lineHeight: 1.75, maxWidth: 520, margin: "0 auto 44px" }}>
             The first marketplace where anyone can offer any service — on their own terms, at their own price.
           </p>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 10, alignItems: "center", marginBottom: 28 }}>
-            <button className="btn-primary" onClick={() => setView("provider")} style={{ width: "100%", maxWidth: 340, fontSize: 16, padding: "16px 32px", borderRadius: 14 }}>Start earning — it&apos;s free</button>
-            <button className="btn-secondary" onClick={() => setView("customer")} style={{ width: "100%", maxWidth: 340, fontSize: 15, padding: "15px 32px", borderRadius: 14 }}>I want to hire someone</button>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, alignItems: "center", marginBottom: 32 }}>
+            <button className="btn-primary" onClick={() => setView("provider")} style={{ width: "100%", maxWidth: 360, fontSize: 16, padding: "17px 32px", borderRadius: 14 }}>Start earning — it&apos;s free</button>
+            <button className="btn-secondary" onClick={() => setView("customer")} style={{ width: "100%", maxWidth: 360, fontSize: 15, padding: "16px 32px", borderRadius: 14 }}>I want to hire someone</button>
           </div>
           <p style={{ fontSize: 13, color: "var(--text-faint)" }}>Zero commission for the first 100,000 providers. Forever.</p>
         </div>
@@ -295,12 +307,12 @@ export default function Page() {
       </div>
 
       {/* STATS */}
-      <div style={{ maxWidth: 760, margin: "0 auto", padding: "48px 20px 8px" }}>
+      <div style={{ maxWidth: 760, margin: "0 auto", padding: "56px 20px 12px" }}>
         <div className="stats reveal">
           {[{ l: "Founding spots", v: 100000, s: "" }, { l: "Countries at launch", v: 160, s: "+" }, { l: "Commission for founders", v: -1, s: "" }].map(({ l, v, s }) => (
             <div className="stat" key={l}>
-              <div style={{ fontSize: "clamp(26px, 4vw, 38px)", fontWeight: 800, letterSpacing: "-1.5px", lineHeight: 1.1 }}>{v === -1 ? <span className="g">0%</span> : <><CountUp to={v} />{s}</>}</div>
-              <div style={{ fontSize: 13, color: "var(--text-faint)", marginTop: 4 }}>{l}</div>
+              <div className="stat-num">{v === -1 ? <span className="g">0%</span> : <><CountUp to={v} />{s}</>}</div>
+              <div style={{ fontSize: 13, color: "var(--text-faint)", marginTop: 6, letterSpacing: "0.02em" }}>{l}</div>
             </div>
           ))}
         </div>
@@ -310,18 +322,18 @@ export default function Page() {
 
       {/* HOW IT WORKS */}
       <div style={{ maxWidth: 920, margin: "0 auto", padding: "72px 20px" }}>
-        <div className="reveal" style={{ textAlign: "center", marginBottom: 44 }}>
-          <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", color: "var(--accent)", textTransform: "uppercase", marginBottom: 12 }}>How it works</p>
-          <h2 style={{ fontSize: "clamp(26px, 4vw, 40px)", fontWeight: 800, letterSpacing: "-1.2px" }}>Earn in three steps</h2>
+        <div className="reveal" style={{ textAlign: "center", marginBottom: 52 }}>
+          <p className="section-label">01 — How it works</p>
+          <h2 style={{ fontSize: "clamp(30px, 4.5vw, 48px)", fontWeight: 900, letterSpacing: "-1.5px" }}>Earn in three steps</h2>
         </div>
         <div className="bento">
-          <div className="card bento-wide reveal d1" style={{ padding: "30px 28px" }}>
-            <div style={{ display: "inline-flex", padding: "5px 11px", borderRadius: 8, background: "rgba(155,109,255,0.12)", border: "1px solid rgba(155,109,255,0.22)", fontSize: 12, fontWeight: 700, color: "var(--accent)", marginBottom: 16 }}>STEP 01</div>
+          <div className="card bento-wide reveal d1" style={{ padding: "36px 32px" }}>
+            <div className="step-badge-purple">Step 01</div>
             <h3 style={{ fontSize: 20, fontWeight: 800, letterSpacing: "-0.4px", marginBottom: 8 }}>List any service</h3>
             <p style={{ fontSize: 15, color: "var(--text-body)", lineHeight: 1.7 }}>Gaming, photography, tutoring, cooking, companionship — whatever you&apos;re good at. No fixed categories, no restrictions. Live in minutes.</p>
           </div>
-          <div className="card bento-tall reveal d2" style={{ padding: "30px 28px" }}>
-            <div style={{ display: "inline-flex", padding: "5px 11px", borderRadius: 8, background: "rgba(155,109,255,0.12)", border: "1px solid rgba(155,109,255,0.22)", fontSize: 12, fontWeight: 700, color: "var(--accent)", marginBottom: 16 }}>STEP 02</div>
+          <div className="card bento-tall reveal d2" style={{ padding: "36px 32px" }}>
+            <div className="step-badge-purple">Step 02</div>
             <h3 style={{ fontSize: 20, fontWeight: 800, letterSpacing: "-0.4px", marginBottom: 8 }}>Set your terms</h3>
             <p style={{ fontSize: 15, color: "var(--text-body)", lineHeight: 1.7, marginBottom: 22 }}>Your price. Your hours. Your rules. No platform deciding for you.</p>
             <div>
@@ -333,8 +345,8 @@ export default function Page() {
               ))}
             </div>
           </div>
-          <div className="card reveal d1" style={{ padding: "28px 24px" }}>
-            <div style={{ display: "inline-flex", padding: "5px 11px", borderRadius: 8, background: "rgba(236,72,153,0.12)", border: "1px solid rgba(236,72,153,0.22)", fontSize: 12, fontWeight: 700, color: "var(--accent-2)", marginBottom: 16 }}>STEP 03</div>
+          <div className="card reveal d1" style={{ padding: "36px 32px" }}>
+            <div className="step-badge-coral">Step 03</div>
             <h3 style={{ fontSize: 20, fontWeight: 800, letterSpacing: "-0.4px", marginBottom: 8 }}>Get paid</h3>
             <p style={{ fontSize: 15, color: "var(--text-body)", lineHeight: 1.7 }}>Customer books. You show up. Money in your account.</p>
           </div>
@@ -368,22 +380,23 @@ export default function Page() {
 
       {/* BOTTOM CTA */}
       <div style={{ maxWidth: 760, margin: "0 auto", padding: "72px 20px 92px" }}>
-        <div className="card reveal" style={{ borderRadius: 22, padding: "clamp(40px, 6vw, 64px) clamp(24px, 5vw, 52px)", textAlign: "center", position: "relative", overflow: "hidden" }}>
-          <div style={{ position: "absolute", top: -100, left: "50%", transform: "translateX(-50%)", width: 320, height: 320, borderRadius: "50%", background: "radial-gradient(circle, rgba(155,109,255,0.16), transparent 60%)", pointerEvents: "none" }} />
+        <div className="card reveal" style={{ borderRadius: 24, padding: "clamp(48px, 7vw, 80px) clamp(24px, 6vw, 64px)", textAlign: "center", position: "relative", overflow: "hidden", border: "1px solid rgba(155,109,255,0.18)", background: "linear-gradient(160deg, rgba(155,109,255,0.07) 0%, var(--surface) 60%)" }}>
+          <div style={{ position: "absolute", top: -120, left: "50%", transform: "translateX(-50%)", width: 480, height: 480, borderRadius: "50%", background: "radial-gradient(circle, rgba(155,109,255,0.14), transparent 60%)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", bottom: -60, right: "5%", width: 280, height: 280, borderRadius: "50%", background: "radial-gradient(circle, rgba(242,139,130,0.07), transparent 60%)", pointerEvents: "none" }} />
           <div style={{ position: "relative" }}>
-            <div style={{ width: 60, height: 60, borderRadius: 16, overflow: "hidden", margin: "0 auto 22px", boxShadow: "0 0 40px rgba(155,109,255,0.4)" }}>
-              <Image src="/logo.png" alt="RentOut" width={60} height={60} />
+            <div style={{ width: 72, height: 72, borderRadius: 20, overflow: "hidden", margin: "0 auto 28px", background: "linear-gradient(135deg, #1a1228, #120d1e)", boxShadow: "0 0 0 1px rgba(155,109,255,0.3), 0 20px 60px rgba(155,109,255,0.45)" }}>
+              <Image src="/logo.png" alt="RentOut" width={72} height={72} />
             </div>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 7, marginBottom: 16, fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", color: "var(--accent)", textTransform: "uppercase" }}>
-              <span className="dot" style={{ background: "var(--accent)" }} /> Offer closes in {cd.d}d {cd.h}h
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 7, marginBottom: 20, fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "var(--accent)", textTransform: "uppercase", background: "rgba(155,109,255,0.1)", border: "1px solid rgba(155,109,255,0.2)", borderRadius: 100, padding: "5px 14px" }}>
+              <span className="dot" style={{ background: "var(--accent)", width: 6, height: 6 }} /> Offer closes in {cd.d}d {cd.h}h
             </div>
-            <h2 style={{ fontSize: "clamp(28px, 4.5vw, 46px)", fontWeight: 900, letterSpacing: "-1.5px", lineHeight: 1.08, marginBottom: 14 }}>
+            <h2 style={{ fontSize: "clamp(30px, 5vw, 56px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.05, marginBottom: 16 }}>
               Be a founding provider.<br /><span className="g">Zero commission. Forever.</span>
             </h2>
-            <p style={{ fontSize: 15, color: "var(--text-dim)", marginBottom: 32, lineHeight: 1.6, maxWidth: 420, margin: "0 auto 32px" }}>
+            <p style={{ fontSize: 16, color: "var(--text-dim)", lineHeight: 1.7, maxWidth: 440, margin: "0 auto 36px" }}>
               The first 100,000 providers keep 100% of every booking — for life. After launch, this never comes back.
             </p>
-            <button className="btn-primary" onClick={() => setView("provider")} style={{ fontSize: 16, padding: "15px 40px" }}>Claim my founding spot</button>
+            <button className="btn-primary" onClick={() => setView("provider")} style={{ fontSize: 16, padding: "17px 44px", borderRadius: 14 }}>Claim my founding spot</button>
           </div>
         </div>
       </div>
