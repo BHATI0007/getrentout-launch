@@ -697,14 +697,14 @@ nav, main, section, footer,
 *, *::before, *::after { cursor: none !important; }
 .cursor-dot {
   position: fixed; pointer-events: none; z-index: 999999;
-  width: 20px; height: 20px; border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #c87dff, #9B6DFF);
+  width: 28px; height: 28px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #d4aaff, #9B6DFF);
   transform: translate(-50%,-50%);
   transition: transform 0.1s ease, width 0.15s ease, height 0.15s ease, background 0.15s, box-shadow 0.15s;
-  box-shadow: 0 0 14px rgba(155,109,255,0.8), 0 0 30px rgba(155,109,255,0.35);
+  box-shadow: 0 0 18px rgba(155,109,255,0.9), 0 0 40px rgba(155,109,255,0.45), 0 0 60px rgba(155,109,255,0.15);
 }
-.cursor-dot.hovered  { width: 10px; height: 10px; opacity: 0.7; }
-.cursor-dot.clicking { width: 28px; height: 28px; background: radial-gradient(circle, #F28B82, #ff6b6b); box-shadow: 0 0 20px rgba(242,139,130,0.9), 0 0 40px rgba(242,139,130,0.4); }
+.cursor-dot.hovered  { width: 14px; height: 14px; opacity: 0.7; }
+.cursor-dot.clicking { width: 38px; height: 38px; background: radial-gradient(circle, #F28B82, #ff6b6b); box-shadow: 0 0 24px rgba(242,139,130,0.9), 0 0 50px rgba(242,139,130,0.5); }
 
 .cursor-ring {
   position: fixed; pointer-events: none; z-index: 999998;
