@@ -10,18 +10,19 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "RentOut — Hire anyone. For anything.",
-  description: "The first marketplace where anyone can offer any service — on their own terms, at their own price. Founding providers keep 100% forever.",
+  title: "RentOut — Sell anything. Keep everything.",
+  description: "Sign up now and be among the first to earn on RentOut. First 100,000 earners get early access — before anyone else.",
   openGraph: {
-    title: "RentOut — Hire anyone. For anything.",
-    description: "The first marketplace where anyone can offer any service — on their own terms, at their own price.",
+    title: "RentOut — Sell anything. Keep everything.",
+    description: "Sign up now and be among the first to earn. First 100,000 earners get early access.",
     type: "website",
     url: "https://getrentout.me",
+    siteName: "RentOut",
   },
   twitter: {
     card: "summary_large_image",
-    title: "RentOut — Hire anyone. For anything.",
-    description: "The first marketplace where anyone can offer any service — on their own terms.",
+    title: "RentOut — Sell anything. Keep everything.",
+    description: "Sign up now and be among the first to earn. First 100,000 earners get early access.",
   },
 };
 
