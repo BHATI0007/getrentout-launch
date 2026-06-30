@@ -697,24 +697,40 @@ nav, main, section, footer,
 *, *::before, *::after { cursor: none !important; }
 .cursor-dot {
   position: fixed; pointer-events: none; z-index: 999999;
-  width: 28px; height: 28px; border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #d4aaff, #9B6DFF);
+  width: 10px; height: 10px; border-radius: 50%;
+  background: #fff;
   transform: translate(-50%,-50%);
-  transition: transform 0.1s ease, width 0.15s ease, height 0.15s ease, background 0.15s, box-shadow 0.15s;
-  box-shadow: 0 0 18px rgba(155,109,255,0.9), 0 0 40px rgba(155,109,255,0.45), 0 0 60px rgba(155,109,255,0.15);
+  opacity: 0;
+  transition: opacity 0.3s, width 0.2s cubic-bezier(.16,1,.3,1), height 0.2s cubic-bezier(.16,1,.3,1), background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 0 10px rgba(255,255,255,0.9), 0 0 20px rgba(155,109,255,0.6);
+  mix-blend-mode: difference;
 }
-.cursor-dot.hovered  { width: 14px; height: 14px; opacity: 0.7; }
-.cursor-dot.clicking { width: 38px; height: 38px; background: radial-gradient(circle, #F28B82, #ff6b6b); box-shadow: 0 0 24px rgba(242,139,130,0.9), 0 0 50px rgba(242,139,130,0.5); }
+.cursor-dot.active { opacity: 1; }
+.cursor-dot.hovered {
+  width: 48px; height: 48px;
+  background: rgba(155,109,255,0.15);
+  box-shadow: 0 0 0 1.5px rgba(155,109,255,0.6), 0 0 30px rgba(155,109,255,0.3);
+  mix-blend-mode: normal;
+}
+.cursor-dot.clicking {
+  width: 36px; height: 36px;
+  background: rgba(242,139,130,0.25);
+  box-shadow: 0 0 0 1.5px rgba(242,139,130,0.8), 0 0 28px rgba(242,139,130,0.5);
+  mix-blend-mode: normal;
+}
 
 .cursor-ring {
   position: fixed; pointer-events: none; z-index: 999998;
-  width: 52px; height: 52px; border-radius: 50%;
-  border: 2px solid rgba(155,109,255,0.5);
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 1.5px solid rgba(155,109,255,0.7);
   transform: translate(-50%,-50%);
-  transition: width 0.2s cubic-bezier(.16,1,.3,1), height 0.2s cubic-bezier(.16,1,.3,1), border-color 0.2s, opacity 0.2s;
+  opacity: 0;
+  transition: width 0.35s cubic-bezier(.16,1,.3,1), height 0.35s cubic-bezier(.16,1,.3,1), border-color 0.25s, opacity 0.4s;
+  box-shadow: 0 0 12px rgba(155,109,255,0.2);
 }
-.cursor-ring.hovered  { width: 70px; height: 70px; border-color: rgba(155,109,255,0.25); }
-.cursor-ring.clicking { width: 90px; height: 90px; border-color: rgba(155,109,255,0.12); border-width: 1px; opacity: 0.6; }
+.cursor-ring.active  { opacity: 1; }
+.cursor-ring.hovered { width: 72px; height: 72px; border-color: rgba(155,109,255,0.35); opacity: 0.7; }
+.cursor-ring.clicking { width: 55px; height: 55px; border-color: rgba(242,139,130,0.6); opacity: 0.8; }
 
 /* ── Click starburst rays ── */
 @keyframes click-ray {

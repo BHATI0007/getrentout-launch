@@ -311,28 +311,55 @@ function useSpringCursor() {
     const dot = document.getElementById("cursor-dot");
     const ring = document.getElementById("cursor-ring");
     if (!dot || !ring) return;
-    let mx = 0, my = 0, rx = 0, ry = 0;
+
+    let mx = 0, my = 0, rx = 0, ry = 0, shown = false;
+
     const onMove = (e: MouseEvent) => {
       mx = e.clientX; my = e.clientY;
       dot.style.left = mx + "px"; dot.style.top = my + "px";
+      if (!shown) {
+        shown = true;
+        dot.classList.add("active");
+        ring.classList.add("active");
+        rx = mx; ry = my; // snap ring to cursor on first move
+      }
     };
-    const onDown = () => { ring.classList.add("clicking"); dot.classList.add("clicking"); };
-    const onUp = () => { ring.classList.remove("clicking"); dot.classList.remove("clicking"); };
+
+    const onDown = () => { ring.classList.add("clicking"); dot.classList.add("clicking"); dot.classList.remove("hovered"); ring.classList.remove("hovered"); };
+    const onUp   = () => { ring.classList.remove("clicking"); dot.classList.remove("clicking"); };
+
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mousedown", onDown);
     window.addEventListener("mouseup", onUp);
+
     let raf: number;
     const tick = () => {
-      rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+      rx += (mx - rx) * 0.1; ry += (my - ry) * 0.1;
       ring.style.left = rx + "px"; ring.style.top = ry + "px";
       raf = requestAnimationFrame(tick);
     };
     tick();
-    const els = document.querySelectorAll("a, button");
-    const enter = () => { dot.classList.add("hovered"); ring.classList.add("hovered"); };
-    const leave = () => { dot.classList.remove("hovered"); ring.classList.remove("hovered"); };
-    els.forEach(el => { el.addEventListener("mouseenter", enter); el.addEventListener("mouseleave", leave); });
-    return () => { cancelAnimationFrame(raf); window.removeEventListener("mousemove", onMove); window.removeEventListener("mousedown", onDown); window.removeEventListener("mouseup", onUp); };
+
+    // Use event delegation so dynamically added elements work too
+    const onEnter = (e: MouseEvent) => {
+      const t = e.target as HTMLElement;
+      if (t.closest("a, button")) { dot.classList.add("hovered"); ring.classList.add("hovered"); }
+    };
+    const onLeave = (e: MouseEvent) => {
+      const t = e.relatedTarget as HTMLElement | null;
+      if (!t?.closest("a, button")) { dot.classList.remove("hovered"); ring.classList.remove("hovered"); }
+    };
+    document.addEventListener("mouseover", onEnter);
+    document.addEventListener("mouseout", onLeave);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mousedown", onDown);
+      window.removeEventListener("mouseup", onUp);
+      document.removeEventListener("mouseover", onEnter);
+      document.removeEventListener("mouseout", onLeave);
+    };
   }, []);
 }
 
