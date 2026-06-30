@@ -71,7 +71,7 @@ export default function ThreeScene() {
         col.multiplyScalar(0.55 + Math.random() * 0.45);
 
         colors[i*3] = col.r; colors[i*3+1] = col.g; colors[i*3+2] = col.b;
-        sizes[i] = Math.random() * 2.5 + 0.5;
+        sizes[i] = Math.random() * 1.2 + 0.3;
       }
 
       const geo = new THREE.BufferGeometry();
@@ -80,51 +80,19 @@ export default function ThreeScene() {
       geo.setAttribute("size",     new THREE.BufferAttribute(sizes, 1));
 
       const mat = new THREE.PointsMaterial({
-        size: 0.12,
+        size: 0.08,
         map: sprite,
         vertexColors: true,
         transparent: true,
-        opacity: 0.9,
+        opacity: 0.75,
         sizeAttenuation: true,
         blending: THREE.AdditiveBlending,
         depthWrite: false,
       });
 
       const galaxy = new THREE.Points(geo, mat);
-      galaxy.rotation.x = Math.PI * 0.18; // tilt for 3D depth
+      galaxy.rotation.x = Math.PI * 0.18;
       scene.add(galaxy);
-
-      // ── Glowing core ──
-      const coreMat = new THREE.PointsMaterial({
-        size: 0.5, map: sprite, color: 0xffffff,
-        transparent: true, opacity: 0.6,
-        blending: THREE.AdditiveBlending, depthWrite: false,
-      });
-      const coreGeo = new THREE.BufferGeometry();
-      const corePos = new Float32Array(150 * 3);
-      for (let i = 0; i < 150; i++) {
-        const r = Math.random() * 0.8;
-        const a = Math.random() * Math.PI * 2;
-        corePos[i*3]   = Math.cos(a) * r;
-        corePos[i*3+1] = (Math.random()-0.5) * 0.3;
-        corePos[i*3+2] = Math.sin(a) * r;
-      }
-      coreGeo.setAttribute("position", new THREE.BufferAttribute(corePos, 3));
-      scene.add(new THREE.Points(coreGeo, coreMat));
-
-      // ── Floating wireframe shapes ──
-      const addWire = (size: number, x: number, y: number, z: number, col: number) => {
-        const mesh = new THREE.Mesh(
-          new THREE.IcosahedronGeometry(size, 1),
-          new THREE.MeshBasicMaterial({ color: col, wireframe: true, transparent: true, opacity: 0.09 })
-        );
-        mesh.position.set(x, y, z);
-        scene.add(mesh);
-        return mesh;
-      };
-      const w1 = addWire(1.0, 4, 0.5, -2, 0x9B6DFF);
-      const w2 = addWire(0.6, -3.5, -0.3, -1, 0xF28B82);
-      const w3 = addWire(0.8, 0.5, 1.5, -4, 0x60A5FA);
 
       // Fog
       scene.fog = new THREE.FogExp2(0x000000, 0.018);
@@ -169,15 +137,7 @@ export default function ThreeScene() {
         camZ += (targetZ - camZ) * 0.025;
 
         camera.position.set(camX, camY, camZ);
-        camera.lookAt(0, 0.5, 0); // look slightly above center so galaxy stays framed
-
-        // Wireframes orbit
-        w1.rotation.x = t * 0.25; w1.rotation.y = t * 0.4;
-        w2.rotation.x = -t * 0.3; w2.rotation.y = -t * 0.25;
-        w3.rotation.x = t * 0.2;  w3.rotation.z = t * 0.3;
-        w1.position.y = 0.5 + Math.sin(t * 0.6) * 0.4;
-        w2.position.y = -0.3 + Math.cos(t * 0.5) * 0.35;
-        w3.position.y = 1.5 + Math.sin(t * 0.4) * 0.3;
+        camera.lookAt(0, 0.5, 0);
 
         renderer.render(scene, camera);
       };
@@ -198,7 +158,7 @@ export default function ThreeScene() {
 
   return (
     <div ref={mountRef} style={{
-      position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0, opacity: 0.75,
+      position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0, opacity: 0.45,
     }} />
   );
 }

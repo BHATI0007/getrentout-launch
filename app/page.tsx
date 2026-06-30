@@ -1193,7 +1193,7 @@ export default function Page() {
       )}
 
       {/* HERO */}
-      <div style={{ position: "relative", overflow: "hidden" }}>
+      <div style={{ position: "relative", overflow: "hidden", zIndex: 1 }}>
         {/* Morphing aurora blobs */}
         <div className="aurora-parallax" style={{ position: "absolute", inset: 0, pointerEvents: "none", transition: "transform 0.8s cubic-bezier(.25,.46,.45,.94)" }}>
           <div className="aurora-blob morph-blob" style={{ width: 900, height: 700, top: "-30%", left: "30%", background: "radial-gradient(ellipse, rgba(155,109,255,0.22), transparent 65%)", filter: "blur(55px)" }} />
@@ -1286,10 +1286,10 @@ export default function Page() {
         </div>
       </div>
 
-      <hr className="hr" style={{ marginTop: 40 }} />
+      <hr className="hr" style={{ marginTop: 40, position: "relative", zIndex: 1 }} />
 
       {/* BOTTOM CTA */}
-      <div style={{ maxWidth: 820, margin: "0 auto", padding: "100px 24px 120px" }}>
+      <div style={{ maxWidth: 820, margin: "0 auto", padding: "100px 24px 120px", position: "relative", zIndex: 1 }}>
         <div className="card reveal" style={{ borderRadius: 24, padding: "clamp(52px, 8vw, 88px) clamp(28px, 6vw, 72px)", textAlign: "center", position: "relative", overflow: "hidden", border: "1px solid rgba(155,109,255,0.16)", background: "linear-gradient(160deg, rgba(155,109,255,0.06) 0%, var(--surface) 55%)" }}>
           <div style={{ position: "absolute", top: -140, left: "50%", transform: "translateX(-50%)", width: 520, height: 520, borderRadius: "50%", background: "radial-gradient(circle, rgba(155,109,255,0.13), transparent 60%)", pointerEvents: "none" }} />
           <div style={{ position: "absolute", bottom: -80, right: "0%", width: 360, height: 360, borderRadius: "50%", background: "radial-gradient(circle, rgba(242,139,130,0.06), transparent 60%)", pointerEvents: "none" }} />
@@ -1327,8 +1327,8 @@ export default function Page() {
         </div>
       </div>
 
-      <hr className="hr" />
-      <div style={{ padding: "28px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16 }}>
+      <hr className="hr" style={{ position: "relative", zIndex: 1 }} />
+      <div style={{ padding: "28px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16, position: "relative", zIndex: 1 }}>
         <Logo />
         <div style={{ display: "flex", gap: 24, alignItems: "center", flexWrap: "wrap" }}>
           <a href="mailto:hello@getrentout.me" style={{ fontSize: 13, color: "var(--text-faint)", textDecoration: "none", transition: "color .2s" }}
