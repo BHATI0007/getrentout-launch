@@ -63,7 +63,8 @@ export default function ThreeScene() {
         positions[i*3+2] = Math.sin(angle) * radius + (Math.random()-0.5) * scatter;
 
         // Color: bright white at center, purple arms, coral+blue tips
-        let col: THREE.Color;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let col: any;
         if (t < 0.15) col = white.clone().lerp(purple, t / 0.15);
         else if (t < 0.55) col = purple.clone().lerp(coral, (t - 0.15) / 0.4);
         else col = coral.clone().lerp(blue, (t - 0.55) / 0.45);
@@ -157,17 +158,18 @@ export default function ThreeScene() {
         // Galaxy slow rotation
         galaxy.rotation.y = t * 0.035;
 
-        // Camera: mouse drift + scroll zoom-in
+        // Camera: mouse drift + scroll zoom-in (capped so galaxy stays visible)
+        const scrollClamped = Math.min(scrollY, 1800);
         const targetX = mx * 2;
-        const targetY = 3.5 - my * 0.8 + scrollY * 0.002;
-        const targetZ = 10 - scrollY * 0.003;
+        const targetY = 3.5 - my * 0.8 + scrollClamped * 0.0008;
+        const targetZ = Math.max(4, 10 - scrollClamped * 0.003);
 
         camX += (targetX - camX) * 0.025;
         camY += (targetY - camY) * 0.025;
-        camZ += (Math.max(5, targetZ) - camZ) * 0.025;
+        camZ += (targetZ - camZ) * 0.025;
 
         camera.position.set(camX, camY, camZ);
-        camera.lookAt(0, 0, 0);
+        camera.lookAt(0, 0.5, 0); // look slightly above center so galaxy stays framed
 
         // Wireframes orbit
         w1.rotation.x = t * 0.25; w1.rotation.y = t * 0.4;
