@@ -787,10 +787,10 @@ export default function Page() {
     return () => clearInterval(id);
   }, []);
 
-  // Exit intent
+  // Exit intent — only fires when mouse actually leaves through the top of the window
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (e.clientY <= 2 && !exitShown.current && view === "home") {
+      if (e.clientY <= 0 && e.relatedTarget === null && !exitShown.current && view === "home") {
         exitShown.current = true; setShowExit(true);
       }
     };
@@ -910,22 +910,21 @@ export default function Page() {
       </div>
 
       {/* Main content */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px 24px 0", position: "relative" }} className="page-in">
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "32px 24px 0", position: "relative" }} className="page-in">
 
-        {/* Robinhood-style: number IS the hero */}
-        <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.18em", color: "var(--accent)", textTransform: "uppercase", marginBottom: 20 }}>
+        <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.18em", color: "var(--accent)", textTransform: "uppercase", marginBottom: 16 }}>
           Early access confirmed
         </p>
 
-        <div style={{ fontSize: "clamp(120px, 28vw, 280px)", fontWeight: 900, letterSpacing: "-0.06em", lineHeight: 0.82, marginBottom: 40, textAlign: "center" }}>
+        <div style={{ fontSize: "clamp(96px, 22vw, 220px)", fontWeight: 900, letterSpacing: "-0.06em", lineHeight: 0.85, marginBottom: 24, textAlign: "center" }}>
           <span className="g">#<CountUpTo target={position} /></span>
         </div>
 
-        <p style={{ fontSize: "clamp(20px, 2.5vw, 28px)", fontWeight: 600, color: "var(--text)", marginBottom: 12, letterSpacing: "-0.02em" }}>
+        <p style={{ fontSize: "clamp(18px, 2.5vw, 24px)", fontWeight: 600, color: "var(--text)", marginBottom: 8, letterSpacing: "-0.02em" }}>
           You&apos;re one of the first.
         </p>
-        <p style={{ fontSize: 16, color: "#8888aa", maxWidth: 360, textAlign: "center", lineHeight: 1.6 }}>
-          We&apos;ll email you when it&apos;s time.<br />Watch your inbox.
+        <p style={{ fontSize: 15, color: "#8888aa", maxWidth: 360, textAlign: "center", lineHeight: 1.6 }}>
+          We&apos;ll email you when it&apos;s time. Watch your inbox.
         </p>
 
         {myRefCode && (

@@ -5,18 +5,29 @@ import Image from "next/image";
 
 function WorldMap() {
   const dots = [
-    {lat:28.6,lng:77.2},{lat:19.07,lng:72.87},{lat:12.97,lng:77.59},{lat:22.57,lng:88.36},
-    {lat:51.5,lng:-0.12},{lat:40.71,lng:-74.0},{lat:37.77,lng:-122.4},{lat:35.68,lng:139.69},
-    {lat:-33.87,lng:151.2},{lat:48.85,lng:2.35},{lat:52.52,lng:13.4},{lat:55.75,lng:37.62},
-    {lat:31.23,lng:121.47},{lat:1.35,lng:103.82},{lat:-23.55,lng:-46.63},
+    {lat:28.6,lng:77.2,c:"#9B6DFF"},{lat:19.07,lng:72.87,c:"#c87dff"},{lat:12.97,lng:77.59,c:"#9B6DFF"},
+    {lat:22.57,lng:88.36,c:"#F28B82"},{lat:51.5,lng:-0.12,c:"#38bdf8"},{lat:40.71,lng:-74.0,c:"#60A5FA"},
+    {lat:37.77,lng:-122.4,c:"#9B6DFF"},{lat:35.68,lng:139.69,c:"#F28B82"},{lat:-33.87,lng:151.2,c:"#38bdf8"},
+    {lat:48.85,lng:2.35,c:"#c87dff"},{lat:52.52,lng:13.4,c:"#9B6DFF"},{lat:55.75,lng:37.62,c:"#F28B82"},
+    {lat:31.23,lng:121.47,c:"#60A5FA"},{lat:1.35,lng:103.82,c:"#9B6DFF"},{lat:-23.55,lng:-46.63,c:"#c87dff"},
+    {lat:6.52,lng:3.38,c:"#F28B82"},{lat:-1.29,lng:36.82,c:"#9B6DFF"},{lat:25.2,lng:55.27,c:"#38bdf8"},
   ];
   const p=(lat:number,lng:number)=>({x:(lng+180)/360*300,y:(90-lat)/180*150});
   return (
-    <svg viewBox="0 0 300 150" style={{width:"100%",opacity:0.65}}>
+    <svg viewBox="0 0 300 150" style={{width:"100%"}}>
+      <defs>
+        {dots.map((_,i)=>(
+          <radialGradient key={i} id={`dg${i}`} cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor={dots[i].c} stopOpacity="1"/>
+            <stop offset="100%" stopColor={dots[i].c} stopOpacity="0"/>
+          </radialGradient>
+        ))}
+      </defs>
       {dots.map((d,i)=>{const {x,y}=p(d.lat,d.lng);return(
         <g key={i} transform={`translate(${x},${y})`}>
-          <circle r="1.5" fill="#9B6DFF" opacity="0.9"/>
-          <circle r="1.5" fill="#9B6DFF" opacity="0.4" style={{animation:`map-pulse 2.5s ease-out ${i*0.3}s infinite`}}/>
+          <circle r="5" fill={`url(#dg${i})`} opacity="0.35"/>
+          <circle r="2.5" fill={d.c} opacity="0.95"/>
+          <circle r="2.5" fill={d.c} opacity="0.6" style={{animation:`map-pulse 2.5s ease-out ${i*0.18}s infinite`}}/>
         </g>
       );})}
     </svg>
@@ -149,8 +160,8 @@ export default function LeaderboardPage() {
 
                   {/* Referral count */}
                   <div style={{ textAlign: "right", flexShrink: 0 }}>
-                    <div style={{ fontSize: 20, fontWeight: 900, letterSpacing: "-0.03em", background: "linear-gradient(135deg,#9B6DFF,#F28B82)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", overflow: "hidden" }}>
-                      <span className="odometer-digit" style={{ animationDelay: `${l.rank * 0.1 + 0.3}s` }}>{l.referralCount}</span>
+                    <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: "-0.03em", color: l.rank === 1 ? "#c87dff" : l.rank === 2 ? "#F28B82" : "#9B6DFF" }}>
+                      {l.referralCount}
                     </div>
                     <div style={{ fontSize: 11, color: "#555577", fontWeight: 600 }}>
                       {l.referralCount === 1 ? "referral" : "referrals"}
