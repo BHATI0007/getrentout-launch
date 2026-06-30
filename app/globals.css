@@ -695,42 +695,32 @@ nav, main, section, footer,
 
 /* ── Custom cursor ── */
 *, *::before, *::after { cursor: none !important; }
+
+@keyframes ring-spin { from { transform: translate(-50%,-50%) rotate(0deg); } to { transform: translate(-50%,-50%) rotate(360deg); } }
+
 .cursor-dot {
   position: fixed; pointer-events: none; z-index: 999999;
-  width: 10px; height: 10px; border-radius: 50%;
-  background: #fff;
-  transform: translate(-50%,-50%);
-  opacity: 0;
-  transition: opacity 0.3s, width 0.2s cubic-bezier(.16,1,.3,1), height 0.2s cubic-bezier(.16,1,.3,1), background 0.2s, box-shadow 0.2s;
-  box-shadow: 0 0 10px rgba(255,255,255,0.9), 0 0 20px rgba(155,109,255,0.6);
-  mix-blend-mode: difference;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #c8a0ff, #9B6DFF);
+  transform: translate(-50%, -50%);
+  left: -100px; top: -100px;
+  transition: width 0.2s cubic-bezier(.16,1,.3,1), height 0.2s cubic-bezier(.16,1,.3,1), opacity 0.2s, background 0.2s;
+  box-shadow: 0 0 12px rgba(155,109,255,1), 0 0 28px rgba(155,109,255,0.6), 0 0 50px rgba(155,109,255,0.2);
 }
-.cursor-dot.active { opacity: 1; }
-.cursor-dot.hovered {
-  width: 48px; height: 48px;
-  background: rgba(155,109,255,0.15);
-  box-shadow: 0 0 0 1.5px rgba(155,109,255,0.6), 0 0 30px rgba(155,109,255,0.3);
-  mix-blend-mode: normal;
-}
-.cursor-dot.clicking {
-  width: 36px; height: 36px;
-  background: rgba(242,139,130,0.25);
-  box-shadow: 0 0 0 1.5px rgba(242,139,130,0.8), 0 0 28px rgba(242,139,130,0.5);
-  mix-blend-mode: normal;
-}
+.cursor-dot.hovered  { width: 8px; height: 8px; opacity: 0.5; }
+.cursor-dot.clicking { width: 10px; height: 10px; background: radial-gradient(circle, #ffd0cc, #F28B82); box-shadow: 0 0 16px rgba(242,139,130,1), 0 0 32px rgba(242,139,130,0.5); }
 
 .cursor-ring {
   position: fixed; pointer-events: none; z-index: 999998;
-  width: 40px; height: 40px; border-radius: 50%;
-  border: 1.5px solid rgba(155,109,255,0.7);
-  transform: translate(-50%,-50%);
-  opacity: 0;
-  transition: width 0.35s cubic-bezier(.16,1,.3,1), height 0.35s cubic-bezier(.16,1,.3,1), border-color 0.25s, opacity 0.4s;
-  box-shadow: 0 0 12px rgba(155,109,255,0.2);
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 2px solid rgba(155,109,255,0.9);
+  transform: translate(-50%, -50%);
+  left: -100px; top: -100px;
+  transition: width 0.35s cubic-bezier(.16,1,.3,1), height 0.35s cubic-bezier(.16,1,.3,1), border-color 0.25s, border-width 0.25s, opacity 0.25s;
+  box-shadow: 0 0 16px rgba(155,109,255,0.4), inset 0 0 8px rgba(155,109,255,0.1);
 }
-.cursor-ring.active  { opacity: 1; }
-.cursor-ring.hovered { width: 72px; height: 72px; border-color: rgba(155,109,255,0.35); opacity: 0.7; }
-.cursor-ring.clicking { width: 55px; height: 55px; border-color: rgba(242,139,130,0.6); opacity: 0.8; }
+.cursor-ring.hovered  { width: 68px; height: 68px; border-color: rgba(155,109,255,1); border-width: 2.5px; box-shadow: 0 0 24px rgba(155,109,255,0.5), inset 0 0 16px rgba(155,109,255,0.08); }
+.cursor-ring.clicking { width: 32px; height: 32px; border-width: 3px; border-color: rgba(242,139,130,1); box-shadow: 0 0 20px rgba(242,139,130,0.6); opacity: 0.9; }
 
 /* ── Click starburst rays ── */
 @keyframes click-ray {
