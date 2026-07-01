@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
+import { getShareText } from "./lib/shareText";
 
 const ThreeScene = dynamic(() => import("./components/ThreeScene"), { ssr: false });
 const MultiCursors = dynamic(() => import("./components/MultiCursors"), { ssr: false });
@@ -955,7 +956,7 @@ export default function Page() {
         {/* Share grid — real brand logos */}
         {(() => {
           const shareUrl = myRefCode ? `https://getrentout.me?ref=${myRefCode}` : "https://getrentout.me";
-          const shareText = "Just got early access to RentOut — something big is coming. Get yours:";
+          const shareText = getShareText();
           return (
             <>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 10 }}>
