@@ -1102,11 +1102,11 @@ export default function Page() {
           <div style={{ maxWidth: 400, width: "100%" }} className="page-in">
             <div style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(155,109,255,0.12)", border: "1px solid rgba(155,109,255,0.3)", borderRadius: 100, padding: "6px 14px", marginBottom: 28 }}>
               <span className="dot" style={{ background: "var(--accent)" }} />
-              <span style={{ fontSize: 13, color: "#b090ff", fontWeight: 600 }}>For early earners</span>
+              <span style={{ fontSize: 13, color: "#b090ff", fontWeight: 600 }}>Earners only</span>
             </div>
 
             <h3 style={{ fontSize: 26, fontWeight: 800, letterSpacing: "-0.03em", marginBottom: 8, color: "#f0f0fa" }}>
-              Start earning early
+              Sign up as an Earner
             </h3>
             <p style={{ fontSize: 14, color: "#9090b8", marginBottom: 28, lineHeight: 1.6 }}>
               60 seconds. We&apos;ll email you when we&apos;re ready.
@@ -1142,7 +1142,7 @@ export default function Page() {
               </div>
               <div style={{ height: 4 }} />
               <button type="submit" disabled={loading} className="btn-primary" style={{ width: "100%", fontSize: 15, padding: "17px", borderRadius: 13 }}>
-                {loading ? "Just a moment…" : "Start earning early"}
+                {loading ? "Just a moment…" : "Join as an Earner"}
               </button>
               <p style={{ textAlign: "center", fontSize: 12, color: "var(--text-faint)" }}>
                 No credit card. No spam.
@@ -1200,7 +1200,7 @@ export default function Page() {
             Check my rank
           </button>
           <button className="btn-primary" onClick={() => setView("form")} style={{ padding: "9px 20px", fontSize: 14, borderRadius: 100 }}>
-            Start earning early
+            Join as an Earner
           </button>
         </div>
       </nav>
@@ -1299,7 +1299,7 @@ export default function Page() {
                     }}
                     onPointerUp={() => { clearInterval(chargeTimer.current!); setChargeLevel(0); }}
                     onPointerLeave={() => { clearInterval(chargeTimer.current!); setChargeLevel(0); }}>
-                    Start earning early
+                    Join as an Earner
                   </button>
                 </div>
               </div>
@@ -1357,7 +1357,7 @@ export default function Page() {
               </div>
             )}
             <button className="btn-primary" onClick={() => setView("form")} style={{ fontSize: 16, padding: "18px 48px", borderRadius: 14 }}>
-              Start earning early
+              Join as an Earner
             </button>
           </div>
         </div>
