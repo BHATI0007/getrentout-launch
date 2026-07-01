@@ -873,7 +873,8 @@ export default function Page() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    setRefCode(params.get("ref"));
+    const ref = params.get("ref");
+    setRefCode(ref ? ref.trim().toUpperCase() : null);
   }, []);
 
   const lookupRank = async (e: React.FormEvent) => {

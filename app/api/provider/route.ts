@@ -12,10 +12,11 @@ function genCode(): string {
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, email, city, category, referredBy } = await req.json();
-    if (!name || !email || !city) {
+    const { name, email: rawEmail, city, category, referredBy } = await req.json();
+    if (!name || !rawEmail || !city) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
+    const email = String(rawEmail).toLowerCase().trim();
 
     // Check duplicate
     const { data: existing } = await supabase
@@ -61,7 +62,7 @@ export async function POST(req: NextRequest) {
       const { data: referrer } = await supabase
         .from("provider_applications")
         .select("id, position, referral_count")
-        .eq("referral_code", referredBy)
+        .eq("referral_code", String(referredBy).trim().toUpperCase())
         .single();
 
       if (referrer) {
