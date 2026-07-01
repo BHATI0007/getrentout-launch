@@ -33,7 +33,7 @@ function useSpots() {
   useEffect(() => {
     const go = () => fetch("/api/spots").then(r => r.json()).then(d => setSpots(d.remaining)).catch(() => {});
     go();
-    const id = setInterval(go, 30000);
+    const id = setInterval(go, 5000);
     return () => clearInterval(id);
   }, []);
   return spots;
@@ -108,41 +108,6 @@ function ShaderBackground() {
     return ()=>{ cancelAnimationFrame(raf); window.removeEventListener("mousemove",onMove); window.removeEventListener("resize",onResize); };
   },[]);
   return <canvas ref={ref} style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:0,opacity:0.35}}/>;
-}
-
-/* ── Live activity toasts ── */
-type ActivityItem = { firstName: string; city: string; ago: number };
-function ActivityToast() {
-  const [item, setItem] = useState<ActivityItem|null>(null);
-  const [phase, setPhase] = useState<"in"|"out"|"hidden">("hidden");
-  const dataRef = useRef<ActivityItem[]>([]);
-  const idxRef = useRef(0);
-  useEffect(() => {
-    fetch("/api/activity").then(r=>r.json()).then(d=>{ dataRef.current=d.activity??[]; });
-    const show=()=>{
-      const items=dataRef.current; if(!items.length) return;
-      const it=items[idxRef.current%items.length]; idxRef.current++;
-      setItem(it); setPhase("in");
-      setTimeout(()=>setPhase("out"),3500);
-      setTimeout(()=>setPhase("hidden"),3950);
-    };
-    const id=setInterval(show,6000);
-    setTimeout(show,4000);
-    return ()=>clearInterval(id);
-  },[]);
-  if(phase==="hidden"||!item) return null;
-  return (
-    <div className={`activity-toast ${phase}`}>
-      <div style={{width:32,height:32,borderRadius:"50%",background:"linear-gradient(135deg,#9B6DFF,#F28B82)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:800,color:"#fff",flexShrink:0}}>
-        {item.firstName[0]}
-      </div>
-      <div>
-        <p style={{fontSize:13,fontWeight:700,color:"#e0e0f0",margin:0}}>{item.firstName} from {item.city}</p>
-        <p style={{fontSize:11,color:"#8888aa",margin:0}}>{item.ago < 2 ? "just joined" : `joined ${item.ago}m ago`}</p>
-      </div>
-      <span style={{fontSize:10,marginLeft:"auto",color:"#22c55e"}}>●</span>
-    </div>
-  );
 }
 
 /* ── World map SVG ── */
@@ -781,7 +746,6 @@ export default function Page() {
   const [viewerCount, setViewerCount] = useState(0);
   const [showExit, setShowExit] = useState(false);
   const [isIdle, setIsIdle] = useState(false);
-  const [timeGreeting, setTimeGreeting] = useState("");
   const chargeTimer = useRef<ReturnType<typeof setInterval>|null>(null);
   const exitShown = useRef(false);
   const haptic = useHaptic();
@@ -810,12 +774,6 @@ export default function Page() {
   useClickEffect();
   useGyroscope();
   useAmbientParticles();
-
-  // Time-aware greeting
-  useEffect(() => {
-    const h = new Date().getHours();
-    setTimeGreeting(h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening");
-  }, []);
 
   // Viewer count (realistic simulation)
   useEffect(() => {
@@ -1171,7 +1129,6 @@ export default function Page() {
       <ThreeScene />
       <ParticleField />
       <MultiCursors />
-      <ActivityToast />
 
       {/* Exit intent popup */}
       {showExit && (
@@ -1251,9 +1208,6 @@ export default function Page() {
         ))}
 
         <div className="hero-tilt hero-jacked" style={{ position: "relative", maxWidth: 960, margin: "0 auto", padding: "72px 24px 64px", textAlign: "center" }}>
-          {timeGreeting && (
-            <p style={{ fontSize: 13, color: "#666688", fontWeight: 600, marginBottom: 12, letterSpacing: "0.04em" }}>{timeGreeting} 👋</p>
-          )}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 36, flexWrap: "wrap" }}>
             <div className="hero-eyebrow" style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(155,109,255,0.07)", border: "1px solid rgba(155,109,255,0.16)", borderRadius: 100, padding: "7px 18px" }}>
               <span className="dot" />
