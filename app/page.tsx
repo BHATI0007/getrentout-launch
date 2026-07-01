@@ -1011,17 +1011,21 @@ export default function Page() {
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 10 }}>
                 {[
                   { label: "WhatsApp", bg: "#25D366", href: `https://wa.me/?text=${encodeURIComponent(`${shareText} ${shareUrl}`)}`, icon: Icons.whatsapp },
-                  { label: "Instagram", bg: "linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)", href: "https://www.instagram.com/", icon: Icons.instagram },
+                  { label: "Instagram", bg: "linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)", href: "https://www.instagram.com/", icon: Icons.instagram, copyFirst: true },
                   { label: "Facebook", bg: "#1877F2", href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, icon: Icons.facebook },
                   { label: "X", bg: "#000", border: "1px solid #2a2a2a", href: `https://twitter.com/intent/tweet?text=${encodeURIComponent(`${shareText} ${shareUrl}`)}`, icon: Icons.twitter },
                   { label: "Telegram", bg: "#229ED9", href: `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`, icon: Icons.telegram },
-                  { label: "TikTok", bg: "#010101", border: "1px solid #333", href: "https://www.tiktok.com/", icon: Icons.tiktok },
+                  { label: "TikTok", bg: "#010101", border: "1px solid #333", href: "https://www.tiktok.com/", icon: Icons.tiktok, copyFirst: true },
                   { label: "Reddit", bg: "#FF4500", href: `https://www.reddit.com/submit?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(shareText)}`, icon: Icons.reddit },
                   { label: "LinkedIn", bg: "#0A66C2", href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`, icon: Icons.linkedin },
-                ].map(({ label, bg, border, href, icon }, i) => (
+                ].map(({ label, bg, border, href, icon, copyFirst }, i) => (
                   <a key={label} href={href} target="_blank" rel="noopener"
                     className="share-btn"
-                    style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, background: bg, border: border || "none", borderRadius: 16, padding: "18px 8px", textDecoration: "none", transition: "opacity .15s, transform .15s", animationDelay: `${i * 0.06}s` }}
+                    onClick={copyFirst ? () => {
+                      navigator.clipboard.writeText(shareUrl);
+                      setCopied(true); setTimeout(() => setCopied(false), 2500);
+                    } : undefined}
+                    style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, background: bg, border: border || "none", borderRadius: 16, padding: "18px 8px", textDecoration: "none", transition: "opacity .15s, transform .15s", animationDelay: `${i * 0.06}s`, position: "relative" }}
                     onMouseEnter={e => { e.currentTarget.style.opacity = "0.85"; e.currentTarget.style.transform = "translateY(-3px) scale(1.04)"; }}
                     onMouseLeave={e => { e.currentTarget.style.opacity = "1"; e.currentTarget.style.transform = ""; }}>
                     {icon}
@@ -1029,6 +1033,9 @@ export default function Page() {
                   </a>
                 ))}
               </div>
+              <p style={{ fontSize: 12, color: "var(--text-faint)", textAlign: "center", marginBottom: 14 }}>
+                Instagram &amp; TikTok copy your link automatically — just paste it in your post.
+              </p>
               <button onClick={(e) => {
                 navigator.clipboard.writeText(myRefCode ? `https://getrentout.me?ref=${myRefCode}` : "https://getrentout.me");
                 setCopied(true); setTimeout(() => setCopied(false), 2000);
@@ -1139,6 +1146,14 @@ export default function Page() {
                   <label className={`float-label${fields.city ? " up" : ""}`} style={{ color: errors.city ? "#F28B82" : undefined }}>Your city</label>
                 </div>
                 {errors.city && <p style={{ fontSize: 12, color: "#F28B82", marginTop: 6 }}>{errors.city}</p>}
+              </div>
+              <div>
+                <div className="field-wrap">
+                  <input type="text" placeholder=" " className="field" name="referralcode"
+                    value={refCode ?? ""}
+                    onChange={e => setRefCode(e.target.value.trim().toUpperCase() || null)} />
+                  <label className={`float-label${refCode ? " up" : ""}`}>Referral code (optional)</label>
+                </div>
               </div>
               <div style={{ height: 4 }} />
               <button type="submit" disabled={loading} className="btn-primary" style={{ width: "100%", fontSize: 15, padding: "17px", borderRadius: 13 }}>

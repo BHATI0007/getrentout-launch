@@ -85,11 +85,13 @@ export default function StatusPage() {
       label: "Instagram", bg: "linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)",
       href: "https://www.instagram.com/",
       icon: <BrandLogo src="https://cdn.simpleicons.org/instagram/ffffff" alt="Instagram" />,
+      copyFirst: true,
     },
     {
       label: "TikTok", bg: "#010101", border: "1px solid #333",
       href: "https://www.tiktok.com/",
       icon: <BrandLogo src="https://cdn.simpleicons.org/tiktok/ffffff" alt="TikTok" />,
+      copyFirst: true,
     },
     {
       label: "Reddit", bg: "#FF4500",
@@ -185,9 +187,13 @@ export default function StatusPage() {
               Share your link
             </p>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 12 }}>
-              {shareLinks.map(({ label, bg, border, href, icon }) => (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 8 }}>
+              {shareLinks.map(({ label, bg, border, href, icon, copyFirst }) => (
                 <a key={label} href={href} target="_blank" rel="noopener"
+                  onClick={copyFirst ? () => {
+                    navigator.clipboard.writeText(shareUrl);
+                    setCopied(true); setTimeout(() => setCopied(false), 2500);
+                  } : undefined}
                   style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, background: bg, border: border || "none", borderRadius: 16, padding: "18px 8px", textDecoration: "none", transition: "opacity .15s" }}
                   onMouseEnter={e => (e.currentTarget.style.opacity = "0.8")}
                   onMouseLeave={e => (e.currentTarget.style.opacity = "1")}>
@@ -196,6 +202,9 @@ export default function StatusPage() {
                 </a>
               ))}
             </div>
+            <p style={{ fontSize: 11, color: "#555577", textAlign: "center", marginBottom: 12 }}>
+              Instagram &amp; TikTok copy your link automatically — just paste it in your post.
+            </p>
 
             <a href={`/leaderboard?me=${code}`}
               style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 14, padding: "14px", fontSize: 14, fontWeight: 700, color: "#8888aa", textDecoration: "none", width: "100%", marginBottom: 10, transition: "all .2s", boxSizing: "border-box" }}
