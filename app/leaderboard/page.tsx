@@ -176,19 +176,9 @@ export default function LeaderboardPage() {
         )}
 
         {!loading && leaders.length > 0 && (
-          <>
-            <p style={{ textAlign: "center", fontSize: 13, color: "#444466", marginTop: 32, marginBottom: 40 }}>
-              Only showing earners with at least 1 referral.
-            </p>
-            <div style={{ background: "linear-gradient(160deg, rgba(155,109,255,0.07), rgba(242,139,130,0.04))", border: "1px solid rgba(155,109,255,0.15)", borderRadius: 20, padding: "32px 24px", textAlign: "center" }}>
-              <p style={{ fontSize: 22, marginBottom: 10 }}>🚀</p>
-              <p style={{ fontSize: 16, fontWeight: 700, color: "#e0e0f0", marginBottom: 6 }}>Want to climb higher?</p>
-              <p style={{ fontSize: 13, color: "#8888aa", marginBottom: 20, lineHeight: 1.6 }}>Each friend you refer moves you 5 spots up the queue.</p>
-              <a href="https://getrentout.me" style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "linear-gradient(110deg,#9B6DFF,#b57dff)", color: "#fff", fontWeight: 700, fontSize: 14, padding: "12px 28px", borderRadius: 100, textDecoration: "none", boxShadow: "0 8px 28px rgba(155,109,255,0.35)" }}>
-                Share your link →
-              </a>
-            </div>
-          </>
+          <p style={{ textAlign: "center", fontSize: 13, color: "#444466", marginTop: 32 }}>
+            Only showing earners with at least 1 referral.
+          </p>
         )}
       </div>
     </div>
