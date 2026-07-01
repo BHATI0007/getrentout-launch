@@ -836,15 +836,6 @@ export default function Page() {
     return () => document.removeEventListener("mouseleave", handler);
   }, [view]);
 
-  // Auto-detect city from IP
-  useEffect(() => {
-    if (view === "form" && !fields.city) {
-      fetch("https://ipapi.co/city/").then(r => r.text()).then(city => {
-        if (city && city.length < 40 && !city.includes("<")) setFields(p => ({ ...p, city }));
-      }).catch(() => {});
-    }
-  }, [view]);
-
   // Idle CTA pulse
   useEffect(() => {
     let t: ReturnType<typeof setTimeout>;
