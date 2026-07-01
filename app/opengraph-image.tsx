@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "RentOut — Sell anything. Keep everything.";
+export const alt = "RentOut — Your time. Get paid for it.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -56,7 +56,7 @@ export default function OgImage() {
 
           {/* Headline */}
           <div style={{ fontSize: 96, fontWeight: 900, lineHeight: 0.92, letterSpacing: "-4px", color: "#f8f8fa", marginBottom: 16 }}>
-            Sell anything.
+            Your time. Your terms.
           </div>
           <div style={{
             fontSize: 96, fontWeight: 900, lineHeight: 0.92, letterSpacing: "-4px",
@@ -64,7 +64,7 @@ export default function OgImage() {
             backgroundClip: "text", color: "transparent",
             WebkitBackgroundClip: "text",
           }}>
-            Keep everything.
+            Get paid for it.
           </div>
 
           {/* Subtext */}

@@ -768,7 +768,7 @@ export default function Page() {
   useCursorTrail();
   useHeroShadow();
   useSoundOnClick();
-  useTextScramble(scrambleRef, "Sell anything.", 900);
+  useTextScramble(scrambleRef, "Your time. Your terms.", 900);
   use3DHeroTilt();
   useScrollJack();
   useSpringCursor();
@@ -1227,12 +1227,12 @@ export default function Page() {
           <div style={{ marginBottom: 28 }}>
             <div style={{ position: "relative", display: "inline-block" }}>
               <div ref={scrambleRef} className="hero-line-1" style={{ fontSize: "clamp(52px, 10vw, 118px)", fontWeight: 900, lineHeight: 0.92, letterSpacing: "-0.055em", color: "#f8f8fa", display: "inline" }}>
-                Sell anything.
+                Your time. Your terms.
               </div>
               {showCursor && <span className="typer-cursor" />}
             </div>
             <div className="hero-line-2" style={{ fontSize: "clamp(52px, 10vw, 118px)", fontWeight: 900, lineHeight: 0.92, letterSpacing: "-0.055em" }}>
-              <span className="g hero-glitch">Keep everything.</span>
+              <span className="g hero-glitch">Get paid for it.</span>
             </div>
           </div>
 

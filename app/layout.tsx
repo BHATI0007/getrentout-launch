@@ -10,10 +10,10 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "RentOut — Sell anything. Keep everything.",
+  title: "RentOut — Your time. Get paid for it.",
   description: "Sign up now and be among the first to earn on RentOut. First 100,000 earners get early access — before anyone else.",
   openGraph: {
-    title: "RentOut — Sell anything. Keep everything.",
+    title: "RentOut — Your time. Get paid for it.",
     description: "Sign up now and be among the first to earn. First 100,000 earners get early access.",
     type: "website",
     url: "https://getrentout.me",
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "RentOut — Sell anything. Keep everything.",
+    title: "RentOut — Your time. Get paid for it.",
     description: "Sign up now and be among the first to earn. First 100,000 earners get early access.",
   },
 };
