@@ -18,7 +18,7 @@ export default function MultiCursors() {
     // Send cursor position
     const sendCursor = (x: number, y: number) => {
       const now = Date.now();
-      if (now - lastSend.current < 80) return;
+      if (now - lastSend.current < 400) return;
       lastSend.current = now;
       lastPos.current = { x, y };
       fetch("/api/cursors", {
@@ -38,7 +38,7 @@ export default function MultiCursors() {
         const data = await res.json();
         setOthers((data.cursors ?? []).filter((c: Cursor) => c.id !== myId.current));
       } catch {}
-    }, 120);
+    }, 1000);
 
     // Remove cursor on leave
     const onLeave = () => {

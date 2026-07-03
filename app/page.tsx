@@ -40,15 +40,16 @@ function useSpots() {
   return spots;
 }
 
-function useReveal() {
+function useReveal(ready: boolean) {
   useEffect(() => {
+    if (!ready) return;
     const io = new IntersectionObserver(
       es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add("in"); }),
       { threshold: 0.08, rootMargin: "0px 0px -40px 0px" }
     );
     document.querySelectorAll(".reveal").forEach(el => io.observe(el));
     return () => io.disconnect();
-  }, []);
+  }, [ready]);
 }
 
 function useCursorGlow() {
@@ -758,7 +759,7 @@ export default function Page() {
   const spots = useSpots();
   const cd = useCountdown();
   const taken = TOTAL - spots;
-  useReveal();
+  useReveal(loaded);
   useCursorGlow();
   useParallax();
   useMagneticButtons();
@@ -1285,6 +1286,61 @@ export default function Page() {
       </div>
 
       <hr className="hr" style={{ marginTop: 40, position: "relative", zIndex: 1 }} />
+
+      {/* HOW IT WORKS */}
+      <div style={{ maxWidth: 1000, margin: "0 auto", padding: "100px 24px 40px", position: "relative", zIndex: 1 }}>
+        <div className="reveal" style={{ textAlign: "center", marginBottom: 56 }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 20, fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "var(--accent)", textTransform: "uppercase", background: "rgba(155,109,255,0.08)", border: "1px solid rgba(155,109,255,0.18)", borderRadius: 100, padding: "6px 16px" }}>
+            How it works
+          </div>
+          <h2 style={{ fontSize: "clamp(28px, 4.5vw, 46px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.1 }}>
+            Three steps. That&apos;s it.
+          </h2>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 24 }}>
+          {[
+            { n: "01", title: "List your skill", body: "Tutoring, editing, design, coaching, photography — whatever you're good at. Set it up in minutes." },
+            { n: "02", title: "Get booked", body: "People searching for that skill find your listing and book you directly through the app." },
+            { n: "03", title: "Get paid", body: "Complete the booking and get paid for your time — no fixed hours, no boss, your schedule." },
+          ].map((step) => (
+            <div key={step.n} className="card reveal" style={{ borderRadius: 20, padding: "32px 28px", border: "1px solid var(--border)" }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: "var(--accent)", letterSpacing: "0.05em", marginBottom: 14 }}>{step.n}</div>
+              <div style={{ fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", marginBottom: 10 }}>{step.title}</div>
+              <div style={{ fontSize: 14.5, color: "var(--text-dim)", lineHeight: 1.6 }}>{step.body}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* KEY FEATURES */}
+      <div style={{ maxWidth: 1000, margin: "0 auto", padding: "80px 24px 40px", position: "relative", zIndex: 1 }}>
+        <div className="reveal" style={{ textAlign: "center", marginBottom: 56 }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 20, fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "var(--accent-2)", textTransform: "uppercase", background: "rgba(242,139,130,0.08)", border: "1px solid rgba(242,139,130,0.18)", borderRadius: 100, padding: "6px 16px" }}>
+            Why RentOut
+          </div>
+          <h2 style={{ fontSize: "clamp(28px, 4.5vw, 46px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.1 }}>
+            Built for how you actually work.
+          </h2>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 20 }}>
+          {[
+            { icon: "⏱️", title: "Set your own hours", body: "No fixed shifts. Take bookings whenever it works for you." },
+            { icon: "🌍", title: "Open globally", body: "Sign up from anywhere. Not limited to one city or country." },
+            { icon: "💳", title: "Get paid for every booking", body: "Earnings scale with how much you take on — no cap." },
+            { icon: "🎯", title: "Any skill counts", body: "Creative, technical, tutoring, or service-based — if it's useful, it's welcome." },
+            { icon: "🔒", title: "Simple, secure signup", body: "60-second signup, no credit card, no spam." },
+            { icon: "📈", title: "Early access perks", body: "First earners get priority visibility and bonus incentives." },
+          ].map((f) => (
+            <div key={f.title} className="reveal" style={{ padding: "24px 20px", borderRadius: 16, border: "1px solid var(--border)", background: "var(--surface)" }}>
+              <div style={{ fontSize: 26, marginBottom: 12 }}>{f.icon}</div>
+              <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: "-0.02em", marginBottom: 8 }}>{f.title}</div>
+              <div style={{ fontSize: 13.5, color: "var(--text-dim)", lineHeight: 1.6 }}>{f.body}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <hr className="hr" style={{ position: "relative", zIndex: 1 }} />
 
       {/* BOTTOM CTA */}
       <div style={{ maxWidth: 820, margin: "0 auto", padding: "100px 24px 120px", position: "relative", zIndex: 1 }}>
