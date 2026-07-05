@@ -435,7 +435,7 @@ function FAQItem({ q, a }: { q: string; a: React.ReactNode }) {
 
 const FAQS: { q: string; a: React.ReactNode }[] = [
   { q: "What exactly is RentOut?", a: "RentOut is a skills marketplace app. You create a listing for something you're good at — tutoring, photography, design, fitness coaching, language practice, gaming sessions, anything legal and useful — set your own price, and people book and pay you through the app." },
-  { q: "Is it free to join?", a: "Yes. Signing up as an earner is completely free — no signup fee, no subscription, no credit card required. RentOut only earns a commission when you complete a paid booking, so we only make money when you do." },
+  { q: "Is it free to join?", a: "Yes. Creating an account and listing your skills is free — no signup fee, no subscription, no credit card required. A transparent service fee applies only to completed bookings." },
   { q: "How and when do I get paid?", a: "Payments are handled inside the app. When a customer books you, their payment is held securely and released to your in-app earnings balance once the booking is completed. You can then withdraw your balance to your local payout method. Full payout details for each country will be confirmed in your onboarding email before launch." },
   { q: "How much can I earn?", a: "You set your own rates — hourly, per session, or per package. There is no cap and no fixed shift: you earn from every booking you choose to accept. Early earners also get priority visibility in search when the marketplace opens." },
   { q: "Is this a job or employment?", a: "No. You are an independent earner on a marketplace — you run your own one-person business through the app. You decide what you offer, when you work, what you charge, and which bookings to accept." },
@@ -445,18 +445,6 @@ const FAQS: { q: string; a: React.ReactNode }[] = [
   { q: "What happens after I sign up?", a: "You get a waitlist position and a personal referral link (each signup through your link moves you 5 spots up). When we launch in your region, you'll receive an email invitation to set up your earner profile and publish your first listing." },
   { q: "What do you do with my data?", a: <>We collect only your name, email, and city — used solely to manage the waitlist and contact you about launch. We never sell your data, and you can ask us to delete it anytime at <a href="mailto:support@getrentout.me" style={{ color: "var(--accent)" }}>support@getrentout.me</a>. See our <a href="/privacy" style={{ color: "var(--accent)" }}>Privacy Policy</a>.</> },
 ];
-
-const SERVICES = [
-  { who: "Arjun", what: "FIFA gaming partner", price: "$6/hr", tag: "Gaming", c: "#9B6DFF" },
-  { who: "Priya", what: "Portrait photographer", price: "$18/hr", tag: "Photography", c: "#F28B82" },
-  { who: "Rohan", what: "Spanish conversation", price: "$8/hr", tag: "Language", c: "#38bdf8" },
-  { who: "Sneha", what: "Watch-party host", price: "$11/hr", tag: "Social", c: "#9B6DFF" },
-  { who: "Karan", what: "City photo walk", price: "$12/hr", tag: "Travel", c: "#fb923c" },
-  { who: "Ananya", what: "Fitness coach", price: "$10/session", tag: "Fitness", c: "#F28B82" },
-  { who: "Dev", what: "Guitar lessons", price: "$7/hr", tag: "Music", c: "#9B6DFF" },
-  { who: "Meera", what: "Study partner", price: "$5/hr", tag: "Tutoring", c: "#38bdf8" },
-];
-
 
 const Logo = () => (
   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -1051,29 +1039,28 @@ export default function Page() {
         </div>
       </div>
 
-      {/* WHAT YOU CAN OFFER */}
+      {/* CATEGORIES */}
       <div style={{ maxWidth: 1000, margin: "0 auto", padding: "80px 24px 40px", position: "relative", zIndex: 1 }}>
-        <div className="reveal" style={{ textAlign: "center", marginBottom: 56 }}>
+        <div className="reveal" style={{ textAlign: "center", marginBottom: 48 }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 20, fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "var(--accent)", textTransform: "uppercase", background: "rgba(155,109,255,0.08)", border: "1px solid rgba(155,109,255,0.18)", borderRadius: 100, padding: "6px 16px" }}>
-            Real examples
+            Categories
           </div>
           <h2 style={{ fontSize: "clamp(28px, 4.5vw, 46px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.1, marginBottom: 14 }}>
-            What could you offer?
+            One marketplace. Every skill.
           </h2>
           <p style={{ fontSize: 15.5, color: "var(--text-dim)", maxWidth: 520, margin: "0 auto", lineHeight: 1.7 }}>
-            Here&apos;s what listings look like. You choose the skill, the format, and the price.
+            You choose what to offer, how to deliver it, and what to charge.
           </p>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 16 }}>
-          {SERVICES.map((s) => (
-            <div key={s.who} className="reveal" style={{ padding: "20px", borderRadius: 16, border: "1px solid var(--border)", background: "var(--surface)", display: "flex", flexDirection: "column", gap: 10 }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: s.c, background: `${s.c}18`, border: `1px solid ${s.c}35`, borderRadius: 100, padding: "4px 10px" }}>{s.tag}</span>
-                <span style={{ fontSize: 14, fontWeight: 800, color: "var(--text)" }}>{s.price}</span>
-              </div>
-              <div style={{ fontSize: 15.5, fontWeight: 700, letterSpacing: "-0.01em" }}>{s.what}</div>
-              <div style={{ fontSize: 12.5, color: "var(--text-faint)" }}>{s.who} · example listing</div>
-            </div>
+        <div className="reveal" style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 12, maxWidth: 760, margin: "0 auto" }}>
+          {[
+            "Tutoring & Test Prep", "Languages", "Photography & Video", "Design & Editing",
+            "Music Lessons", "Fitness & Coaching", "Tech Help", "Gaming Sessions",
+            "Career & Interview Prep", "Cooking", "Event Support", "And more",
+          ].map((c) => (
+            <span key={c} style={{ fontSize: 14, fontWeight: 600, color: "var(--text-body)", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 100, padding: "10px 20px" }}>
+              {c}
+            </span>
           ))}
         </div>
       </div>
@@ -1088,7 +1075,7 @@ export default function Page() {
             How you get paid.
           </h2>
           <p style={{ fontSize: 15.5, color: "var(--text-dim)", maxWidth: 560, margin: "0 auto", lineHeight: 1.7 }}>
-            Joining is free. There are no signup fees and no subscriptions — RentOut takes a transparent commission on completed bookings, so we only earn when you do.
+            No signup fees. No subscriptions. A single transparent service fee applies only when a booking is completed.
           </p>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 24 }}>
