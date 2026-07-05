@@ -478,6 +478,8 @@ export default function Page() {
   const [refCode, setRefCode] = useState<string | null>(null);
   const [fields, setFields] = useState({ name: "", email: "", city: "" });
   const [errors, setErrors] = useState({ name: "", email: "", city: "" });
+  const [submitError, setSubmitError] = useState("");
+  const honeypotRef = useRef<HTMLInputElement>(null);
   const [showRankModal, setShowRankModal] = useState(false);
   const [rankEmail, setRankEmail] = useState("");
   const [rankLoading, setRankLoading] = useState(false);
@@ -577,16 +579,25 @@ export default function Page() {
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);
+    setSubmitError("");
     try {
       const res = await fetch("/api/provider", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...fields, referredBy: refCode }),
+        body: JSON.stringify({ ...fields, referredBy: refCode, website: honeypotRef.current?.value ?? "" }),
       });
       const data = await res.json();
+      if (!res.ok || data.error) {
+        setSubmitError(data.error === "Please use a permanent email address"
+          ? "Please use a permanent email address (temporary inboxes aren't accepted)."
+          : data.error ?? "Something went wrong. Please try again.");
+        return;
+      }
       setPosition(data.position ?? taken + 1);
       setMyRefCode(data.referralCode ?? null);
       setView("done");
+    } catch {
+      setSubmitError("Network error. Please check your connection and try again.");
     } finally {
       setLoading(false);
     }
@@ -820,7 +831,9 @@ export default function Page() {
                   <label className={`float-label${refCode ? " up" : ""}`}>Referral code (optional)</label>
                 </div>
               </div>
+              <input ref={honeypotRef} type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }} />
               <div style={{ height: 4 }} />
+              {submitError && <p style={{ fontSize: 13, color: "#F28B82", textAlign: "center", lineHeight: 1.5 }}>{submitError}</p>}
               <button type="submit" disabled={loading} className="btn-primary" style={{ width: "100%", fontSize: 15, padding: "17px", borderRadius: 13 }}>
                 {loading ? "Just a moment…" : "Join as an Earner"}
               </button>
