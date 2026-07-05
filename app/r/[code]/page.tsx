@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
-import CustomCursor from "../../components/CustomCursor";
 
 const BrandLogo = ({ src, alt }: { src: string; alt: string }) => (
   // eslint-disable-next-line @next/next/no-img-element
@@ -107,7 +106,6 @@ export default function StatusPage() {
 
   return (
     <div style={{ background: "#07070a", minHeight: "100vh", color: "#f0f0fa", fontFamily: "Inter, sans-serif" }}>
-      <CustomCursor />
       {/* Glow */}
       <div style={{ position: "fixed", top: "-20%", left: "50%", transform: "translateX(-50%)", width: 800, height: 600, background: "radial-gradient(ellipse, rgba(155,109,255,0.1), transparent 60%)", pointerEvents: "none" }} />
 

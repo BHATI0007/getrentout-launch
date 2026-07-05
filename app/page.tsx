@@ -112,50 +112,6 @@ function ShaderBackground() {
   return <canvas ref={ref} style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:0,opacity:0.35}}/>;
 }
 
-/* ── World map SVG ── */
-function WorldMap({ signups }: { signups: {city:string;lat:number;lng:number}[] }) {
-  const dots = [
-    {lat:28.6,lng:77.2},{lat:19.07,lng:72.87},{lat:12.97,lng:77.59},{lat:22.57,lng:88.36},
-    {lat:51.5,lng:-0.12},{lat:40.71,lng:-74.0},{lat:37.77,lng:-122.4},{lat:35.68,lng:139.69},
-    {lat:-33.87,lng:151.2},{lat:48.85,lng:2.35},{lat:52.52,lng:13.4},{lat:55.75,lng:37.62},
-    {lat:31.23,lng:121.47},{lat:1.35,lng:103.82},{lat:-23.55,lng:-46.63},
-  ];
-  const project=(lat:number,lng:number)=>({
-    x:(lng+180)/360*300, y:(90-lat)/180*150,
-  });
-  return (
-    <svg viewBox="0 0 300 150" style={{width:"100%",opacity:0.6}}>
-      <rect width="300" height="150" fill="transparent"/>
-      {dots.map((d,i)=>{const p=project(d.lat,d.lng);return(
-        <g key={i} transform={`translate(${p.x},${p.y})`}>
-          <circle r="1.5" fill="#9B6DFF" opacity="0.9"/>
-          <circle r="1.5" fill="#9B6DFF" opacity="0.5" className="map-dot-ring" style={{animationDelay:`${i*0.3}s`}}/>
-        </g>
-      );})}
-    </svg>
-  );
-}
-
-/* ── Sparkline ── */
-function Sparkline({ position }: { position: number }) {
-  const points = Array.from({length:8},(_,i)=>{
-    const decay = Math.pow(0.75, 7-i);
-    return Math.round(position + (7-i)*12*decay + Math.sin(i)*3);
-  });
-  const max=Math.max(...points), min=Math.min(...points,position);
-  const W=120,H=32;
-  const px=(i:number)=>(i/(points.length-1))*W;
-  const py=(v:number)=>H-((v-min)/(max-min||1))*(H-4)-2;
-  const d=points.map((v,i)=>`${i===0?"M":"L"}${px(i)},${py(v)}`).join(" ")+` L${W},${py(position)}`;
-  return (
-    <svg width={W} height={H} style={{overflow:"visible"}}>
-      <defs><linearGradient id="sg" x1="0" x2="1"><stop offset="0%" stopColor="#9B6DFF"/><stop offset="100%" stopColor="#F28B82"/></linearGradient></defs>
-      <path d={d} fill="none" stroke="url(#sg)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-      <circle cx={W} cy={py(position)} r="3" fill="#F28B82"/>
-    </svg>
-  );
-}
-
 /* ── Preloader ── */
 function Preloader({ onDone }: { onDone: () => void }) {
   const [exiting, setExiting] = useState(false);
@@ -165,7 +121,7 @@ function Preloader({ onDone }: { onDone: () => void }) {
   }, [onDone]);
   return (
     <div className={`preloader${exiting ? " exit" : ""}`}>
-      <Image src="/logo.png" alt="RentOut" width={52} height={52} style={{ borderRadius: 15, opacity: 0.95 }} />
+      <Image src="/logo.png" alt="RentOut" width={52} height={52} priority style={{ borderRadius: 15, opacity: 0.95 }} />
       <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: "-0.02em", color: "#f0f0fa" }}>RentOut</div>
       <div className="preloader-bar"><div className="preloader-bar-inner" /></div>
     </div>
@@ -233,114 +189,6 @@ function CountUpTo({ target }: { target: number }) {
   return <>{n.toLocaleString()}</>;
 }
 
-/* ── Click starburst effect ── */
-function useClickEffect() {
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      const cx = e.clientX, cy = e.clientY;
-
-      // Expanding ring
-      const ring = document.createElement("div");
-      ring.className = "click-ring-burst";
-      ring.style.left = cx + "px"; ring.style.top = cy + "px";
-      document.body.appendChild(ring);
-      setTimeout(() => ring.remove(), 550);
-
-      // Second ring
-      const ring2 = document.createElement("div");
-      ring2.className = "click-ring-burst2";
-      ring2.style.left = cx + "px"; ring2.style.top = cy + "px";
-      document.body.appendChild(ring2);
-      setTimeout(() => ring2.remove(), 500);
-
-      // 8 starburst rays
-      const rayCount = 8;
-      for (let i = 0; i < rayCount; i++) {
-        const angle = (i / rayCount) * 360;
-        const ray = document.createElement("div");
-        ray.className = "click-ray";
-        ray.style.left = cx + "px";
-        ray.style.top = cy + "px";
-        ray.style.transform = `rotate(${angle}deg)`;
-        ray.style.animationDelay = `${i * 0.012}s`;
-        document.body.appendChild(ray);
-        setTimeout(() => ray.remove(), 500);
-      }
-    };
-    window.addEventListener("click", handler);
-    return () => window.removeEventListener("click", handler);
-  }, []);
-}
-
-/* ── Spring cursor (fully JS-driven, bypasses CSS cache) ── */
-function useSpringCursor() {
-  useEffect(() => {
-    document.documentElement.style.cursor = "none";
-    document.body.style.cursor = "none";
-
-    // Create elements fresh so inline styles are never stale
-    const dot = document.createElement("div");
-    const ring = document.createElement("div");
-
-    const BASE_DOT = "position:fixed;pointer-events:none;z-index:999999;border-radius:50%;transform:translate(-50%,-50%);left:-200px;top:-200px;transition:width .18s cubic-bezier(.16,1,.3,1),height .18s cubic-bezier(.16,1,.3,1);";
-    const BASE_RING = "position:fixed;pointer-events:none;z-index:999998;border-radius:50%;transform:translate(-50%,-50%);left:-200px;top:-200px;";
-
-    const setDotNormal  = () => { dot.style.cssText  = BASE_DOT  + "width:22px;height:22px;background:radial-gradient(circle at 38% 35%,#d8baff,#9B6DFF 60%,#7c44ff);box-shadow:0 0 16px rgba(155,109,255,1),0 0 36px rgba(155,109,255,.7),0 0 70px rgba(155,109,255,.3);"; dot.style.left = dotX + "px"; dot.style.top = dotY + "px"; };
-    const setDotHovered = () => { dot.style.cssText  = BASE_DOT  + "width:10px;height:10px;opacity:.5;background:#9B6DFF;box-shadow:0 0 10px rgba(155,109,255,1);"; dot.style.left = dotX + "px"; dot.style.top = dotY + "px"; };
-    const setDotClick   = () => { dot.style.cssText  = BASE_DOT  + "width:16px;height:16px;background:radial-gradient(circle,#ffd0cc,#F28B82);box-shadow:0 0 20px rgba(242,139,130,1),0 0 40px rgba(242,139,130,.5);"; dot.style.left = dotX + "px"; dot.style.top = dotY + "px"; };
-
-    const setRingNormal  = () => { ring.style.cssText = BASE_RING + "width:56px;height:56px;border:2px solid rgba(155,109,255,.85);box-shadow:0 0 18px rgba(155,109,255,.35);transition:width .35s cubic-bezier(.16,1,.3,1),height .35s cubic-bezier(.16,1,.3,1),border-color .25s;"; ring.style.left = ringX + "px"; ring.style.top = ringY + "px"; };
-    const setRingHovered = () => { ring.style.cssText = BASE_RING + "width:80px;height:80px;border:2.5px solid rgba(155,109,255,1);box-shadow:0 0 28px rgba(155,109,255,.55);transition:width .35s cubic-bezier(.16,1,.3,1),height .35s cubic-bezier(.16,1,.3,1),border-color .25s;"; ring.style.left = ringX + "px"; ring.style.top = ringY + "px"; };
-    const setRingClick   = () => { ring.style.cssText = BASE_RING + "width:38px;height:38px;border:3px solid rgba(242,139,130,1);box-shadow:0 0 22px rgba(242,139,130,.7);transition:width .35s cubic-bezier(.16,1,.3,1),height .35s cubic-bezier(.16,1,.3,1),border-color .25s;"; ring.style.left = ringX + "px"; ring.style.top = ringY + "px"; };
-
-    let dotX = -200, dotY = -200, ringX = -200, ringY = -200;
-    let isHovered = false, isClicking = false;
-
-    setDotNormal(); setRingNormal();
-    document.body.appendChild(dot);
-    document.body.appendChild(ring);
-
-    let mx = -200, my = -200, raf: number;
-
-    const onMove = (e: MouseEvent) => {
-      mx = e.clientX; my = e.clientY;
-      dotX = mx; dotY = my;
-      dot.style.left = dotX + "px"; dot.style.top = dotY + "px";
-    };
-
-    const onDown = () => { isClicking = true;  setDotClick();   setRingClick(); };
-    const onUp   = () => { isClicking = false; isHovered ? setDotHovered() : setDotNormal(); isHovered ? setRingHovered() : setRingNormal(); };
-
-    const onEnter = (e: MouseEvent) => { if ((e.target as HTMLElement).closest("a,button")) { isHovered = true;  if (!isClicking) { setDotHovered(); setRingHovered(); } } };
-    const onLeave = (e: MouseEvent) => { if (!(e.relatedTarget as HTMLElement|null)?.closest("a,button")) { isHovered = false; if (!isClicking) { setDotNormal();  setRingNormal();  } } };
-
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("mousedown", onDown);
-    window.addEventListener("mouseup",   onUp);
-    document.addEventListener("mouseover",  onEnter);
-    document.addEventListener("mouseout",   onLeave);
-
-    const tick = () => {
-      ringX += (mx - ringX) * 0.1; ringY += (my - ringY) * 0.1;
-      ring.style.left = ringX + "px"; ring.style.top = ringY + "px";
-      raf = requestAnimationFrame(tick);
-    };
-    tick();
-
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mousedown", onDown);
-      window.removeEventListener("mouseup",   onUp);
-      document.removeEventListener("mouseover",  onEnter);
-      document.removeEventListener("mouseout",   onLeave);
-      dot.remove(); ring.remove();
-      document.documentElement.style.cursor = "";
-      document.body.style.cursor = "";
-    };
-  }, []);
-}
-
 /* ── Gyroscope parallax ── */
 function useGyroscope() {
   useEffect(() => {
@@ -353,34 +201,6 @@ function useGyroscope() {
     };
     window.addEventListener("deviceorientation", handler);
     return () => window.removeEventListener("deviceorientation", handler);
-  }, []);
-}
-
-/* ── Ambient hover particles from CTA ── */
-function useAmbientParticles() {
-  useEffect(() => {
-    const btn = document.querySelector(".cta-border-wrap") as HTMLElement | null;
-    if (!btn) return;
-    let interval: ReturnType<typeof setInterval> | null = null;
-    const emit = () => {
-      const r = btn.getBoundingClientRect();
-      const el = document.createElement("div");
-      const x = r.left + Math.random() * r.width;
-      const y = r.top + Math.random() * r.height;
-      const colors = ["#9B6DFF", "#F28B82", "#c87dff", "#38bdf8"];
-      el.style.cssText = `position:fixed;left:${x}px;top:${y}px;width:4px;height:4px;border-radius:50%;background:${colors[Math.floor(Math.random() * colors.length)]};pointer-events:none;z-index:9997;transition:all 0.8s ease-out;transform:translate(-50%,-50%)`;
-      document.body.appendChild(el);
-      requestAnimationFrame(() => {
-        el.style.transform = `translate(calc(-50% + ${(Math.random() - 0.5) * 60}px), calc(-50% - ${Math.random() * 60 + 20}px))`;
-        el.style.opacity = "0";
-      });
-      setTimeout(() => el.remove(), 900);
-    };
-    const start = () => { interval = setInterval(emit, 80); };
-    const stop = () => { if (interval) { clearInterval(interval); interval = null; } };
-    btn.addEventListener("mouseenter", start);
-    btn.addEventListener("mouseleave", stop);
-    return () => { btn.removeEventListener("mouseenter", start); btn.removeEventListener("mouseleave", stop); stop(); };
   }, []);
 }
 
@@ -472,25 +292,6 @@ function useButtonRipple() {
   }, []);
 }
 
-function useCursorTrail() {
-  useEffect(() => {
-    let last = 0;
-    const move = (e: MouseEvent) => {
-      const now = Date.now();
-      if (now - last < 40) return;
-      last = now;
-      const el = document.createElement("div");
-      el.className = "cursor-trail";
-      el.style.left = e.clientX + "px";
-      el.style.top = e.clientY + "px";
-      document.body.appendChild(el);
-      setTimeout(() => el.remove(), 460);
-    };
-    window.addEventListener("mousemove", move);
-    return () => window.removeEventListener("mousemove", move);
-  }, []);
-}
-
 function useHeroShadow() {
   useEffect(() => {
     const hero = document.querySelector(".hero-line-1") as HTMLElement | null;
@@ -502,34 +303,6 @@ function useHeroShadow() {
     };
     window.addEventListener("mousemove", move);
     return () => window.removeEventListener("mousemove", move);
-  }, []);
-}
-
-function useSoundOnClick() {
-  useEffect(() => {
-    let ctx: AudioContext | null = null;
-    const play = (freq = 700) => {
-      try {
-        if (!ctx) ctx = new AudioContext();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain); gain.connect(ctx.destination);
-        osc.type = "sine";
-        osc.frequency.setValueAtTime(freq, ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(freq * 0.5, ctx.currentTime + 0.1);
-        gain.gain.setValueAtTime(0.07, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
-        osc.start(); osc.stop(ctx.currentTime + 0.13);
-      } catch { /* AudioContext blocked */ }
-    };
-    const onClick = (e: MouseEvent) => {
-      const t = e.target as HTMLElement;
-      if (t.closest(".btn-primary")) play(800);
-      else if (t.closest("button")) play(600);
-      else if (t.closest("a")) play(500);
-    };
-    document.addEventListener("click", onClick);
-    return () => document.removeEventListener("click", onClick);
   }, []);
 }
 
@@ -569,31 +342,6 @@ function useNavGlass() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-}
-
-function useTextScramble(ref: React.RefObject<HTMLElement | null>, text: string, delay = 600) {
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&";
-    let frame = 0;
-    const total = text.length * 3 + 8;
-    let raf: number;
-    const timer = setTimeout(() => {
-      const tick = () => {
-        el.textContent = text.split("").map((ch, i) => {
-          if (ch === " " || ch === ".") return ch;
-          if (i < Math.floor(frame / 3)) return ch;
-          return chars[Math.floor(Math.random() * chars.length)];
-        }).join("");
-        frame++;
-        if (frame < total) raf = requestAnimationFrame(tick);
-        else el.textContent = text;
-      };
-      raf = requestAnimationFrame(tick);
-    }, delay);
-    return () => { clearTimeout(timer); cancelAnimationFrame(raf); };
-  }, [text, delay, ref]);
 }
 
 function Confetti() {
@@ -661,28 +409,6 @@ function useCountdown() {
     tick(); const id = setInterval(tick, 30000); return () => clearInterval(id);
   }, []);
   return t;
-}
-
-function CountUp({ to }: { to: number }) {
-  const [v, setV] = useState(0);
-  const ref = useRef<HTMLSpanElement>(null);
-  const done = useRef(false);
-  useEffect(() => {
-    const io = new IntersectionObserver(([e]) => {
-      if (!e.isIntersecting || done.current) return;
-      done.current = true; io.disconnect();
-      const t0 = Date.now(), dur = 1800;
-      const tick = () => {
-        const p = Math.min((Date.now() - t0) / dur, 1);
-        setV(Math.round((1 - Math.pow(1 - p, 4)) * to));
-        if (p < 1) requestAnimationFrame(tick);
-      };
-      requestAnimationFrame(tick);
-    }, { threshold: 0.5 });
-    if (ref.current) io.observe(ref.current);
-    return () => io.disconnect();
-  }, [to]);
-  return <span ref={ref}>{v.toLocaleString()}</span>;
 }
 
 function Ticker({ value }: { value: number }) {
@@ -773,7 +499,6 @@ export default function Page() {
   const scrambleRef = useRef<HTMLDivElement>(null);
   const [loaded, setLoaded] = useState(false);
   const [showCursor, setShowCursor] = useState(true);
-  const [exiting, setExiting] = useState(false);
   const [konamiActive, setKonamiActive] = useState(false);
   const [chargeLevel, setChargeLevel] = useState(0);
   const [isIdle, setIsIdle] = useState(false);

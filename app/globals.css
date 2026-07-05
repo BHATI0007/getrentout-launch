@@ -674,35 +674,6 @@ nav, main, section, footer,
   transform-origin: center;
 }
 
-/* ── Custom cursor ── */
-*, *::before, *::after { cursor: none !important; }
-
-@keyframes ring-spin { from { transform: translate(-50%,-50%) rotate(0deg); } to { transform: translate(-50%,-50%) rotate(360deg); } }
-
-.cursor-dot {
-  position: fixed; pointer-events: none; z-index: 999999;
-  width: 22px; height: 22px; border-radius: 50%;
-  background: radial-gradient(circle at 38% 35%, #d8baff, #9B6DFF 60%, #7c44ff);
-  transform: translate(-50%, -50%);
-  left: -200px; top: -200px;
-  transition: width 0.18s cubic-bezier(.16,1,.3,1), height 0.18s cubic-bezier(.16,1,.3,1), opacity 0.18s;
-  box-shadow: 0 0 0 1px rgba(155,109,255,0.3), 0 0 16px rgba(155,109,255,1), 0 0 36px rgba(155,109,255,0.7), 0 0 70px rgba(155,109,255,0.3);
-}
-.cursor-dot.hovered  { width: 10px; height: 10px; opacity: 0.6; }
-.cursor-dot.clicking { width: 16px; height: 16px; background: radial-gradient(circle, #ffd0cc, #F28B82); box-shadow: 0 0 20px rgba(242,139,130,1), 0 0 40px rgba(242,139,130,0.5); }
-
-.cursor-ring {
-  position: fixed; pointer-events: none; z-index: 999998;
-  width: 56px; height: 56px; border-radius: 50%;
-  border: 2px solid rgba(155,109,255,0.85);
-  transform: translate(-50%, -50%);
-  left: -200px; top: -200px;
-  transition: width 0.4s cubic-bezier(.16,1,.3,1), height 0.4s cubic-bezier(.16,1,.3,1), border-color 0.25s, border-width 0.25s;
-  box-shadow: 0 0 18px rgba(155,109,255,0.35), inset 0 0 12px rgba(155,109,255,0.08);
-}
-.cursor-ring.hovered  { width: 80px; height: 80px; border-color: rgba(155,109,255,1); border-width: 2.5px; box-shadow: 0 0 28px rgba(155,109,255,0.55); }
-.cursor-ring.clicking { width: 38px; height: 38px; border-width: 3px; border-color: rgba(242,139,130,1); box-shadow: 0 0 22px rgba(242,139,130,0.7); }
-
 /* ── Click starburst rays ── */
 @keyframes click-ray {
   from { width: 0px; opacity: 1; }

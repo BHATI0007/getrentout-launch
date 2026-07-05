@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import CustomCursor from "../components/CustomCursor";
 
 function WorldMap() {
   const dots = [
@@ -64,7 +63,6 @@ export default function LeaderboardPage() {
 
   return (
     <div style={{ background: "#07070a", minHeight: "100vh", color: "#f0f0fa", fontFamily: "Inter, sans-serif" }}>
-      <CustomCursor />
       <div className="leaderboard-glow" />
       <div style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: 600, height: 400, background: "radial-gradient(ellipse at bottom, rgba(242,139,130,0.05), transparent 65%)", pointerEvents: "none", zIndex: 0 }} />
 
