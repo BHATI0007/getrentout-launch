@@ -421,7 +421,7 @@ function FAQItem({ q, a }: { q: string; a: React.ReactNode }) {
 
 const FAQS: { q: string; a: React.ReactNode }[] = [
   { q: "What exactly is RentOut?", a: "RentOut is a skills marketplace app. You create a listing for something you're good at, such as tutoring, photography, design, coaching, or language practice. You set your own price, and people book and pay you through the app." },
-  { q: "Is it free to join?", a: "Yes. Creating an account and listing your skills is free. There is no signup fee, no subscription, and no credit card required. A transparent service fee applies only to completed bookings." },
+  { q: "Is it free to join?", a: "Yes. Creating an account and listing your skills is free. There is no signup fee and no credit card required. A transparent service fee applies only to completed bookings." },
   { q: "How and when do I get paid?", a: "Payments are handled inside the app. When a customer books you, their payment is held securely and released to your in-app earnings balance once the booking is completed. You can then withdraw your balance to your local payout method. Full payout details for each country will be confirmed in your onboarding email before launch." },
   { q: "How much can I earn?", a: "You set your own rates: hourly, per session, or per package. There is no cap and no fixed shift. You earn from every booking you choose to accept. Early earners also get priority visibility in search when the marketplace opens." },
   { q: "Is this a job or employment?", a: "No. You are an independent earner on a marketplace, running your own one-person business through the app. You decide what you offer, when you work, what you charge, and which bookings to accept." },
@@ -1061,7 +1061,7 @@ export default function Page() {
             How you get paid
           </h2>
           <p style={{ fontSize: 15.5, color: "var(--text-dim)", maxWidth: 560, margin: "0 auto", lineHeight: 1.7 }}>
-            No signup fees. No subscriptions. A single transparent service fee applies only when a booking is completed.
+            No signup fees. A single transparent service fee applies only when a booking is completed.
           </p>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 24 }}>
