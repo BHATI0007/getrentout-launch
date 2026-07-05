@@ -766,16 +766,10 @@ export default function Page() {
   useNavGlass();
   useScrollProgress();
   useButtonRipple();
-  useCursorTrail();
   useHeroShadow();
-  useSoundOnClick();
-  useTextScramble(scrambleRef, "Rent out your time.", 900);
   use3DHeroTilt();
   useScrollJack();
-  useSpringCursor();
-  useClickEffect();
   useGyroscope();
-  useAmbientParticles();
 
   // Viewer count (realistic simulation)
   useEffect(() => {
