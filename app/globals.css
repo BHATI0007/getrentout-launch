@@ -775,3 +775,7 @@ nav, main, section, footer,
   width: 700px; height: 500px; pointer-events: none; z-index: 0;
   background: radial-gradient(ellipse at top, rgba(155,109,255,0.09), transparent 65%);
 }
+
+/* Smooth in-page navigation; keep anchor headings clear of the sticky nav */
+html { scroll-behavior: smooth; }
+#how-it-works, #faq, #about { scroll-margin-top: 72px; }

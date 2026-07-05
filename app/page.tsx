@@ -6,7 +6,6 @@ import dynamic from "next/dynamic";
 import { getShareText } from "./lib/shareText";
 
 const ThreeScene = dynamic(() => import("./components/ThreeScene"), { ssr: false });
-const MultiCursors = dynamic(() => import("./components/MultiCursors"), { ssr: false });
 
 const BrandLogo = ({ src, alt }: { src: string; alt: string }) => (
   // eslint-disable-next-line @next/next/no-img-element
@@ -210,19 +209,6 @@ function transitionTo(cb: () => void) {
   } else {
     cb();
   }
-}
-
-function useKonami(cb: () => void) {
-  useEffect(() => {
-    const seq = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
-    let i = 0;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === seq[i]) { i++; if (i === seq.length) { cb(); i = 0; } }
-      else i = e.key === seq[0] ? 1 : 0;
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [cb]);
 }
 
 function use3DHeroTilt() {
@@ -434,11 +420,11 @@ function FAQItem({ q, a }: { q: string; a: React.ReactNode }) {
 }
 
 const FAQS: { q: string; a: React.ReactNode }[] = [
-  { q: "What exactly is RentOut?", a: "RentOut is a skills marketplace app. You create a listing for something you're good at — tutoring, photography, design, fitness coaching, language practice, gaming sessions, anything legal and useful — set your own price, and people book and pay you through the app." },
-  { q: "Is it free to join?", a: "Yes. Creating an account and listing your skills is free — no signup fee, no subscription, no credit card required. A transparent service fee applies only to completed bookings." },
+  { q: "What exactly is RentOut?", a: "RentOut is a skills marketplace app. You create a listing for something you're good at, such as tutoring, photography, design, coaching, or language practice. You set your own price, and people book and pay you through the app." },
+  { q: "Is it free to join?", a: "Yes. Creating an account and listing your skills is free. There is no signup fee, no subscription, and no credit card required. A transparent service fee applies only to completed bookings." },
   { q: "How and when do I get paid?", a: "Payments are handled inside the app. When a customer books you, their payment is held securely and released to your in-app earnings balance once the booking is completed. You can then withdraw your balance to your local payout method. Full payout details for each country will be confirmed in your onboarding email before launch." },
-  { q: "How much can I earn?", a: "You set your own rates — hourly, per session, or per package. There is no cap and no fixed shift: you earn from every booking you choose to accept. Early earners also get priority visibility in search when the marketplace opens." },
-  { q: "Is this a job or employment?", a: "No. You are an independent earner on a marketplace — you run your own one-person business through the app. You decide what you offer, when you work, what you charge, and which bookings to accept." },
+  { q: "How much can I earn?", a: "You set your own rates: hourly, per session, or per package. There is no cap and no fixed shift. You earn from every booking you choose to accept. Early earners also get priority visibility in search when the marketplace opens." },
+  { q: "Is this a job or employment?", a: "No. You are an independent earner on a marketplace, running your own one-person business through the app. You decide what you offer, when you work, what you charge, and which bookings to accept." },
   { q: "What skills can I list?", a: "Any legal skill or service people would pay for: tutoring and languages, photography and video, design and editing, music lessons, fitness coaching, tech help, gaming partners, event help, and more. Every listing is reviewed by our moderation team before it goes live." },
   { q: "Is it safe? How do you prevent scams?", a: "Every earner goes through identity verification (KYC) before they can accept bookings. Payments are held by the platform until the booking is completed, both sides review each other after every booking, and our moderation team reviews reports and removes bad actors." },
   { q: "Which countries can join?", a: "The waitlist is open globally — you can sign up from anywhere. The app launches city by city, and waitlist members in each region get access first, in the order they joined." },
@@ -454,6 +440,24 @@ const Logo = () => (
     <span className="logo-text">RentOut</span>
   </div>
 );
+
+const ic = (d: React.ReactNode) => (
+  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">{d}</svg>
+);
+const FeatureIcons = {
+  clock: ic(<><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>),
+  globe: ic(<><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" /></>),
+  card: ic(<><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 10h18" /></>),
+  layers: ic(<><path d="M12 3 3 8l9 5 9-5-9-5Z" /><path d="m3 13 9 5 9-5" /></>),
+  lock: ic(<><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></>),
+  chart: ic(<><path d="M4 20V10M10 20V4M16 20v-8M21 20H3" /></>),
+  id: ic(<><rect x="3" y="5" width="18" height="14" rx="2" /><circle cx="9" cy="11" r="2" /><path d="M6 16c.5-1.5 1.7-2 3-2s2.5.5 3 2M15 9h4M15 13h4" /></>),
+  shield: ic(<><path d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6l-7-3Z" /><path d="m9 12 2 2 4-4" /></>),
+  star: ic(<path d="m12 4 2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.5-4.8 2.5.9-5.4L4.2 9.7l5.4-.8L12 4Z" />),
+  flag: ic(<><path d="M5 21V4" /><path d="M5 4h12l-2 4 2 4H5" /></>),
+  doc: ic(<><path d="M7 3h7l5 5v13H7V3Z" /><path d="M14 3v5h5M10 13h6M10 17h6" /></>),
+  mail: ic(<><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></>),
+};
 
 type V = "home" | "form" | "done";
 
@@ -475,7 +479,6 @@ export default function Page() {
   const scrambleRef = useRef<HTMLDivElement>(null);
   const [loaded, setLoaded] = useState(false);
   const [showCursor, setShowCursor] = useState(true);
-  const [konamiActive, setKonamiActive] = useState(false);
   const [chargeLevel, setChargeLevel] = useState(0);
   const [isIdle, setIsIdle] = useState(false);
   const chargeTimer = useRef<ReturnType<typeof setInterval>|null>(null);
@@ -507,22 +510,6 @@ export default function Page() {
     reset();
     return () => { clearTimeout(t); window.removeEventListener("mousemove", reset); window.removeEventListener("keydown", reset); };
   }, []);
-  useKonami(() => {
-    setKonamiActive(true);
-    haptic();
-    setTimeout(() => setKonamiActive(false), 1600);
-    // Rainbow confetti burst
-    const colors = ["#9B6DFF","#F28B82","#38bdf8","#fbbf24","#34d399","#f472b6","#fff"];
-    Array.from({length:120}).forEach((_,i) => {
-      const el = document.createElement("div");
-      el.className = "copy-particle";
-      const angle = (i/120)*Math.PI*2;
-      const dist = 80+Math.random()*200;
-      el.style.cssText = `left:50vw;top:40vh;width:${Math.random()*8+4}px;height:${Math.random()*4+3}px;background:${colors[i%colors.length]};--tx:${Math.cos(angle)*dist}px;--ty:${Math.sin(angle)*dist}px`;
-      document.body.appendChild(el);
-      setTimeout(()=>el.remove(),600);
-    });
-  });
   useEffect(() => { setTimeout(() => setShowCursor(false), 850); }, []);
 
   useEffect(() => {
@@ -607,7 +594,7 @@ export default function Page() {
         <a href="/leaderboard" target="_blank" rel="noopener" style={{ position: "absolute", right: 32, fontSize: 13, fontWeight: 700, color: "#8888aa", textDecoration: "none", display: "flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 100, padding: "7px 14px", transition: "all .2s" }}
           onMouseEnter={e => { e.currentTarget.style.color = "#b090ff"; e.currentTarget.style.borderColor = "rgba(155,109,255,0.3)"; }}
           onMouseLeave={e => { e.currentTarget.style.color = "#8888aa"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; }}>
-          🏆 Leaderboard
+          Leaderboard
         </a>
       </div>
 
@@ -638,7 +625,7 @@ export default function Page() {
             </a>
             <a href={`/leaderboard?me=${myRefCode}`} target="_blank" rel="noopener"
               style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 600, color: "#c0a080", textDecoration: "none", background: "rgba(242,139,130,0.07)", border: "1px solid rgba(242,139,130,0.2)", borderRadius: 100, padding: "8px 18px" }}>
-              🏆 See your rank
+              See your rank
             </a>
           </div>
         )}
@@ -837,13 +824,12 @@ export default function Page() {
 
   /* ── HOME ── */
   return (
-    <div style={{ background: "var(--bg)", minHeight: "100vh" }} className={konamiActive ? "konami-active" : ""}>
+    <div style={{ background: "var(--bg)", minHeight: "100vh" }}>
       {/* Custom cursor */}
       <div id="scroll-progress" className="scroll-progress" style={{ width: "0%" }} />
       <ShaderBackground />
       <ThreeScene />
       <ParticleField />
-      <MultiCursors />
       <div id="cursor-glow" className="cursor-glow" />
 
       <nav style={{ position: "sticky", top: 0, zIndex: 99, background: "rgba(7,7,10,0.85)", borderBottom: "1px solid rgba(255,255,255,0.04)", padding: "0 28px", height: 58, display: "flex", alignItems: "center", justifyContent: "space-between", backdropFilter: "blur(16px)" }}>
@@ -862,7 +848,7 @@ export default function Page() {
           <a href="/leaderboard" target="_blank" rel="noopener" className="nav-hide-mobile" style={{ fontSize: 13, fontWeight: 700, color: "#8888aa", textDecoration: "none", display: "flex", alignItems: "center", gap: 6, padding: "7px 14px", borderRadius: 100, border: "1px solid rgba(255,255,255,0.07)", background: "rgba(255,255,255,0.03)", transition: "all .2s" }}
             onMouseEnter={e => { e.currentTarget.style.color = "#b090ff"; e.currentTarget.style.borderColor = "rgba(155,109,255,0.3)"; }}
             onMouseLeave={e => { e.currentTarget.style.color = "#8888aa"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; }}>
-            🏆 Leaderboard
+            Leaderboard
           </a>
           <button onClick={() => { setShowRankModal(true); setRankError(""); setRankEmail(""); }} className="nav-hide-mobile"
             style={{ fontSize: 13, fontWeight: 700, color: "#8888aa", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 100, padding: "7px 14px", cursor: "pointer", transition: "all .2s" }}
@@ -993,7 +979,7 @@ export default function Page() {
             How it works
           </div>
           <h2 style={{ fontSize: "clamp(28px, 4.5vw, 46px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.1 }}>
-            Three steps. That&apos;s it.
+            Start earning in three steps
           </h2>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 24 }}>
@@ -1018,20 +1004,20 @@ export default function Page() {
             Why RentOut
           </div>
           <h2 style={{ fontSize: "clamp(28px, 4.5vw, 46px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.1 }}>
-            Built for how you actually work.
+            Work on your terms
           </h2>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 20 }}>
           {[
-            { icon: "⏱️", title: "Set your own hours", body: "No fixed shifts. Take bookings whenever it works for you." },
-            { icon: "🌍", title: "Open globally", body: "Sign up from anywhere. Not limited to one city or country." },
-            { icon: "💳", title: "Get paid for every booking", body: "Earnings scale with how much you take on — no cap." },
-            { icon: "🎯", title: "Any skill counts", body: "Creative, technical, tutoring, or service-based — if it's useful, it's welcome." },
-            { icon: "🔒", title: "Simple, secure signup", body: "60-second signup, no credit card, no spam." },
-            { icon: "📈", title: "Early access perks", body: "First earners get priority visibility when the marketplace opens." },
+            { icon: FeatureIcons.clock, title: "Set your own hours", body: "No fixed shifts. Take bookings whenever it works for you." },
+            { icon: FeatureIcons.globe, title: "Open globally", body: "Sign up from anywhere. Not limited to one city or country." },
+            { icon: FeatureIcons.card, title: "Get paid for every booking", body: "Earnings scale with how much you take on. There is no cap." },
+            { icon: FeatureIcons.layers, title: "Any skill counts", body: "Creative, technical, tutoring, or service-based. If it's useful, it's welcome." },
+            { icon: FeatureIcons.lock, title: "Simple, secure signup", body: "60-second signup, no credit card, no spam." },
+            { icon: FeatureIcons.chart, title: "Early access perks", body: "First earners get priority visibility when the marketplace opens." },
           ].map((f) => (
             <div key={f.title} className="reveal" style={{ padding: "24px 20px", borderRadius: 16, border: "1px solid var(--border)", background: "var(--surface)" }}>
-              <div style={{ fontSize: 26, marginBottom: 12 }}>{f.icon}</div>
+              <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(155,109,255,0.1)", border: "1px solid rgba(155,109,255,0.2)", color: "#b090ff", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 14 }}>{f.icon}</div>
               <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: "-0.02em", marginBottom: 8 }}>{f.title}</div>
               <div style={{ fontSize: 13.5, color: "var(--text-dim)", lineHeight: 1.6 }}>{f.body}</div>
             </div>
@@ -1046,7 +1032,7 @@ export default function Page() {
             Categories
           </div>
           <h2 style={{ fontSize: "clamp(28px, 4.5vw, 46px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.1, marginBottom: 14 }}>
-            One marketplace. Every skill.
+            What you can offer
           </h2>
           <p style={{ fontSize: 15.5, color: "var(--text-dim)", maxWidth: 520, margin: "0 auto", lineHeight: 1.7 }}>
             You choose what to offer, how to deliver it, and what to charge.
@@ -1056,7 +1042,7 @@ export default function Page() {
           {[
             "Tutoring & Test Prep", "Languages", "Photography & Video", "Design & Editing",
             "Music Lessons", "Fitness & Coaching", "Tech Help", "Gaming Sessions",
-            "Career & Interview Prep", "Cooking", "Event Support", "And more",
+            "Career & Interview Prep", "Cooking", "Event Support",
           ].map((c) => (
             <span key={c} style={{ fontSize: 14, fontWeight: 600, color: "var(--text-body)", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 100, padding: "10px 20px" }}>
               {c}
@@ -1072,7 +1058,7 @@ export default function Page() {
             Payments
           </div>
           <h2 style={{ fontSize: "clamp(28px, 4.5vw, 46px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.1, marginBottom: 14 }}>
-            How you get paid.
+            How you get paid
           </h2>
           <p style={{ fontSize: 15.5, color: "var(--text-dim)", maxWidth: 560, margin: "0 auto", lineHeight: 1.7 }}>
             No signup fees. No subscriptions. A single transparent service fee applies only when a booking is completed.
@@ -1080,7 +1066,7 @@ export default function Page() {
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 24 }}>
           {[
-            { n: "01", title: "Customer books & pays", body: "The customer pays through the app when they book you. Their payment is held securely by the platform — not by the customer." },
+            { n: "01", title: "Customer books & pays", body: "The customer pays through the app at the time of booking. The payment is held securely by the platform, so you never have to chase anyone for money." },
             { n: "02", title: "You complete the booking", body: "Deliver the session or service. Completion is confirmed in the app, which protects both you and the customer." },
             { n: "03", title: "Earnings released to you", body: "The money lands in your in-app earnings balance, and you withdraw it to your local payout method. Payout options for your country are confirmed before launch." },
           ].map((step) => (
@@ -1100,7 +1086,7 @@ export default function Page() {
             Trust &amp; safety
           </div>
           <h2 style={{ fontSize: "clamp(28px, 4.5vw, 46px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.1, marginBottom: 14 }}>
-            Built to be safe for both sides.
+            Trust and safety, built in
           </h2>
           <p style={{ fontSize: 15.5, color: "var(--text-dim)", maxWidth: 540, margin: "0 auto", lineHeight: 1.7 }}>
             A marketplace only works if everyone can trust it. This is what&apos;s built into RentOut from day one.
@@ -1108,15 +1094,15 @@ export default function Page() {
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 20 }}>
           {[
-            { icon: "🪪", title: "Verified identities", body: "Every earner completes identity verification (KYC) before accepting bookings. No anonymous accounts." },
-            { icon: "🛡️", title: "Protected payments", body: "Payments are held by the platform and only released when the booking is completed — protecting both sides." },
-            { icon: "⭐", title: "Two-way reviews", body: "Earners and customers review each other after every booking, so reputations are real and earned." },
-            { icon: "🚫", title: "Active moderation", body: "Every listing is screened before going live, and a moderation team reviews reports and removes bad actors." },
-            { icon: "📜", title: "Clear terms, no tricks", body: "Plain-language Terms of Service and Privacy Policy. No hidden fees, no fine-print surprises." },
-            { icon: "✉️", title: "A team you can reach", body: "Questions or concerns? Email support@getrentout.me and a real person will reply." },
+            { icon: FeatureIcons.id, title: "Verified identities", body: "Every earner completes identity verification (KYC) before accepting bookings. No anonymous accounts." },
+            { icon: FeatureIcons.shield, title: "Protected payments", body: "Payments are held by the platform and only released when the booking is completed. This protects both sides." },
+            { icon: FeatureIcons.star, title: "Two-way reviews", body: "Earners and customers review each other after every booking, so reputations are real and earned." },
+            { icon: FeatureIcons.flag, title: "Active moderation", body: "Every listing is screened before going live, and a moderation team reviews reports and removes bad actors." },
+            { icon: FeatureIcons.doc, title: "Clear terms, no tricks", body: "Plain-language Terms of Service and Privacy Policy. No hidden fees, no fine-print surprises." },
+            { icon: FeatureIcons.mail, title: "A team you can reach", body: "Questions or concerns? Email support@getrentout.me and a real person will reply." },
           ].map((f) => (
             <div key={f.title} className="reveal" style={{ padding: "24px 20px", borderRadius: 16, border: "1px solid var(--border)", background: "var(--surface)" }}>
-              <div style={{ fontSize: 26, marginBottom: 12 }}>{f.icon}</div>
+              <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(155,109,255,0.1)", border: "1px solid rgba(155,109,255,0.2)", color: "#b090ff", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 14 }}>{f.icon}</div>
               <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: "-0.02em", marginBottom: 8 }}>{f.title}</div>
               <div style={{ fontSize: 13.5, color: "var(--text-dim)", lineHeight: 1.6 }}>{f.body}</div>
             </div>
@@ -1131,14 +1117,14 @@ export default function Page() {
             FAQ
           </div>
           <h2 style={{ fontSize: "clamp(28px, 4.5vw, 46px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.1 }}>
-            Questions, answered.
+            Frequently asked questions
           </h2>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {FAQS.map((f, i) => <FAQItem key={i} q={f.q} a={f.a} />)}
         </div>
         <p className="reveal" style={{ textAlign: "center", fontSize: 14, color: "var(--text-faint)", marginTop: 28 }}>
-          Something else on your mind? Email <a href="mailto:support@getrentout.me" style={{ color: "var(--accent)", textDecoration: "none" }}>support@getrentout.me</a> — we answer every message.
+          Have a question we didn't cover? Email <a href="mailto:support@getrentout.me" style={{ color: "var(--accent)", textDecoration: "none" }}>support@getrentout.me</a>.
         </p>
       </div>
 
@@ -1147,7 +1133,7 @@ export default function Page() {
         <div className="card reveal" style={{ borderRadius: 20, padding: "40px 36px", border: "1px solid var(--border)" }}>
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "var(--accent-2)", textTransform: "uppercase", marginBottom: 16 }}>About RentOut</div>
           <p style={{ fontSize: 15.5, color: "var(--text-body)", lineHeight: 1.8, marginBottom: 14 }}>
-            RentOut is built by a dedicated team of engineers, designers, and marketplace operators with one belief: <span style={{ color: "var(--text)", fontWeight: 600 }}>everyone has a skill someone else would pay for</span> — most people just never get a simple, safe way to sell it.
+            RentOut is built by a dedicated team of engineers, designers, and marketplace operators with one belief: <span style={{ color: "var(--text)", fontWeight: 600 }}>everyone has a skill someone else would pay for</span>. Most people just never get a simple, safe way to sell it.
           </p>
           <p style={{ fontSize: 15.5, color: "var(--text-body)", lineHeight: 1.8 }}>
             The app is in the final stage of development, with verified onboarding, secure in-app payments, and moderation built in from the start. This waitlist decides who gets access first. Reach us anytime at <a href="mailto:hello@getrentout.me" style={{ color: "var(--accent)", textDecoration: "none" }}>hello@getrentout.me</a>.
@@ -1185,7 +1171,7 @@ export default function Page() {
           <div>
             <Logo />
             <p style={{ fontSize: 13, color: "var(--text-faint)", lineHeight: 1.7, marginTop: 14, maxWidth: 240 }}>
-              The marketplace where people book your skills by the hour. Free to join — earn on your own schedule.
+              The marketplace where people book your skills by the hour. Free to join. Earn on your own schedule.
             </p>
           </div>
           {[
