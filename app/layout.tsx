@@ -11,7 +11,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "RentOut — Rent out your time. Get paid for it.",
-  description: "Sign up now and be among the first to earn on RentOut. First 100,000 earners get early access — before anyone else.",
+  description: "RentOut is a marketplace where people book your skills by the hour — tutoring, design, coaching, photography and more. Free to join. First 100,000 earners get early access.",
   openGraph: {
     title: "RentOut — Rent out your time. Get paid for it.",
     description: "Sign up now and be among the first to earn. First 100,000 earners get early access.",

@@ -703,6 +703,37 @@ function Ticker({ value }: { value: number }) {
   return <span key={flash ? "f" : "n"} className={flash ? "counter-flash" : ""}>{d.toLocaleString()}</span>;
 }
 
+function FAQItem({ q, a }: { q: string; a: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="reveal" style={{ border: "1px solid var(--border)", borderRadius: 14, background: "var(--surface)", overflow: "hidden" }}>
+      <button onClick={() => setOpen(o => !o)} aria-expanded={open}
+        style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, padding: "18px 22px", background: "none", border: "none", cursor: "pointer", textAlign: "left" }}>
+        <span style={{ fontSize: 15.5, fontWeight: 700, letterSpacing: "-0.01em", color: "var(--text)" }}>{q}</span>
+        <span aria-hidden style={{ fontSize: 18, fontWeight: 400, color: "var(--accent)", flexShrink: 0, transform: open ? "rotate(45deg)" : "none", transition: "transform .25s cubic-bezier(.16,1,.3,1)" }}>+</span>
+      </button>
+      <div style={{ display: "grid", gridTemplateRows: open ? "1fr" : "0fr", transition: "grid-template-rows .3s cubic-bezier(.16,1,.3,1)" }}>
+        <div style={{ overflow: "hidden" }}>
+          <div style={{ padding: "0 22px 20px", fontSize: 14, color: "var(--text-dim)", lineHeight: 1.7 }}>{a}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const FAQS: { q: string; a: React.ReactNode }[] = [
+  { q: "What exactly is RentOut?", a: "RentOut is a skills marketplace app. You create a listing for something you're good at — tutoring, photography, design, fitness coaching, language practice, gaming sessions, anything legal and useful — set your own price, and people book and pay you through the app." },
+  { q: "Is it free to join?", a: "Yes. Signing up as an earner is completely free — no signup fee, no subscription, no credit card required. RentOut only earns a commission when you complete a paid booking, so we only make money when you do." },
+  { q: "How and when do I get paid?", a: "Payments are handled inside the app. When a customer books you, their payment is held securely and released to your in-app earnings balance once the booking is completed. You can then withdraw your balance to your local payout method. Full payout details for each country will be confirmed in your onboarding email before launch." },
+  { q: "How much can I earn?", a: "You set your own rates — hourly, per session, or per package. There is no cap and no fixed shift: you earn from every booking you choose to accept. Early earners also get priority visibility in search, which typically means more bookings." },
+  { q: "Is this a job or employment?", a: "No. You are an independent earner on a marketplace, like a seller on Fiverr or a host on Airbnb. You decide what you offer, when you work, what you charge, and which bookings to accept." },
+  { q: "What skills can I list?", a: "Any legal skill or service people would pay for: tutoring and languages, photography and video, design and editing, music lessons, fitness coaching, tech help, gaming partners, event help, and more. Every listing is reviewed by our moderation team before it goes live." },
+  { q: "Is it safe? How do you prevent scams?", a: "Every earner goes through identity verification (KYC) before they can accept bookings. Payments are held by the platform until the booking is completed, both sides review each other after every booking, and our moderation team reviews reports and removes bad actors." },
+  { q: "Which countries can join?", a: "The waitlist is open globally — you can sign up from anywhere. The app launches city by city, and waitlist members in each region get access first, in the order they joined." },
+  { q: "What happens after I sign up?", a: "You get a waitlist position and a personal referral link (each signup through your link moves you 5 spots up). When we launch in your region, you'll receive an email invitation to set up your earner profile and publish your first listing." },
+  { q: "What do you do with my data?", a: <>We collect only your name, email, and city — used solely to manage the waitlist and contact you about launch. We never sell your data, and you can ask us to delete it anytime at <a href="mailto:support@getrentout.me" style={{ color: "var(--accent)" }}>support@getrentout.me</a>. See our <a href="/privacy" style={{ color: "var(--accent)" }}>Privacy Policy</a>.</> },
+];
+
 const SERVICES = [
   { who: "Arjun", what: "FIFA gaming partner", price: "$6/hr", tag: "Gaming", c: "#9B6DFF" },
   { who: "Priya", what: "Portrait photographer", price: "$18/hr", tag: "Photography", c: "#F28B82" },
@@ -745,11 +776,8 @@ export default function Page() {
   const [exiting, setExiting] = useState(false);
   const [konamiActive, setKonamiActive] = useState(false);
   const [chargeLevel, setChargeLevel] = useState(0);
-  const [viewerCount, setViewerCount] = useState(0);
-  const [showExit, setShowExit] = useState(false);
   const [isIdle, setIsIdle] = useState(false);
   const chargeTimer = useRef<ReturnType<typeof setInterval>|null>(null);
-  const exitShown = useRef(false);
   const haptic = useHaptic();
   const starsRef = useRef(Array.from({ length: 32 }, (_, i) => ({
     id: i, left: `${(i * 37 + 11) % 100}%`, top: `${(i * 53 + 7) % 100}%`,
@@ -770,25 +798,6 @@ export default function Page() {
   use3DHeroTilt();
   useScrollJack();
   useGyroscope();
-
-  // Viewer count (realistic simulation)
-  useEffect(() => {
-    const base = 12 + Math.floor(Math.random() * 8);
-    setViewerCount(base);
-    const id = setInterval(() => setViewerCount(v => v + (Math.random() > 0.5 ? 1 : -1) * Math.floor(Math.random() * 2)), 7000);
-    return () => clearInterval(id);
-  }, []);
-
-  // Exit intent — only fires when mouse actually leaves through the top of the window
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (e.clientY <= 0 && e.relatedTarget === null && !exitShown.current && view === "home") {
-        exitShown.current = true; setShowExit(true);
-      }
-    };
-    document.addEventListener("mouseleave", handler);
-    return () => document.removeEventListener("mouseleave", handler);
-  }, [view]);
 
   // Idle CTA pulse
   useEffect(() => {
@@ -1030,7 +1039,7 @@ export default function Page() {
               Something new<br />is coming.<br /><span className="g">Start earning early.</span>
             </h2>
             <p style={{ fontSize: 16, color: "#b0b0cc", lineHeight: 1.75, marginBottom: 40 }}>
-              We&apos;re not ready to reveal everything yet. Sign up and be among the first to know when we launch.
+              List a skill, get booked, get paid — on your own schedule. Signing up is free and takes 60 seconds.
             </p>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 40 }}>
@@ -1120,34 +1129,25 @@ export default function Page() {
     <div style={{ background: "var(--bg)", minHeight: "100vh" }} className={konamiActive ? "konami-active" : ""}>
       {/* Custom cursor */}
       <div id="scroll-progress" className="scroll-progress" style={{ width: "0%" }} />
-      <div className="scanlines" /><div className="scan-sweep" />
       <ShaderBackground />
       <ThreeScene />
       <ParticleField />
       <MultiCursors />
-
-      {/* Exit intent popup */}
-      {showExit && (
-        <div className="exit-popup">
-          <div style={{ fontSize: 36, marginBottom: 12 }}>⏳</div>
-          <h3 style={{ fontSize: 22, fontWeight: 900, letterSpacing: "-0.03em", marginBottom: 8 }}>Wait — spots are filling up.</h3>
-          <p style={{ fontSize: 14, color: "#8888aa", marginBottom: 24, lineHeight: 1.6 }}>
-            {viewerCount} people are looking at this right now.<br />Your spot won&apos;t be saved if you leave.
-          </p>
-          <button className={`btn-primary${isIdle ? " btn-idle" : ""}`} style={{ width: "100%", fontSize: 15, padding: "16px", borderRadius: 12 }}
-            onClick={() => { setShowExit(false); transitionTo(() => setView("form")); haptic(); }}>
-            Claim my spot now →
-          </button>
-          <button onClick={() => setShowExit(false)} style={{ marginTop: 14, background: "none", border: "none", color: "#555577", fontSize: 13, cursor: "pointer" }}>
-            No thanks, I&apos;ll miss out
-          </button>
-        </div>
-      )}
       <div id="cursor-glow" className="cursor-glow" />
 
       <nav style={{ position: "sticky", top: 0, zIndex: 99, background: "rgba(7,7,10,0.85)", borderBottom: "1px solid rgba(255,255,255,0.04)", padding: "0 28px", height: 58, display: "flex", alignItems: "center", justifyContent: "space-between", backdropFilter: "blur(16px)" }}>
         <Logo />
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <a href="#how-it-works" className="nav-hide-mobile" style={{ fontSize: 13, fontWeight: 600, color: "#8888aa", textDecoration: "none", padding: "7px 10px", transition: "color .2s" }}
+            onMouseEnter={e => (e.currentTarget.style.color = "#b090ff")}
+            onMouseLeave={e => (e.currentTarget.style.color = "#8888aa")}>
+            How it works
+          </a>
+          <a href="#faq" className="nav-hide-mobile" style={{ fontSize: 13, fontWeight: 600, color: "#8888aa", textDecoration: "none", padding: "7px 10px", transition: "color .2s" }}
+            onMouseEnter={e => (e.currentTarget.style.color = "#b090ff")}
+            onMouseLeave={e => (e.currentTarget.style.color = "#8888aa")}>
+            FAQ
+          </a>
           <a href="/leaderboard" target="_blank" rel="noopener" className="nav-hide-mobile" style={{ fontSize: 13, fontWeight: 700, color: "#8888aa", textDecoration: "none", display: "flex", alignItems: "center", gap: 6, padding: "7px 14px", borderRadius: 100, border: "1px solid rgba(255,255,255,0.07)", background: "rgba(255,255,255,0.03)", transition: "all .2s" }}
             onMouseEnter={e => { e.currentTarget.style.color = "#b090ff"; e.currentTarget.style.borderColor = "rgba(155,109,255,0.3)"; }}
             onMouseLeave={e => { e.currentTarget.style.color = "#8888aa"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; }}>
@@ -1211,12 +1211,6 @@ export default function Page() {
                 <span style={{ color: "var(--text)", fontWeight: 600 }}>Earner early access</span>
               </span>
             </div>
-            {viewerCount > 0 && (
-              <div className="hero-eyebrow viewer-badge">
-                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#F28B82", display: "inline-block", animation: "pulse-dot 2s infinite" }} />
-                {viewerCount} viewing now
-              </div>
-            )}
           </div>
 
           <div style={{ marginBottom: 28 }}>
@@ -1231,8 +1225,8 @@ export default function Page() {
             </div>
           </div>
 
-          <p className="hero-sub" style={{ fontSize: "clamp(17px, 2vw, 21px)", color: "var(--text-body)", lineHeight: 1.7, maxWidth: 520, margin: "0 auto 40px" }}>
-            Something new is coming. Sign up to earn — before anyone else.
+          <p className="hero-sub" style={{ fontSize: "clamp(17px, 2vw, 21px)", color: "var(--text-body)", lineHeight: 1.7, maxWidth: 560, margin: "0 auto 40px" }}>
+            RentOut is a marketplace where people book your skills by the hour — tutoring, design, coaching, photography, gaming and more. Signing up is free. Early earners get first access at launch.
           </p>
 
           <div className="hero-cta" style={{ display: "flex", justifyContent: "center", marginBottom: 40 }}>
@@ -1282,7 +1276,7 @@ export default function Page() {
       <hr className="hr" style={{ marginTop: 40, position: "relative", zIndex: 1 }} />
 
       {/* HOW IT WORKS */}
-      <div style={{ maxWidth: 1000, margin: "0 auto", padding: "100px 24px 40px", position: "relative", zIndex: 1 }}>
+      <div id="how-it-works" style={{ maxWidth: 1000, margin: "0 auto", padding: "100px 24px 40px", position: "relative", zIndex: 1 }}>
         <div className="reveal" style={{ textAlign: "center", marginBottom: 56 }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 20, fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "var(--accent)", textTransform: "uppercase", background: "rgba(155,109,255,0.08)", border: "1px solid rgba(155,109,255,0.18)", borderRadius: 100, padding: "6px 16px" }}>
             How it works
@@ -1334,6 +1328,123 @@ export default function Page() {
         </div>
       </div>
 
+      {/* WHAT YOU CAN OFFER */}
+      <div style={{ maxWidth: 1000, margin: "0 auto", padding: "80px 24px 40px", position: "relative", zIndex: 1 }}>
+        <div className="reveal" style={{ textAlign: "center", marginBottom: 56 }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 20, fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "var(--accent)", textTransform: "uppercase", background: "rgba(155,109,255,0.08)", border: "1px solid rgba(155,109,255,0.18)", borderRadius: 100, padding: "6px 16px" }}>
+            Real examples
+          </div>
+          <h2 style={{ fontSize: "clamp(28px, 4.5vw, 46px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.1, marginBottom: 14 }}>
+            What could you offer?
+          </h2>
+          <p style={{ fontSize: 15.5, color: "var(--text-dim)", maxWidth: 520, margin: "0 auto", lineHeight: 1.7 }}>
+            Here&apos;s what listings look like. You choose the skill, the format, and the price.
+          </p>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 16 }}>
+          {SERVICES.map((s) => (
+            <div key={s.who} className="reveal" style={{ padding: "20px", borderRadius: 16, border: "1px solid var(--border)", background: "var(--surface)", display: "flex", flexDirection: "column", gap: 10 }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: s.c, background: `${s.c}18`, border: `1px solid ${s.c}35`, borderRadius: 100, padding: "4px 10px" }}>{s.tag}</span>
+                <span style={{ fontSize: 14, fontWeight: 800, color: "var(--text)" }}>{s.price}</span>
+              </div>
+              <div style={{ fontSize: 15.5, fontWeight: 700, letterSpacing: "-0.01em" }}>{s.what}</div>
+              <div style={{ fontSize: 12.5, color: "var(--text-faint)" }}>{s.who} · example listing</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* HOW YOU GET PAID */}
+      <div style={{ maxWidth: 1000, margin: "0 auto", padding: "80px 24px 40px", position: "relative", zIndex: 1 }}>
+        <div className="reveal" style={{ textAlign: "center", marginBottom: 56 }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 20, fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "var(--accent-2)", textTransform: "uppercase", background: "rgba(242,139,130,0.08)", border: "1px solid rgba(242,139,130,0.18)", borderRadius: 100, padding: "6px 16px" }}>
+            Payments
+          </div>
+          <h2 style={{ fontSize: "clamp(28px, 4.5vw, 46px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.1, marginBottom: 14 }}>
+            How you get paid.
+          </h2>
+          <p style={{ fontSize: 15.5, color: "var(--text-dim)", maxWidth: 560, margin: "0 auto", lineHeight: 1.7 }}>
+            Joining is free. There are no signup fees and no subscriptions — RentOut takes a transparent commission on completed bookings, so we only earn when you do.
+          </p>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 24 }}>
+          {[
+            { n: "01", title: "Customer books & pays", body: "The customer pays through the app when they book you. Their payment is held securely by the platform — not by the customer." },
+            { n: "02", title: "You complete the booking", body: "Deliver the session or service. Completion is confirmed in the app, which protects both you and the customer." },
+            { n: "03", title: "Earnings released to you", body: "The money lands in your in-app earnings balance, and you withdraw it to your local payout method. Payout options for your country are confirmed before launch." },
+          ].map((step) => (
+            <div key={step.n} className="card reveal" style={{ borderRadius: 20, padding: "32px 28px", border: "1px solid var(--border)" }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: "var(--accent-2)", letterSpacing: "0.05em", marginBottom: 14 }}>{step.n}</div>
+              <div style={{ fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", marginBottom: 10 }}>{step.title}</div>
+              <div style={{ fontSize: 14.5, color: "var(--text-dim)", lineHeight: 1.6 }}>{step.body}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* TRUST & SAFETY */}
+      <div style={{ maxWidth: 1000, margin: "0 auto", padding: "80px 24px 40px", position: "relative", zIndex: 1 }}>
+        <div className="reveal" style={{ textAlign: "center", marginBottom: 56 }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 20, fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "var(--accent)", textTransform: "uppercase", background: "rgba(155,109,255,0.08)", border: "1px solid rgba(155,109,255,0.18)", borderRadius: 100, padding: "6px 16px" }}>
+            Trust &amp; safety
+          </div>
+          <h2 style={{ fontSize: "clamp(28px, 4.5vw, 46px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.1, marginBottom: 14 }}>
+            Built to be safe for both sides.
+          </h2>
+          <p style={{ fontSize: 15.5, color: "var(--text-dim)", maxWidth: 540, margin: "0 auto", lineHeight: 1.7 }}>
+            A marketplace only works if everyone can trust it. This is what&apos;s built into RentOut from day one.
+          </p>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 20 }}>
+          {[
+            { icon: "🪪", title: "Verified identities", body: "Every earner completes identity verification (KYC) before accepting bookings. No anonymous accounts." },
+            { icon: "🛡️", title: "Protected payments", body: "Payments are held by the platform and only released when the booking is completed — protecting both sides." },
+            { icon: "⭐", title: "Two-way reviews", body: "Earners and customers review each other after every booking, so reputations are real and earned." },
+            { icon: "🚫", title: "Active moderation", body: "Every listing is screened before going live, and a moderation team reviews reports and removes bad actors." },
+            { icon: "📜", title: "Clear terms, no tricks", body: "Plain-language Terms of Service and Privacy Policy. No hidden fees, no fine-print surprises." },
+            { icon: "✉️", title: "A team you can reach", body: "Questions or concerns? Email support@getrentout.me and a real person will reply." },
+          ].map((f) => (
+            <div key={f.title} className="reveal" style={{ padding: "24px 20px", borderRadius: 16, border: "1px solid var(--border)", background: "var(--surface)" }}>
+              <div style={{ fontSize: 26, marginBottom: 12 }}>{f.icon}</div>
+              <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: "-0.02em", marginBottom: 8 }}>{f.title}</div>
+              <div style={{ fontSize: 13.5, color: "var(--text-dim)", lineHeight: 1.6 }}>{f.body}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* FAQ */}
+      <div id="faq" style={{ maxWidth: 760, margin: "0 auto", padding: "80px 24px 40px", position: "relative", zIndex: 1 }}>
+        <div className="reveal" style={{ textAlign: "center", marginBottom: 48 }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 20, fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "var(--accent)", textTransform: "uppercase", background: "rgba(155,109,255,0.08)", border: "1px solid rgba(155,109,255,0.18)", borderRadius: 100, padding: "6px 16px" }}>
+            FAQ
+          </div>
+          <h2 style={{ fontSize: "clamp(28px, 4.5vw, 46px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.1 }}>
+            Questions, answered.
+          </h2>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {FAQS.map((f, i) => <FAQItem key={i} q={f.q} a={f.a} />)}
+        </div>
+        <p className="reveal" style={{ textAlign: "center", fontSize: 14, color: "var(--text-faint)", marginTop: 28 }}>
+          Something else on your mind? Email <a href="mailto:support@getrentout.me" style={{ color: "var(--accent)", textDecoration: "none" }}>support@getrentout.me</a> — we answer every message.
+        </p>
+      </div>
+
+      {/* ABOUT */}
+      <div id="about" style={{ maxWidth: 760, margin: "0 auto", padding: "80px 24px 40px", position: "relative", zIndex: 1 }}>
+        <div className="card reveal" style={{ borderRadius: 20, padding: "40px 36px", border: "1px solid var(--border)" }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "var(--accent-2)", textTransform: "uppercase", marginBottom: 16 }}>About RentOut</div>
+          <p style={{ fontSize: 15.5, color: "var(--text-body)", lineHeight: 1.8, marginBottom: 14 }}>
+            RentOut is built by a dedicated team of engineers, designers, and marketplace operators with one belief: <span style={{ color: "var(--text)", fontWeight: 600 }}>everyone has a skill someone else would pay for</span> — most people just never get a simple, safe way to sell it.
+          </p>
+          <p style={{ fontSize: 15.5, color: "var(--text-body)", lineHeight: 1.8 }}>
+            The app is in the final stage of development, with verified onboarding, secure in-app payments, and moderation built in from the start. This waitlist decides who gets access first. Reach us anytime at <a href="mailto:hello@getrentout.me" style={{ color: "var(--accent)", textDecoration: "none" }}>hello@getrentout.me</a>.
+          </p>
+        </div>
+      </div>
+
       <hr className="hr" style={{ position: "relative", zIndex: 1 }} />
 
       {/* BOTTOM CTA */}
@@ -1349,7 +1460,7 @@ export default function Page() {
               Don&apos;t wait.<br /><span className="g">Start earning early.</span>
             </h2>
             <p style={{ fontSize: 16, color: "var(--text-dim)", lineHeight: 1.7, maxWidth: 460, margin: "0 auto 40px" }}>
-              We&apos;re building something new. Sign up now and be among the first to experience it.
+              Free to join. No credit card. Your skills, your rates, your schedule — and early earners get first access at launch.
             </p>
             {/* Countdown */}
             {(cd.d > 0 || cd.h > 0 || cd.m > 0) && (
@@ -1376,15 +1487,47 @@ export default function Page() {
       </div>
 
       <hr className="hr" style={{ position: "relative", zIndex: 1 }} />
-      <div style={{ padding: "28px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16, position: "relative", zIndex: 1 }}>
-        <Logo />
-        <div style={{ display: "flex", gap: 24, alignItems: "center", flexWrap: "wrap" }}>
-          <a href="mailto:hello@getrentout.me" style={{ fontSize: 13, color: "var(--text-faint)", textDecoration: "none", transition: "color .2s" }}
-            onMouseEnter={e => (e.currentTarget.style.color = "var(--text-dim)")}
-            onMouseLeave={e => (e.currentTarget.style.color = "var(--text-faint)")}>hello@getrentout.me</a>
+      <footer style={{ maxWidth: 1000, margin: "0 auto", padding: "56px 24px 32px", position: "relative", zIndex: 1 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 36, marginBottom: 44 }}>
+          <div>
+            <Logo />
+            <p style={{ fontSize: 13, color: "var(--text-faint)", lineHeight: 1.7, marginTop: 14, maxWidth: 240 }}>
+              The marketplace where people book your skills by the hour. Free to join — earn on your own schedule.
+            </p>
+          </div>
+          {[
+            { head: "Product", links: [
+              { label: "How it works", href: "#how-it-works" },
+              { label: "FAQ", href: "#faq" },
+              { label: "Leaderboard", href: "/leaderboard" },
+            ]},
+            { head: "Company", links: [
+              { label: "About", href: "#about" },
+              { label: "Contact us", href: "mailto:hello@getrentout.me" },
+              { label: "Support", href: "mailto:support@getrentout.me" },
+            ]},
+            { head: "Legal", links: [
+              { label: "Terms of Service", href: "/terms" },
+              { label: "Privacy Policy", href: "/privacy" },
+            ]},
+          ].map(col => (
+            <div key={col.head}>
+              <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-dim)", marginBottom: 16 }}>{col.head}</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
+                {col.links.map(l => (
+                  <a key={l.label} href={l.href} style={{ fontSize: 13.5, color: "var(--text-faint)", textDecoration: "none", transition: "color .2s" }}
+                    onMouseEnter={e => (e.currentTarget.style.color = "var(--text)")}
+                    onMouseLeave={e => (e.currentTarget.style.color = "var(--text-faint)")}>{l.label}</a>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
-        <span style={{ fontSize: 13, color: "var(--text-faint)" }}>© 2026 RentOut</span>
-      </div>
+        <div style={{ borderTop: "1px solid var(--border)", paddingTop: 24, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
+          <span style={{ fontSize: 12.5, color: "var(--text-faint)" }}>© 2026 RentOut. All rights reserved.</span>
+          <span style={{ fontSize: 12.5, color: "var(--text-faint)" }}>hello@getrentout.me</span>
+        </div>
+      </footer>
     </div>
   );
 }
