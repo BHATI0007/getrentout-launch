@@ -27,7 +27,6 @@ const Icons = {
 };
 
 const TOTAL = 100000;
-const CLOSE_DATE = new Date("2026-07-19T23:59:59");
 
 function useSpots() {
   const [spots, setSpots] = useState(TOTAL);
@@ -398,19 +397,6 @@ function useParallax() {
   }, []);
 }
 
-function useCountdown() {
-  const [t, setT] = useState({ d: 0, h: 0, m: 0 });
-  useEffect(() => {
-    const tick = () => {
-      const diff = CLOSE_DATE.getTime() - Date.now();
-      if (diff <= 0) return;
-      setT({ d: Math.floor(diff / 864e5), h: Math.floor((diff % 864e5) / 36e5), m: Math.floor((diff % 36e5) / 6e4) });
-    };
-    tick(); const id = setInterval(tick, 30000); return () => clearInterval(id);
-  }, []);
-  return t;
-}
-
 function Ticker({ value }: { value: number }) {
   const [d, setD] = useState(value);
   const [flash, setFlash] = useState(false);
@@ -451,8 +437,8 @@ const FAQS: { q: string; a: React.ReactNode }[] = [
   { q: "What exactly is RentOut?", a: "RentOut is a skills marketplace app. You create a listing for something you're good at — tutoring, photography, design, fitness coaching, language practice, gaming sessions, anything legal and useful — set your own price, and people book and pay you through the app." },
   { q: "Is it free to join?", a: "Yes. Signing up as an earner is completely free — no signup fee, no subscription, no credit card required. RentOut only earns a commission when you complete a paid booking, so we only make money when you do." },
   { q: "How and when do I get paid?", a: "Payments are handled inside the app. When a customer books you, their payment is held securely and released to your in-app earnings balance once the booking is completed. You can then withdraw your balance to your local payout method. Full payout details for each country will be confirmed in your onboarding email before launch." },
-  { q: "How much can I earn?", a: "You set your own rates — hourly, per session, or per package. There is no cap and no fixed shift: you earn from every booking you choose to accept. Early earners also get priority visibility in search, which typically means more bookings." },
-  { q: "Is this a job or employment?", a: "No. You are an independent earner on a marketplace, like a seller on Fiverr or a host on Airbnb. You decide what you offer, when you work, what you charge, and which bookings to accept." },
+  { q: "How much can I earn?", a: "You set your own rates — hourly, per session, or per package. There is no cap and no fixed shift: you earn from every booking you choose to accept. Early earners also get priority visibility in search when the marketplace opens." },
+  { q: "Is this a job or employment?", a: "No. You are an independent earner on a marketplace — you run your own one-person business through the app. You decide what you offer, when you work, what you charge, and which bookings to accept." },
   { q: "What skills can I list?", a: "Any legal skill or service people would pay for: tutoring and languages, photography and video, design and editing, music lessons, fitness coaching, tech help, gaming partners, event help, and more. Every listing is reviewed by our moderation team before it goes live." },
   { q: "Is it safe? How do you prevent scams?", a: "Every earner goes through identity verification (KYC) before they can accept bookings. Payments are held by the platform until the booking is completed, both sides review each other after every booking, and our moderation team reviews reports and removes bad actors." },
   { q: "Which countries can join?", a: "The waitlist is open globally — you can sign up from anywhere. The app launches city by city, and waitlist members in each region get access first, in the order they joined." },
@@ -464,7 +450,7 @@ const SERVICES = [
   { who: "Arjun", what: "FIFA gaming partner", price: "$6/hr", tag: "Gaming", c: "#9B6DFF" },
   { who: "Priya", what: "Portrait photographer", price: "$18/hr", tag: "Photography", c: "#F28B82" },
   { who: "Rohan", what: "Spanish conversation", price: "$8/hr", tag: "Language", c: "#38bdf8" },
-  { who: "Sneha", what: "Watch-party companion", price: "$11/hr", tag: "Social", c: "#9B6DFF" },
+  { who: "Sneha", what: "Watch-party host", price: "$11/hr", tag: "Social", c: "#9B6DFF" },
   { who: "Karan", what: "City photo walk", price: "$12/hr", tag: "Travel", c: "#fb923c" },
   { who: "Ananya", what: "Fitness coach", price: "$10/session", tag: "Fitness", c: "#F28B82" },
   { who: "Dev", what: "Guitar lessons", price: "$7/hr", tag: "Music", c: "#9B6DFF" },
@@ -510,7 +496,6 @@ export default function Page() {
     dur: `${(i % 5) * 0.7 + 2}s`, del: `${(i % 7) * 0.5}s`,
   })));
   const spots = useSpots();
-  const cd = useCountdown();
   const taken = TOTAL - spots;
   useReveal(loaded);
   useCursorGlow();
@@ -761,7 +746,7 @@ export default function Page() {
           <div style={{ position: "relative", maxWidth: 420 }}>
             <p className="section-label" style={{ marginBottom: 20 }}>Early access</p>
             <h2 style={{ fontSize: "clamp(32px, 4vw, 52px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.05, marginBottom: 20, color: "#f0f0fa" }}>
-              Something new<br />is coming.<br /><span className="g">Start earning early.</span>
+              Your skills<br />are worth money.<br /><span className="g">Be first to sell them.</span>
             </h2>
             <p style={{ fontSize: 16, color: "#b0b0cc", lineHeight: 1.75, marginBottom: 40 }}>
               List a skill, get booked, get paid — on your own schedule. Signing up is free and takes 60 seconds.
@@ -771,7 +756,7 @@ export default function Page() {
               {[
                 "Early access before anyone else",
                 "First in line on launch day",
-                "Exclusive earner benefits",
+                "Priority visibility for founding earners",
                 "Direct line to the team",
               ].map(text => (
                 <div key={text} style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -796,7 +781,7 @@ export default function Page() {
               Sign up as an Earner
             </h3>
             <p style={{ fontSize: 14, color: "#9090b8", marginBottom: 28, lineHeight: 1.6 }}>
-              60 seconds. We&apos;ll email you when we&apos;re ready.
+              60 seconds. We&apos;ll email you when your access is ready.
             </p>
 
             <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -1042,7 +1027,7 @@ export default function Page() {
             { icon: "💳", title: "Get paid for every booking", body: "Earnings scale with how much you take on — no cap." },
             { icon: "🎯", title: "Any skill counts", body: "Creative, technical, tutoring, or service-based — if it's useful, it's welcome." },
             { icon: "🔒", title: "Simple, secure signup", body: "60-second signup, no credit card, no spam." },
-            { icon: "📈", title: "Early access perks", body: "First earners get priority visibility and bonus incentives." },
+            { icon: "📈", title: "Early access perks", body: "First earners get priority visibility when the marketplace opens." },
           ].map((f) => (
             <div key={f.title} className="reveal" style={{ padding: "24px 20px", borderRadius: 16, border: "1px solid var(--border)", background: "var(--surface)" }}>
               <div style={{ fontSize: 26, marginBottom: 12 }}>{f.icon}</div>
@@ -1182,28 +1167,11 @@ export default function Page() {
               <span className="dot" style={{ background: "var(--accent)", width: 6, height: 6 }} /> Earner early access
             </div>
             <h2 style={{ fontSize: "clamp(32px, 5.5vw, 60px)", fontWeight: 900, letterSpacing: "-0.045em", lineHeight: 1.02, marginBottom: 18 }}>
-              Don&apos;t wait.<br /><span className="g">Start earning early.</span>
+              Join the first<br /><span className="g">100,000 earners.</span>
             </h2>
             <p style={{ fontSize: 16, color: "var(--text-dim)", lineHeight: 1.7, maxWidth: 460, margin: "0 auto 40px" }}>
               Free to join. No credit card. Your skills, your rates, your schedule — and early earners get first access at launch.
             </p>
-            {/* Countdown */}
-            {(cd.d > 0 || cd.h > 0 || cd.m > 0) && (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 28 }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-                  {[{ v: cd.d, l: "days" }, { v: cd.h, l: "hrs" }, { v: cd.m, l: "min" }].map(({ v, l }, i) => (
-                    <div key={l} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "rgba(155,109,255,0.09)", border: "1px solid rgba(155,109,255,0.22)", borderRadius: 10, padding: "10px 18px", minWidth: 58 }}>
-                        <span style={{ fontSize: 24, fontWeight: 900, letterSpacing: "-0.03em", color: "var(--text)" }}>{String(v).padStart(2, "0")}</span>
-                        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", color: "var(--text-dim)", textTransform: "uppercase", marginTop: 3 }}>{l}</span>
-                      </div>
-                      {i < 2 && <span style={{ fontSize: 22, fontWeight: 900, color: "var(--text-dim)", lineHeight: 1, paddingBottom: 14 }}>:</span>}
-                    </div>
-                  ))}
-                </div>
-                <span style={{ fontSize: 12, fontWeight: 600, color: "var(--text-dim)", letterSpacing: "0.04em" }}>left to claim your spot</span>
-              </div>
-            )}
             <button className="btn-primary" onClick={() => setView("form")} style={{ fontSize: 16, padding: "18px 48px", borderRadius: 14 }}>
               Join as an Earner
             </button>

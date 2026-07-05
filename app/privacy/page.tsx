@@ -55,7 +55,7 @@ export default function PrivacyPage() {
         </S>
 
         <S title="5. Your rights">
-          <p>You can ask us at any time to: see the data we hold about you, correct it, or delete it entirely. Email <a href="mailto:support@getrentout.me" style={{ color: "var(--accent)" }}>support@getrentout.me</a> from the address you signed up with and we will action it promptly. Depending on where you live (for example the EU/EEA under GDPR), you may have additional statutory rights, and we honour them.</p>
+          <p>You can ask us at any time to: see the data we hold about you, correct it, or delete it entirely. Email <a href="mailto:support@getrentout.me" style={{ color: "var(--accent)" }}>support@getrentout.me</a> from the address you signed up with and we&apos;ll take care of it promptly. Depending on where you live (for example the EU/EEA under GDPR), you may have additional statutory rights, and we honor them.</p>
         </S>
 
         <S title="6. Children">
