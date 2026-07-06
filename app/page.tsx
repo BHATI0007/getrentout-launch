@@ -1153,7 +1153,7 @@ export default function Page() {
               <span className="dot" style={{ background: "var(--accent)", width: 6, height: 6 }} /> Earner early access
             </div>
             <h2 style={{ fontSize: "clamp(32px, 5.5vw, 60px)", fontWeight: 900, letterSpacing: "-0.045em", lineHeight: 1.02, marginBottom: 18 }}>
-              Join the first<br /><span className="g">100,000 earners.</span>
+              <Ticker value={spots} /> spots left.<br /><span className="g">Claim yours.</span>
             </h2>
             <p style={{ fontSize: 16, color: "var(--text-dim)", lineHeight: 1.7, maxWidth: 460, margin: "0 auto 40px" }}>
               Free to join. No credit card. Your skills, your rates, your schedule — and early earners get first access at launch.
