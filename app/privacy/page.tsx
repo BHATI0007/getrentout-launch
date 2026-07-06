@@ -52,6 +52,7 @@ export default function PrivacyPage() {
             "To create and manage your waitlist position and referral standing (performance of our agreement with you).",
             "To email you about your signup, your position, and the launch of RentOut in your region (performance of our agreement with you).",
             "To prevent abuse, duplicate signups, bots, and fraud on the waitlist (our legitimate interest in keeping the waitlist fair and secure).",
+            "If you refer others using your referral link, to display your first name, city, and referral count on our public leaderboard (performance of the referral program you chose to take part in). Your email address and full name are never shown publicly.",
           ]} />
           <p style={{ marginTop: 10 }}>We do not sell, rent, or trade your personal data. We do not send third-party marketing. We do not use your data for automated decision-making that produces legal or similarly significant effects.</p>
         </S>

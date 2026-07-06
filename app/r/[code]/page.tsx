@@ -3,30 +3,12 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
+import { getShareText } from "../../lib/shareText";
 
 const BrandLogo = ({ src, alt }: { src: string; alt: string }) => (
   // eslint-disable-next-line @next/next/no-img-element
   <img src={src} alt={alt} width={26} height={26} style={{ display: "block" }} />
 );
-
-function Sparkline({ position }: { position: number }) {
-  const pts = Array.from({length:8},(_,i)=>{
-    const decay = Math.pow(0.72, 7-i);
-    return Math.round(position + (7-i)*14*decay + Math.sin(i*1.3)*2);
-  });
-  const max=Math.max(...pts), min=Math.min(...pts,position);
-  const W=140,H=36;
-  const px=(i:number)=>(i/(pts.length-1))*(W-8)+4;
-  const py=(v:number)=>H-((v-min)/(max-min||1))*(H-8)-4;
-  const d=pts.map((v,i)=>`${i===0?"M":"L"}${px(i)},${py(v)}`).join(" ")+` L${W-4},${py(position)}`;
-  return (
-    <svg width={W} height={H} style={{overflow:"visible"}}>
-      <defs><linearGradient id="sg2" x1="0" x2="1"><stop offset="0%" stopColor="#9B6DFF"/><stop offset="100%" stopColor="#F28B82"/></linearGradient></defs>
-      <path d={d} fill="none" stroke="url(#sg2)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.8"/>
-      <circle cx={W-4} cy={py(position)} r="3.5" fill="#F28B82" style={{filter:"drop-shadow(0 0 4px #F28B82)"}}/>
-    </svg>
-  );
-}
 
 const Logo = () => (
   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -57,7 +39,7 @@ export default function StatusPage() {
   }, [code]);
 
   const shareUrl = `https://getrentout.me?ref=${code}`;
-  const shareText = "Just got early access to RentOut — something big is coming. Get yours:";
+  const shareText = getShareText();
 
   const shareLinks = [
     {
@@ -128,7 +110,6 @@ export default function StatusPage() {
         {/* Not found */}
         {notFound && (
           <div style={{ textAlign: "center", paddingTop: 80 }}>
-            <p style={{ fontSize: 48, marginBottom: 16 }}>🤔</p>
             <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 12 }}>Link not found</h2>
             <p style={{ color: "#8888aa", marginBottom: 32 }}>This referral link doesn&apos;t exist. Check the URL and try again.</p>
             <a href="https://getrentout.me" style={{ display: "inline-block", background: "linear-gradient(135deg,#9B6DFF,#F28B82)", color: "#fff", fontWeight: 700, fontSize: 15, padding: "14px 32px", borderRadius: 12, textDecoration: "none" }}>
@@ -157,12 +138,6 @@ export default function StatusPage() {
             <p style={{ textAlign: "center", fontSize: 14, color: "#8888aa", marginBottom: 16, lineHeight: 1.6 }}>
               We&apos;ll email you when it&apos;s time to start earning.
             </p>
-            {/* Sparkline — position trend */}
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, marginBottom: 32 }}>
-              <Sparkline position={status.position} />
-              <p style={{ fontSize: 11, color: "#444466", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" }}>Your position over time</p>
-            </div>
-
             {/* Referral stats */}
             <div style={{ background: "rgba(155,109,255,0.07)", border: "1px solid rgba(155,109,255,0.2)", borderRadius: 20, padding: "28px 24px", marginBottom: 28, textAlign: "center" }}>
               <div style={{ fontSize: "clamp(48px,10vw,72px)", fontWeight: 900, letterSpacing: "-0.04em", marginBottom: 4, background: "linear-gradient(135deg,#9B6DFF,#F28B82)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
@@ -208,7 +183,7 @@ export default function StatusPage() {
               style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 14, padding: "14px", fontSize: 14, fontWeight: 700, color: "#8888aa", textDecoration: "none", width: "100%", marginBottom: 10, transition: "all .2s", boxSizing: "border-box" }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(155,109,255,0.25)"; e.currentTarget.style.color = "#b090ff"; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; e.currentTarget.style.color = "#8888aa"; }}>
-              🏆 View leaderboard
+              View leaderboard
             </a>
 
             <button onClick={() => { navigator.clipboard.writeText(shareUrl); setCopied(true); setTimeout(() => setCopied(false), 2000); }}

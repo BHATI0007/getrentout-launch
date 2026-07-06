@@ -98,7 +98,6 @@ export default function LeaderboardPage() {
 
         {!loading && leaders.length === 0 && (
           <div style={{ textAlign: "center", paddingTop: 40 }}>
-            <p style={{ fontSize: 48, marginBottom: 16 }}>🏆</p>
             <p style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>No referrals yet</p>
             <p style={{ color: "#8888aa", fontSize: 14 }}>Be the first to climb the leaderboard.</p>
             <a href="https://getrentout.me" style={{ display: "inline-block", marginTop: 24, background: "linear-gradient(135deg,#9B6DFF,#F28B82)", color: "#fff", fontWeight: 700, fontSize: 15, padding: "14px 32px", borderRadius: 12, textDecoration: "none" }}>

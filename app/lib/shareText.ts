@@ -1,12 +1,12 @@
 const SHARE_TEXT: Record<string, string> = {
-  en: "Just got early access to RentOut — something big is coming. Get yours:",
-  es: "Acabo de conseguir acceso anticipado a RentOut — algo grande está por llegar. Consigue el tuyo:",
-  pt: "Acabei de conseguir acesso antecipado ao RentOut — algo grande está chegando. Garanta o seu:",
-  fr: "Je viens d'obtenir un accès anticipé à RentOut — quelque chose de grand arrive. Obtenez le vôtre :",
-  hi: "मुझे RentOut का early access मिल गया — कुछ बड़ा आने वाला है। अपना भी लो:",
-  id: "Aku baru dapat akses awal ke RentOut — sesuatu yang besar akan datang. Ambil punyamu:",
-  tl: "Nakakuha na ako ng early access sa RentOut — may malaki paparating. Kunin mo rin:",
-  ar: "حصلت للتو على وصول مبكر إلى RentOut — هناك شيء كبير قادم. احصل على نصيبك:",
+  en: "I joined the RentOut early access list — a marketplace where people book your skills by the hour. Free to join:",
+  es: "Me uní a la lista de acceso anticipado de RentOut: un marketplace donde la gente reserva tus habilidades por hora. Unirse es gratis:",
+  pt: "Entrei na lista de acesso antecipado do RentOut: um marketplace onde as pessoas reservam suas habilidades por hora. É grátis:",
+  fr: "J'ai rejoint la liste d'accès anticipé de RentOut : une marketplace où l'on réserve vos compétences à l'heure. Inscription gratuite :",
+  hi: "मैंने RentOut की early access list join की — एक marketplace जहाँ लोग आपकी skills को घंटे के हिसाब से book करते हैं। Join करना free है:",
+  id: "Aku baru gabung daftar akses awal RentOut — marketplace tempat orang memesan keahlianmu per jam. Gratis untuk bergabung:",
+  tl: "Sumali ako sa early access list ng RentOut — isang marketplace kung saan bino-book ng mga tao ang skills mo per hour. Libre sumali:",
+  ar: "انضممت إلى قائمة الوصول المبكر في RentOut — سوق يحجز فيه الناس مهاراتك بالساعة. الانضمام مجاني:",
 };
 
 export function getShareText(): string {

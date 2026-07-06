@@ -812,8 +812,10 @@ export default function Page() {
               <button type="submit" disabled={loading} className="btn-primary" style={{ width: "100%", fontSize: 15, padding: "17px", borderRadius: 13 }}>
                 {loading ? "Just a moment…" : "Join as an Earner"}
               </button>
-              <p style={{ textAlign: "center", fontSize: 12, color: "var(--text-faint)" }}>
-                No credit card. No spam.
+              <p style={{ textAlign: "center", fontSize: 12, color: "var(--text-faint)", lineHeight: 1.6 }}>
+                No credit card. No spam. By joining, you confirm you are 18 or older and agree to our{" "}
+                <a href="/terms" target="_blank" rel="noopener" style={{ color: "var(--text-dim)", textDecoration: "underline" }}>Terms of Service</a> and{" "}
+                <a href="/privacy" target="_blank" rel="noopener" style={{ color: "var(--text-dim)", textDecoration: "underline" }}>Privacy Policy</a>.
               </p>
             </form>
           </div>
