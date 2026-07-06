@@ -962,7 +962,7 @@ export default function Page() {
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 12 }}>
               <span className="dot" />
               <span style={{ fontSize: 13, color: "var(--text-faint)", letterSpacing: "0.06em", textTransform: "uppercase", fontWeight: 600 }}>
-                spots remaining
+                of 100,000 early access spots remaining
               </span>
             </div>
           </div>
