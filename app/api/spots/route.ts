@@ -6,6 +6,8 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_KEY!
 );
 
+export const dynamic = "force-dynamic";
+
 const TOTAL_SPOTS = 100000;
 
 export async function GET() {
@@ -17,7 +19,7 @@ export async function GET() {
     const taken = count ?? 0;
     const remaining = TOTAL_SPOTS - taken;
 
-    return NextResponse.json({ total: TOTAL_SPOTS, taken, remaining });
+    return NextResponse.json({ total: TOTAL_SPOTS, taken, remaining }, { headers: { "Cache-Control": "no-store" } });
   } catch (err) {
     console.error(err);
     return NextResponse.json({ total: TOTAL_SPOTS, taken: 0, remaining: TOTAL_SPOTS });
