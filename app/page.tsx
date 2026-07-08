@@ -774,11 +774,38 @@ export default function Page() {
             </p>
 
             {source === "creator_outreach" && (
-              <div style={{ display: "flex", alignItems: "center", gap: 9, background: "rgba(242,139,130,0.1)", border: "1px solid rgba(242,139,130,0.3)", borderRadius: 12, padding: "10px 14px", marginBottom: 24 }}>
-                <span className="dot" style={{ background: "#F28B82" }} />
-                <span style={{ fontSize: 13, color: "#f0c0bc", fontWeight: 600, lineHeight: 1.4 }}>
-                  Refer 5 people with your link, earn a free month at 0% platform fee
-                </span>
+              <div style={{
+                position: "relative", borderRadius: 16, padding: 1.5, marginBottom: 24,
+                background: "linear-gradient(135deg, rgba(155,109,255,0.55), rgba(242,139,130,0.55))",
+              }}>
+                <div style={{
+                  borderRadius: 14.5, padding: "16px 18px",
+                  background: "linear-gradient(180deg, rgba(20,16,30,0.97), rgba(14,12,20,0.97))",
+                }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="url(#gradStar)">
+                      <defs>
+                        <linearGradient id="gradStar" x1="0" y1="0" x2="24" y2="24">
+                          <stop offset="0" stopColor="#b090ff" />
+                          <stop offset="1" stopColor="#F28B82" />
+                        </linearGradient>
+                      </defs>
+                      <path strokeWidth="1.6" strokeLinejoin="round" d="M12 2.5l2.6 5.8 6.3.6-4.8 4.2 1.5 6.2L12 16.2l-5.6 3.1 1.5-6.2-4.8-4.2 6.3-.6z"/>
+                    </svg>
+                    <span style={{
+                      fontSize: 11, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase",
+                      backgroundImage: "linear-gradient(90deg, #b090ff, #F28B82)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent",
+                    }}>
+                      Founding Creator Invite &middot; Limited spots
+                    </span>
+                  </div>
+                  <p style={{ fontSize: 13.5, color: "#e6e2f2", fontWeight: 600, lineHeight: 1.5, margin: 0 }}>
+                    Refer 5 people with your link, earn a free month at 0% platform fee.
+                  </p>
+                  <p style={{ fontSize: 12, color: "#8888aa", marginTop: 6, marginBottom: 0, lineHeight: 1.4 }}>
+                    We&apos;re only extending this to a small group of creators before public launch.
+                  </p>
+                </div>
               </div>
             )}
 
