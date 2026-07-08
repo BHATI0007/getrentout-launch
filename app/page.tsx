@@ -469,8 +469,8 @@ export default function Page() {
   const [myRefCode, setMyRefCode] = useState<string | null>(null);
   const [refCode, setRefCode] = useState<string | null>(null);
   const [source, setSource] = useState<string | null>(null);
-  const [fields, setFields] = useState({ name: "", email: "", city: "" });
-  const [errors, setErrors] = useState({ name: "", email: "", city: "" });
+  const [fields, setFields] = useState({ name: "", email: "", city: "", phone: "" });
+  const [errors, setErrors] = useState({ name: "", email: "", city: "", phone: "" });
   const [submitError, setSubmitError] = useState("");
   const honeypotRef = useRef<HTMLInputElement>(null);
   const [showRankModal, setShowRankModal] = useState(false);
@@ -545,14 +545,17 @@ export default function Page() {
   };
 
   const validate = () => {
-    const e = { name: "", email: "", city: "" };
+    const e = { name: "", email: "", city: "", phone: "" };
     if (!fields.name.trim()) e.name = "Please enter your name";
     else if (fields.name.trim().length < 2) e.name = "Name is too short";
     if (!fields.email.trim()) e.email = "Please enter your email";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email.trim())) e.email = "That doesn't look like a valid email";
+    const digits = fields.phone.replace(/\D/g, "");
+    if (!fields.phone.trim()) e.phone = "Please enter your phone or WhatsApp number";
+    else if (digits.length < 7 || digits.length > 15) e.phone = "That doesn't look like a valid phone number";
     if (source !== "creator_outreach" && !fields.city.trim()) e.city = "Please enter your city";
     setErrors(e);
-    return !e.name && !e.email && !e.city;
+    return !e.name && !e.email && !e.city && !e.phone;
   };
 
   const submit = async (e: React.FormEvent) => {
@@ -857,6 +860,15 @@ export default function Page() {
                   <label className={`float-label${fields.email ? " up" : ""}`} style={{ color: errors.email ? "#F28B82" : undefined }}>Email address</label>
                 </div>
                 {errors.email && <p style={{ fontSize: 12, color: "#F28B82", marginTop: 6 }}>{errors.email}</p>}
+              </div>
+              <div>
+                <div className="field-wrap">
+                  <input type="tel" placeholder=" " className="field" inputMode="tel" name="userphone"
+                    value={fields.phone} style={{ borderColor: errors.phone ? "#F28B82" : undefined }}
+                    onChange={e => { setFields(p => ({ ...p, phone: e.target.value })); setErrors(p => ({ ...p, phone: "" })); }} />
+                  <label className={`float-label${fields.phone ? " up" : ""}`} style={{ color: errors.phone ? "#F28B82" : undefined }}>Phone / WhatsApp number</label>
+                </div>
+                {errors.phone && <p style={{ fontSize: 12, color: "#F28B82", marginTop: 6 }}>{errors.phone}</p>}
               </div>
               {source !== "creator_outreach" && (
                 <div>

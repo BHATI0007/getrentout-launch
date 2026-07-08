@@ -12,6 +12,9 @@ function genCode(): string {
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
 
+// Total early-access cap. Beyond this, referrals no longer apply.
+const TOTAL_SPOTS = 100000;
+
 // Common disposable-email domains used by signup bots
 const DISPOSABLE_DOMAINS = new Set([
   "mailinator.com", "guerrillamail.com", "guerrillamail.net", "sharklasers.com",
@@ -44,7 +47,7 @@ function rateLimited(ip: string): boolean {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, email: rawEmail, city, category, referredBy, source: rawSource, website } = body;
+    const { name, email: rawEmail, city, category, referredBy, source: rawSource, website, phone: rawPhone } = body;
 
     // Honeypot: real users never fill this hidden field. Pretend success so bots don't adapt.
     if (website) {
@@ -59,6 +62,8 @@ export async function POST(req: NextRequest) {
     const cleanName = String(name).trim();
     const cleanCity = String(city).trim();
     const source = typeof rawSource === "string" && /^[a-z0-9_]{1,40}$/.test(rawSource) ? rawSource : null;
+    // Keep only digits and a leading +, cap length. Stored for the app to match on later.
+    const phone = typeof rawPhone === "string" ? rawPhone.replace(/[^\d+]/g, "").slice(0, 16) : "";
 
     if (!EMAIL_RE.test(email) || email.length > 254) {
       return NextResponse.json({ error: "Invalid email" }, { status: 400 });
@@ -72,6 +77,11 @@ export async function POST(req: NextRequest) {
     }
     if (cleanCity.length < 2 || cleanCity.length > 80 || /https?:\/\//i.test(cleanCity)) {
       return NextResponse.json({ error: "Invalid city" }, { status: 400 });
+    }
+    // Phone / WhatsApp is required — it's the key the app matches referrals on later.
+    const phoneDigits = phone.replace(/\D/g, "");
+    if (phoneDigits.length < 7 || phoneDigits.length > 15) {
+      return NextResponse.json({ error: "Please enter a valid phone or WhatsApp number" }, { status: 400 });
     }
 
     const ip = (req.headers.get("x-forwarded-for") ?? "unknown").split(",")[0].trim();
@@ -113,10 +123,10 @@ export async function POST(req: NextRequest) {
       status: "pending",
       created_at: new Date().toISOString(),
     };
-    let { error: insertErr } = await supabase.from("provider_applications").insert({ ...baseRow, source });
+    let { error: insertErr } = await supabase.from("provider_applications").insert({ ...baseRow, source, phone: phone || null });
 
-    // The `source` column may not exist yet if the migration hasn't been run —
-    // fall back to inserting without it so signups never break because of this.
+    // The `source`/`phone` columns may not exist yet if the migration hasn't been run —
+    // fall back to inserting core fields so signups never break because of this.
     if (insertErr?.code === "42703") {
       ({ error: insertErr } = await supabase.from("provider_applications").insert(baseRow));
     }
@@ -125,8 +135,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Insert failed", detail: insertErr.message });
     }
 
+    // Referrals only apply within the 100k early-access cap. Once the waitlist is full,
+    // new signups no longer earn referral credit (waitlist boost or creator commission).
+    const referralsOpen = referredBy && position <= TOTAL_SPOTS;
+
     // Boost referrer +5 spots (lower position = better)
-    if (referredBy) {
+    if (referralsOpen) {
       const { data: referrer } = await supabase
         .from("provider_applications")
         .select("id, position, referral_count")
@@ -141,6 +155,29 @@ export async function POST(req: NextRequest) {
             referral_count: (referrer.referral_count ?? 0) + 1,
           })
           .eq("id", referrer.id);
+      }
+    }
+
+    // If the referral code belongs to an approved CREATOR (invite-only program),
+    // also log this person under that creator. This is separate from the waitlist
+    // queue-jump above — it feeds the 5%-commission tracking that the app credits later.
+    if (referralsOpen) {
+      const creatorCode = String(referredBy).trim().toUpperCase();
+      const { data: creator } = await supabase
+        .from("creators")
+        .select("code, status")
+        .eq("code", creatorCode)
+        .single();
+
+      if (creator && creator.status === "active") {
+        // phone is the join key the app matches on later — best effort, may be blank.
+        await supabase.from("creator_referrals").insert({
+          creator_code: creator.code,
+          referred_name: cleanName,
+          referred_phone: phone || null,
+          referred_email: email,
+          city: cleanCity,
+        });
       }
     }
 

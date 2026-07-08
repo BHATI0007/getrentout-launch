@@ -42,9 +42,17 @@ export async function POST(req: NextRequest) {
     if (!earliest || r.created_at < earliest) earliest = r.created_at;
     if (!latest || r.created_at > latest) latest = r.created_at;
   }
+  // If this code is also a CREATOR code, count their referral rows so fraud cleanup
+  // covers the commission side too (otherwise fake sign-ups keep inflating a creator).
+  const { count: creatorRefCount } = await supabase
+    .from("creator_referrals")
+    .select("*", { count: "exact", head: true })
+    .eq("creator_code", code);
+
   const summary = {
     referrerCode: code,
     matchedRows: rows?.length ?? 0,
+    creatorReferralRows: creatorRefCount ?? 0,
     emailDomains: Object.fromEntries(Object.entries(domains).sort((a, b) => b[1] - a[1]).slice(0, 15)),
     createdBetween: [earliest, latest],
   };
@@ -61,6 +69,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Delete failed", detail: delErr.message }, { status: 500 });
   }
 
+  // Purge the matching creator-commission rows too, so the creator's count/earnings
+  // reset alongside the waitlist cleanup.
+  const { error: crefErr } = await supabase
+    .from("creator_referrals")
+    .delete()
+    .eq("creator_code", code);
+
   const { error: updErr } = await supabase
     .from("provider_applications")
     .update({ referral_count: 0 })
@@ -70,6 +85,7 @@ export async function POST(req: NextRequest) {
     dryRun: false,
     ...summary,
     deleted: rows?.length ?? 0,
+    creatorReferralsDeleted: crefErr ? `error: ${crefErr.message}` : (creatorRefCount ?? 0),
     referrerCountReset: !updErr,
   });
 }
