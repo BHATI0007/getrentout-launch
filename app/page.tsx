@@ -518,7 +518,9 @@ export default function Page() {
     const ref = params.get("ref");
     setRefCode(ref ? ref.trim().toUpperCase() : null);
     const src = params.get("src");
-    setSource(src ? src.trim().toLowerCase() : null);
+    const cleanSrc = src ? src.trim().toLowerCase() : null;
+    setSource(cleanSrc);
+    if (cleanSrc === "creator_outreach") setView("form");
   }, []);
 
   const lookupRank = async (e: React.FormEvent) => {
@@ -548,7 +550,7 @@ export default function Page() {
     else if (fields.name.trim().length < 2) e.name = "Name is too short";
     if (!fields.email.trim()) e.email = "Please enter your email";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email.trim())) e.email = "That doesn't look like a valid email";
-    if (!fields.city.trim()) e.city = "Please enter your city";
+    if (source !== "creator_outreach" && !fields.city.trim()) e.city = "Please enter your city";
     setErrors(e);
     return !e.name && !e.email && !e.city;
   };
@@ -562,7 +564,13 @@ export default function Page() {
       const res = await fetch("/api/provider", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...fields, referredBy: refCode, source, website: honeypotRef.current?.value ?? "" }),
+        body: JSON.stringify({
+          ...fields,
+          city: source === "creator_outreach" && !fields.city.trim() ? "Not specified" : fields.city,
+          referredBy: refCode,
+          source,
+          website: honeypotRef.current?.value ?? "",
+        }),
       });
       const data = await res.json();
       if (!res.ok || data.error) {
@@ -733,21 +741,34 @@ export default function Page() {
         <div className="form-brand" style={{ position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", top: -100, left: -100, width: 600, height: 600, background: "radial-gradient(circle, rgba(155,109,255,0.2), transparent 65%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", maxWidth: 420 }}>
-            <p className="section-label" style={{ marginBottom: 20 }}>Early access</p>
-            <h2 style={{ fontSize: "clamp(32px, 4vw, 52px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.05, marginBottom: 20, color: "#f0f0fa" }}>
-              Your skills<br />are worth money.<br /><span className="g">Be first to sell them.</span>
-            </h2>
+            <p className="section-label" style={{ marginBottom: 20 }}>{source === "creator_outreach" ? "Creator invite" : "Early access"}</p>
+            {source === "creator_outreach" ? (
+              <h2 style={{ fontSize: "clamp(32px, 4vw, 52px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.05, marginBottom: 20, color: "#f0f0fa" }}>
+                Your audience<br />already trusts you.<br /><span className="g">Now get paid by them.</span>
+              </h2>
+            ) : (
+              <h2 style={{ fontSize: "clamp(32px, 4vw, 52px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.05, marginBottom: 20, color: "#f0f0fa" }}>
+                Your skills<br />are worth money.<br /><span className="g">Be first to sell them.</span>
+              </h2>
+            )}
             <p style={{ fontSize: 16, color: "#b0b0cc", lineHeight: 1.75, marginBottom: 40 }}>
-              List a skill, get booked, get paid — on your own schedule. Signing up is free and takes 60 seconds.
+              {source === "creator_outreach"
+                ? "List what you do — photography, coaching, design, tutoring — and get booked directly by people who want to pay for it. Free to join, takes 60 seconds."
+                : "List a skill, get booked, get paid — on your own schedule. Signing up is free and takes 60 seconds."}
             </p>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 40 }}>
-              {[
+              {(source === "creator_outreach" ? [
+                "Founding Creator badge on your profile",
+                "0% platform fee for your first referral streak",
+                "Priority placement in your category",
+                "Direct line to the team",
+              ] : [
                 "Early access before anyone else",
                 "First in line on launch day",
                 "Priority visibility for founding earners",
                 "Direct line to the team",
-              ].map(text => (
+              ]).map(text => (
                 <div key={text} style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   <span style={{ width: 22, height: 22, borderRadius: 6, background: "rgba(155,109,255,0.18)", border: "1px solid rgba(155,109,255,0.35)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#b090ff", fontWeight: 800, flexShrink: 0 }}>✓</span>
                   <span style={{ fontSize: 14, color: "#a8a8c8", lineHeight: 1.5 }}>{text}</span>
@@ -763,11 +784,11 @@ export default function Page() {
           <div style={{ maxWidth: 400, width: "100%" }} className="page-in">
             <div style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(155,109,255,0.12)", border: "1px solid rgba(155,109,255,0.3)", borderRadius: 100, padding: "6px 14px", marginBottom: 28 }}>
               <span className="dot" style={{ background: "var(--accent)" }} />
-              <span style={{ fontSize: 13, color: "#b090ff", fontWeight: 600 }}>Earners only</span>
+              <span style={{ fontSize: 13, color: "#b090ff", fontWeight: 600 }}>{source === "creator_outreach" ? "Founding creators only" : "Earners only"}</span>
             </div>
 
             <h3 style={{ fontSize: 26, fontWeight: 800, letterSpacing: "-0.03em", marginBottom: 8, color: "#f0f0fa" }}>
-              Sign up as an Earner
+              {source === "creator_outreach" ? "Claim your Founding Creator spot" : "Sign up as an Earner"}
             </h3>
             <p style={{ fontSize: 14, color: "#9090b8", marginBottom: source === "creator_outreach" ? 14 : 28, lineHeight: 1.6 }}>
               60 seconds. We&apos;ll email you when your access is ready.
@@ -828,23 +849,27 @@ export default function Page() {
                 </div>
                 {errors.email && <p style={{ fontSize: 12, color: "#F28B82", marginTop: 6 }}>{errors.email}</p>}
               </div>
-              <div>
-                <div className="field-wrap">
-                  <input type="text" placeholder=" " className="field" name="usercity"
-                    value={fields.city} style={{ borderColor: errors.city ? "#F28B82" : undefined }}
-                    onChange={e => { setFields(p => ({ ...p, city: e.target.value })); setErrors(p => ({ ...p, city: "" })); }} />
-                  <label className={`float-label${fields.city ? " up" : ""}`} style={{ color: errors.city ? "#F28B82" : undefined }}>Your city</label>
+              {source !== "creator_outreach" && (
+                <div>
+                  <div className="field-wrap">
+                    <input type="text" placeholder=" " className="field" name="usercity"
+                      value={fields.city} style={{ borderColor: errors.city ? "#F28B82" : undefined }}
+                      onChange={e => { setFields(p => ({ ...p, city: e.target.value })); setErrors(p => ({ ...p, city: "" })); }} />
+                    <label className={`float-label${fields.city ? " up" : ""}`} style={{ color: errors.city ? "#F28B82" : undefined }}>Your city</label>
+                  </div>
+                  {errors.city && <p style={{ fontSize: 12, color: "#F28B82", marginTop: 6 }}>{errors.city}</p>}
                 </div>
-                {errors.city && <p style={{ fontSize: 12, color: "#F28B82", marginTop: 6 }}>{errors.city}</p>}
-              </div>
-              <div>
-                <div className="field-wrap">
-                  <input type="text" placeholder=" " className="field" name="referralcode"
-                    value={refCode ?? ""}
-                    onChange={e => setRefCode(e.target.value.trim().toUpperCase() || null)} />
-                  <label className={`float-label${refCode ? " up" : ""}`}>Referral code (optional)</label>
+              )}
+              {source !== "creator_outreach" && (
+                <div>
+                  <div className="field-wrap">
+                    <input type="text" placeholder=" " className="field" name="referralcode"
+                      value={refCode ?? ""}
+                      onChange={e => setRefCode(e.target.value.trim().toUpperCase() || null)} />
+                    <label className={`float-label${refCode ? " up" : ""}`}>Referral code (optional)</label>
+                  </div>
                 </div>
-              </div>
+              )}
               <input ref={honeypotRef} type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }} />
               <div style={{ height: 4 }} />
               {submitError && <p style={{ fontSize: 13, color: "#F28B82", textAlign: "center", lineHeight: 1.5 }}>{submitError}</p>}
