@@ -627,7 +627,7 @@ export default function Page() {
           We&apos;ll email you when it&apos;s time. Watch your inbox.
         </p>
 
-        {myRefCode && (
+        {myRefCode && source !== "creator_outreach" && (
           <div style={{ marginTop: 20, display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center" }}>
             <a href={`/r/${myRefCode}`} target="_blank" rel="noopener"
               style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 600, color: "#9B6DFF", textDecoration: "none", background: "rgba(155,109,255,0.08)", border: "1px solid rgba(155,109,255,0.2)", borderRadius: 100, padding: "8px 18px" }}>
@@ -640,8 +640,15 @@ export default function Page() {
             </a>
           </div>
         )}
+        {source === "creator_outreach" && (
+          <p style={{ marginTop: 20, fontSize: 14, color: "#8888aa", textAlign: "center", maxWidth: 340, lineHeight: 1.6 }}>
+            This invite is personal to you — we&apos;ll be in touch directly with next steps.
+          </p>
+        )}
       </div>
 
+      {source === "creator_outreach" ? null : (
+      <>
       {/* Bottom share section — pinned to bottom like Robinhood */}
       <div style={{ padding: "40px 24px 48px", maxWidth: 560, width: "100%", margin: "0 auto", position: "relative" }}>
         <div style={{ height: 1, background: "var(--border)", marginBottom: 32 }} />
@@ -720,6 +727,8 @@ export default function Page() {
         })()}
 
       </div>
+      </>
+      )}
     </div>
   );
 
@@ -760,7 +769,7 @@ export default function Page() {
             <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 40 }}>
               {(source === "creator_outreach" ? [
                 "Founding Creator badge on your profile",
-                "0% platform fee for your first referral streak",
+                "0% platform fee for your first 3 months",
                 "Priority placement in your category",
                 "Direct line to the team",
               ] : [
@@ -803,7 +812,7 @@ export default function Page() {
                   borderRadius: 14.5, padding: "16px 18px",
                   background: "linear-gradient(180deg, rgba(20,16,30,0.97), rgba(14,12,20,0.97))",
                 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
                     <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="url(#gradStar)">
                       <defs>
                         <linearGradient id="gradStar" x1="0" y1="0" x2="24" y2="24">
@@ -817,14 +826,14 @@ export default function Page() {
                       fontSize: 11, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase",
                       backgroundImage: "linear-gradient(90deg, #b090ff, #F28B82)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent",
                     }}>
-                      Founding Creator Invite &middot; Limited spots
+                      A personal invite
                     </span>
                   </div>
                   <p style={{ fontSize: 13.5, color: "#e6e2f2", fontWeight: 600, lineHeight: 1.5, margin: 0 }}>
-                    Refer 5 people with your link, earn a free month at 0% platform fee.
+                    You&apos;ve been personally selected to join RentOut as a Founding Creator.
                   </p>
-                  <p style={{ fontSize: 12, color: "#8888aa", marginTop: 6, marginBottom: 0, lineHeight: 1.4 }}>
-                    We&apos;re only extending this to a small group of creators before public launch.
+                  <p style={{ fontSize: 12.5, color: "#a8a4bc", marginTop: 8, marginBottom: 0, lineHeight: 1.5 }}>
+                    0% platform fee for your first 3 months, on us.
                   </p>
                 </div>
               </div>
