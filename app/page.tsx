@@ -468,6 +468,7 @@ export default function Page() {
   const [copied, setCopied] = useState(false);
   const [myRefCode, setMyRefCode] = useState<string | null>(null);
   const [refCode, setRefCode] = useState<string | null>(null);
+  const [source, setSource] = useState<string | null>(null);
   const [fields, setFields] = useState({ name: "", email: "", city: "" });
   const [errors, setErrors] = useState({ name: "", email: "", city: "" });
   const [submitError, setSubmitError] = useState("");
@@ -516,6 +517,8 @@ export default function Page() {
     const params = new URLSearchParams(window.location.search);
     const ref = params.get("ref");
     setRefCode(ref ? ref.trim().toUpperCase() : null);
+    const src = params.get("src");
+    setSource(src ? src.trim().toLowerCase() : null);
   }, []);
 
   const lookupRank = async (e: React.FormEvent) => {
@@ -559,7 +562,7 @@ export default function Page() {
       const res = await fetch("/api/provider", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...fields, referredBy: refCode, website: honeypotRef.current?.value ?? "" }),
+        body: JSON.stringify({ ...fields, referredBy: refCode, source, website: honeypotRef.current?.value ?? "" }),
       });
       const data = await res.json();
       if (!res.ok || data.error) {
@@ -766,9 +769,18 @@ export default function Page() {
             <h3 style={{ fontSize: 26, fontWeight: 800, letterSpacing: "-0.03em", marginBottom: 8, color: "#f0f0fa" }}>
               Sign up as an Earner
             </h3>
-            <p style={{ fontSize: 14, color: "#9090b8", marginBottom: 28, lineHeight: 1.6 }}>
+            <p style={{ fontSize: 14, color: "#9090b8", marginBottom: source === "creator_outreach" ? 14 : 28, lineHeight: 1.6 }}>
               60 seconds. We&apos;ll email you when your access is ready.
             </p>
+
+            {source === "creator_outreach" && (
+              <div style={{ display: "flex", alignItems: "center", gap: 9, background: "rgba(242,139,130,0.1)", border: "1px solid rgba(242,139,130,0.3)", borderRadius: 12, padding: "10px 14px", marginBottom: 24 }}>
+                <span className="dot" style={{ background: "#F28B82" }} />
+                <span style={{ fontSize: 13, color: "#f0c0bc", fontWeight: 600, lineHeight: 1.4 }}>
+                  Refer 5 people with your link, earn a free month at 0% platform fee
+                </span>
+              </div>
+            )}
 
             <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <div>

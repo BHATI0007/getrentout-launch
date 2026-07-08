@@ -44,7 +44,7 @@ function rateLimited(ip: string): boolean {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, email: rawEmail, city, category, referredBy, website } = body;
+    const { name, email: rawEmail, city, category, referredBy, source: rawSource, website } = body;
 
     // Honeypot: real users never fill this hidden field. Pretend success so bots don't adapt.
     if (website) {
@@ -58,6 +58,7 @@ export async function POST(req: NextRequest) {
     const email = String(rawEmail).toLowerCase().trim();
     const cleanName = String(name).trim();
     const cleanCity = String(city).trim();
+    const source = typeof rawSource === "string" && /^[a-z0-9_]{1,40}$/.test(rawSource) ? rawSource : null;
 
     if (!EMAIL_RE.test(email) || email.length > 254) {
       return NextResponse.json({ error: "Invalid email" }, { status: 400 });
@@ -103,7 +104,7 @@ export async function POST(req: NextRequest) {
     const referralCode = genCode();
 
     // Insert
-    const { error: insertErr } = await supabase.from("provider_applications").insert({
+    const baseRow = {
       name: cleanName, email, city: cleanCity, category,
       position,
       referral_code: referralCode,
@@ -111,7 +112,14 @@ export async function POST(req: NextRequest) {
       referral_count: 0,
       status: "pending",
       created_at: new Date().toISOString(),
-    });
+    };
+    let { error: insertErr } = await supabase.from("provider_applications").insert({ ...baseRow, source });
+
+    // The `source` column may not exist yet if the migration hasn't been run —
+    // fall back to inserting without it so signups never break because of this.
+    if (insertErr?.code === "42703") {
+      ({ error: insertErr } = await supabase.from("provider_applications").insert(baseRow));
+    }
 
     if (insertErr) {
       return NextResponse.json({ error: "Insert failed", detail: insertErr.message });
