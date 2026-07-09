@@ -644,8 +644,11 @@ export default function Page() {
           </div>
         )}
         {source === "creator_outreach" && (
-          <p style={{ marginTop: 20, fontSize: 14, color: "#8888aa", textAlign: "center", maxWidth: 340, lineHeight: 1.6 }}>
-            This invite is personal to you — we&apos;ll be in touch directly with next steps.
+          <p style={{ marginTop: 20, fontSize: 14, color: "#8888aa", textAlign: "center", maxWidth: 380, lineHeight: 1.7 }}>
+            This invite is personal to you. We&apos;ll review your application and email you your
+            <strong style={{ color: "#b090ff" }}> creator code, referral link, and personal dashboard</strong> —
+            where you&apos;ll track your sign-ups and 5% commission. See the{" "}
+            <a href="/creator-terms" target="_blank" rel="noopener" style={{ color: "#b090ff", textDecoration: "underline" }}>Creator Program Terms</a>.
           </p>
         )}
       </div>
@@ -771,6 +774,7 @@ export default function Page() {
 
             <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 40 }}>
               {(source === "creator_outreach" ? [
+                "Earn 5% commission on every booking from people you refer, for 3 months",
                 "Founding Creator badge on your profile",
                 "0% platform fee for your first 3 months",
                 "Priority placement in your category",
@@ -833,7 +837,7 @@ export default function Page() {
                     </span>
                   </div>
                   <p style={{ fontSize: 13.5, color: "#e6e2f2", fontWeight: 600, lineHeight: 1.5, margin: 0 }}>
-                    You&apos;ve been personally selected to join RentOut as a Founding Creator.
+                    You&apos;ve been personally selected to join RentOut as a Founding Creator. You&apos;ll earn <strong style={{ color: "#b090ff" }}>5% commission</strong> on every completed booking from people who join through your link, for 3 months — full details in the <a href="/creator-terms" target="_blank" rel="noopener" style={{ color: "#b090ff", textDecoration: "underline" }}>Creator Program Terms</a>.
                   </p>
                   <p style={{ fontSize: 12.5, color: "#a8a4bc", marginTop: 8, marginBottom: 0, lineHeight: 1.5 }}>
                     0% platform fee for your first 3 months, on us.
@@ -899,8 +903,9 @@ export default function Page() {
               </button>
               <p style={{ textAlign: "center", fontSize: 12, color: "var(--text-faint)", lineHeight: 1.6 }}>
                 No credit card. No spam. By joining, you confirm you are 18 or older and agree to our{" "}
-                <a href="/terms" target="_blank" rel="noopener" style={{ color: "var(--text-dim)", textDecoration: "underline" }}>Terms of Service</a> and{" "}
-                <a href="/privacy" target="_blank" rel="noopener" style={{ color: "var(--text-dim)", textDecoration: "underline" }}>Privacy Policy</a>.
+                <a href="/terms" target="_blank" rel="noopener" style={{ color: "var(--text-dim)", textDecoration: "underline" }}>Terms of Service</a>,{" "}
+                <a href="/privacy" target="_blank" rel="noopener" style={{ color: "var(--text-dim)", textDecoration: "underline" }}>Privacy Policy</a>
+                {source === "creator_outreach" && <>, and <a href="/creator-terms" target="_blank" rel="noopener" style={{ color: "var(--text-dim)", textDecoration: "underline" }}>Creator Program Terms</a></>}.
               </p>
             </form>
           </div>
