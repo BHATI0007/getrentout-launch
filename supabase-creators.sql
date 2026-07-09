@@ -6,6 +6,9 @@
 
 -- Phone/WhatsApp is now required at signup — the key the app matches referrals on.
 alter table provider_applications add column if not exists phone text;
+-- Signup source tag (e.g. creator_outreach) — was referenced by the API since
+-- 2026-07-08 but never migrated, which silently broke all signups. Keep in sync!
+alter table provider_applications add column if not exists source text;
 
 -- One record per approved creator (invite-only — you add rows here).
 create table if not exists creators (

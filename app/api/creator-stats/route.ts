@@ -40,7 +40,8 @@ export async function GET(req: NextRequest) {
   const cErr = first.error;
 
   // accepted_terms_at may not exist before the latest migration — retry without it.
-  if (cErr?.code === "42703") {
+  // (42703 = Postgres missing column; PGRST204 = PostgREST schema-cache miss.)
+  if (cErr?.code === "42703" || cErr?.code === "PGRST204") {
     ({ data: creator } = await supabase
       .from("creators")
       .select("code, name, status")

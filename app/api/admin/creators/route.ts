@@ -56,7 +56,8 @@ export async function POST(req: NextRequest) {
   let { error } = await supabase.from("creators").insert({ ...baseCreator, pan: pan ? String(pan).trim().toUpperCase() : null });
 
   // `pan` column may not exist yet if the latest migration hasn't been run — fall back.
-  if (error?.code === "42703") {
+  // (42703 = Postgres missing column; PGRST204 = PostgREST schema-cache miss.)
+  if (error?.code === "42703" || error?.code === "PGRST204") {
     ({ error } = await supabase.from("creators").insert(baseCreator));
   }
 

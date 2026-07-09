@@ -127,8 +127,15 @@ export async function POST(req: NextRequest) {
 
     // The `source`/`phone` columns may not exist yet if the migration hasn't been run —
     // fall back to inserting core fields so signups never break because of this.
-    if (insertErr?.code === "42703") {
-      ({ error: insertErr } = await supabase.from("provider_applications").insert(baseRow));
+    // Postgres reports a missing column as 42703; Supabase's REST layer (PostgREST)
+    // reports it as PGRST204 (schema-cache miss) — handle both.
+    const missingColumn = (c?: string) => c === "42703" || c === "PGRST204";
+    if (missingColumn(insertErr?.code)) {
+      // Try keeping phone (only `source` missing), then bare core fields.
+      ({ error: insertErr } = await supabase.from("provider_applications").insert({ ...baseRow, phone: phone || null }));
+      if (missingColumn(insertErr?.code)) {
+        ({ error: insertErr } = await supabase.from("provider_applications").insert(baseRow));
+      }
     }
 
     if (insertErr) {
