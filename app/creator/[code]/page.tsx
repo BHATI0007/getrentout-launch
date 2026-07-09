@@ -144,7 +144,7 @@ export default function CreatorDashboard() {
               </div>
             </div>
             <p style={{ textAlign: "center", fontSize: 12.5, color: "#9090b8", marginBottom: 6, fontWeight: 600 }}>
-              ${(stats.pendingUsd ?? 0).toFixed(2)} pending · paid monthly by the 10th (min $10)
+              ${(stats.pendingUsd ?? 0).toFixed(2)} pending · paid out monthly (min $10)
               {(() => { const wk = stats.referrals.filter(r => Date.now() - new Date(r.date).getTime() < 7 * 864e5).length; return wk > 0 ? ` · ${wk} sign-up${wk === 1 ? "" : "s"} this week` : ""; })()}
             </p>
             <p style={{ textAlign: "center", fontSize: 12, color: "#666688", marginBottom: 28, lineHeight: 1.6 }}>
@@ -213,7 +213,7 @@ export default function CreatorDashboard() {
                 {[
                   "You earn 5% of the service price on each completed, paid booking your referrals make — for 3 months from their first booking.",
                   "Each commission is confirmed 14 days after the booking completes (to cover refunds), then paid out.",
-                  "Payouts are monthly by the 10th, via PayPal, in US dollars, once your confirmed balance is $10+. KYC required; you handle your own local taxes.",
+                  "Payouts are monthly once your confirmed balance is $10+. Your payout method is confirmed before your first payout. KYC required; you handle your own local taxes.",
                   "Refer real people only — no spam or fake sign-ups — and disclose that you earn a commission when you promote RentOut.",
                 ].map((t, i) => (
                   <li key={i} style={{ display: "flex", gap: 10, fontSize: 12.5, lineHeight: 1.65, color: "#8888aa" }}>
