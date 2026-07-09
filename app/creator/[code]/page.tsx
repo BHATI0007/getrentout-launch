@@ -15,7 +15,7 @@ const Logo = () => (
 );
 
 type Referral = { name: string; city: string; converted: boolean; date: string };
-type Stats = { name: string; code: string; status: string; totalReferrals: number; convertedReferrals: number; acceptedTerms: boolean | null; referrals: Referral[] };
+type Stats = { name: string; code: string; status: string; totalReferrals: number; convertedReferrals: number; acceptedTerms: boolean | null; totalEarnedUsd: number; referrals: Referral[] };
 
 const fmtDate = (iso: string) => {
   try { return new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "short" }); }
@@ -123,15 +123,21 @@ export default function CreatorDashboard() {
             )}
 
             {/* Stat cards */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 28 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 28 }}>
+              <div style={{ background: "rgba(95,211,154,0.06)", border: "1px solid rgba(95,211,154,0.22)", borderRadius: 18, padding: "24px 12px", textAlign: "center" }}>
+                <div style={{ fontSize: "clamp(26px,5.5vw,40px)", fontWeight: 900, letterSpacing: "-0.03em", color: "#5fd39a" }}>
+                  ${(stats.totalEarnedUsd ?? 0).toFixed(2)}
+                </div>
+                <p style={{ fontSize: 12, color: "#7aa88f", fontWeight: 600 }}>earned so far</p>
+              </div>
               <div style={{ background: "rgba(155,109,255,0.07)", border: "1px solid rgba(155,109,255,0.2)", borderRadius: 18, padding: "24px 16px", textAlign: "center" }}>
-                <div style={{ fontSize: "clamp(40px,9vw,60px)", fontWeight: 900, letterSpacing: "-0.04em", background: "linear-gradient(135deg,#9B6DFF,#F28B82)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                <div style={{ fontSize: "clamp(26px,5.5vw,40px)", fontWeight: 900, letterSpacing: "-0.04em", background: "linear-gradient(135deg,#9B6DFF,#F28B82)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
                   {stats.totalReferrals.toLocaleString()}
                 </div>
                 <p style={{ fontSize: 12, color: "#9090b8", fontWeight: 600 }}>people signed up</p>
               </div>
               <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 18, padding: "24px 16px", textAlign: "center" }}>
-                <div style={{ fontSize: "clamp(40px,9vw,60px)", fontWeight: 900, letterSpacing: "-0.04em", color: "#f0f0fa" }}>
+                <div style={{ fontSize: "clamp(26px,5.5vw,40px)", fontWeight: 900, letterSpacing: "-0.04em", color: "#f0f0fa" }}>
                   {stats.convertedReferrals.toLocaleString()}
                 </div>
                 <p style={{ fontSize: 12, color: "#7070a0", fontWeight: 600 }}>started booking</p>

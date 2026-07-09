@@ -53,9 +53,11 @@ export async function GET(req: NextRequest) {
 
   if (!creator) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
+  // select * so commission-lifecycle columns are included when migrated (and
+  // absent-but-harmless when not) — avoids schema-cache errors entirely.
   const { data: referrals } = await supabase
     .from("creator_referrals")
-    .select("referred_name, city, converted, created_at")
+    .select("*")
     .eq("creator_code", code)
     .order("created_at", { ascending: false });
 
@@ -66,6 +68,13 @@ export async function GET(req: NextRequest) {
     date: r.created_at,
   }));
 
+  // Confirmed + paid commission (USD). 0 until bookings start post-launch.
+  const totalEarnedUsd = (referrals ?? []).reduce((sum, r) => {
+    const s = (r as { status?: string }).status;
+    const c = Number((r as { commission_usd?: number }).commission_usd ?? 0);
+    return sum + ((s === "confirmed" || s === "paid") && c > 0 ? c : 0);
+  }, 0);
+
   return NextResponse.json({
     name: firstName(creator.name),
     code: creator.code,
@@ -73,6 +82,7 @@ export async function GET(req: NextRequest) {
     totalReferrals: list.length,
     convertedReferrals: list.filter(r => r.converted).length,
     acceptedTerms,
+    totalEarnedUsd,
     referrals: list,
   });
 }
