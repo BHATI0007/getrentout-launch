@@ -31,7 +31,7 @@ export default function PrivacyPage() {
         <p style={{ fontSize: 13.5, color: "#666688", marginBottom: 48 }}>Effective date: July 6, 2026 · Applies to the getrentout.me website and early-access waitlist</p>
 
         <S title="The short version">
-          <p>We collect the minimum we need to run the RentOut early-access waitlist: your name, email address, and city. We use it only to manage your waitlist position and to contact you about the launch. We use no advertising or tracking cookies. We never sell your data. You can ask us to delete it at any time.</p>
+          <p>We collect the minimum we need to run the RentOut early-access waitlist: your name, email address, phone/WhatsApp number, and city. We use it only to manage your waitlist position, to contact you about the launch, and — if you joined through a creator&apos;s referral link — to match your sign-up when RentOut launches. We use no advertising or tracking cookies. We never sell your data. You can ask us to delete it at any time.</p>
         </S>
 
         <S title="1. Who we are">
@@ -40,8 +40,8 @@ export default function PrivacyPage() {
 
         <S title="2. What we collect">
           <UL items={[
-            <><strong style={{ color: "#d0d0e8" }}>Name, email address, and city</strong> — the details you enter in the signup form.</>,
-            <><strong style={{ color: "#d0d0e8" }}>Referral data</strong> — if you arrived through someone&apos;s referral link, we record that connection so both of you receive referral credit.</>,
+            <><strong style={{ color: "#d0d0e8" }}>Name, email, phone/WhatsApp number, and city</strong> — the details you enter in the signup form. Your phone number lets us contact you about launch and, if you joined through a creator&apos;s link, match your account when RentOut goes live.</>,
+            <><strong style={{ color: "#d0d0e8" }}>Referral data</strong> — if you arrived through someone&apos;s referral link, we record that connection so referral credit can be applied. If the link belongs to a RentOut Creator, we record your sign-up under that creator for our Creator Program.</>,
             <><strong style={{ color: "#d0d0e8" }}>Basic technical data</strong> — standard server logs (such as IP address, browser type, and request time) generated automatically by our infrastructure for security, rate limiting, and reliability.</>,
           ]} />
           <p style={{ marginTop: 10 }}>We do not knowingly collect any special categories of personal data, and we ask you not to submit any.</p>

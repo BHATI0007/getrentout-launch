@@ -170,14 +170,24 @@ export async function POST(req: NextRequest) {
         .single();
 
       if (creator && creator.status === "active") {
-        // phone is the join key the app matches on later — best effort, may be blank.
-        await supabase.from("creator_referrals").insert({
-          creator_code: creator.code,
-          referred_name: cleanName,
-          referred_phone: phone || null,
-          referred_email: email,
-          city: cleanCity,
-        });
+        // Dedup by phone: one person (one phone) can only be credited to one creator,
+        // ever. Prevents the same person signing up under multiple creators (or a
+        // creator self-referring with new emails) from being counted more than once.
+        const { data: dupePhone } = await supabase
+          .from("creator_referrals")
+          .select("id")
+          .eq("referred_phone", phone)
+          .limit(1);
+
+        if (!dupePhone || dupePhone.length === 0) {
+          await supabase.from("creator_referrals").insert({
+            creator_code: creator.code,
+            referred_name: cleanName,
+            referred_phone: phone, // required + validated above, always present
+            referred_email: email,
+            city: cleanCity,
+          });
+        }
       }
     }
 

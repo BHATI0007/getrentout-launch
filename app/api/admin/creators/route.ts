@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
   if (unauthorized(req)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
-  const { name, code: rawCode, phone, email, upi_id, instagram, notes } = body;
+  const { name, code: rawCode, phone, email, upi_id, pan, instagram, notes } = body;
 
   if (!name || typeof name !== "string" || name.trim().length < 2) {
     return NextResponse.json({ error: "name is required" }, { status: 400 });
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "That code collides with an existing waitlist referral code — pick another" }, { status: 409 });
   }
 
-  const { error } = await supabase.from("creators").insert({
+  const baseCreator = {
     code,
     name: name.trim(),
     phone: phone ?? null,
@@ -52,7 +52,13 @@ export async function POST(req: NextRequest) {
     instagram: instagram ?? null,
     notes: notes ?? null,
     status: "active",
-  });
+  };
+  let { error } = await supabase.from("creators").insert({ ...baseCreator, pan: pan ? String(pan).trim().toUpperCase() : null });
+
+  // `pan` column may not exist yet if the latest migration hasn't been run — fall back.
+  if (error?.code === "42703") {
+    ({ error } = await supabase.from("creators").insert(baseCreator));
+  }
 
   if (error) return NextResponse.json({ error: "Insert failed", detail: error.message }, { status: 500 });
 

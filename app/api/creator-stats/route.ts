@@ -30,11 +30,25 @@ export async function GET(req: NextRequest) {
   if (!raw) return NextResponse.json({ error: "Missing code" }, { status: 400 });
   const code = raw.trim().toUpperCase();
 
-  const { data: creator } = await supabase
+  let acceptedTerms: boolean | null = null; // null = column not migrated yet, hide the banner
+  const first = await supabase
     .from("creators")
-    .select("code, name, status")
+    .select("code, name, status, accepted_terms_at")
     .eq("code", code)
     .single();
+  let creator = first.data;
+  const cErr = first.error;
+
+  // accepted_terms_at may not exist before the latest migration — retry without it.
+  if (cErr?.code === "42703") {
+    ({ data: creator } = await supabase
+      .from("creators")
+      .select("code, name, status")
+      .eq("code", code)
+      .single());
+  } else if (creator) {
+    acceptedTerms = !!(creator as { accepted_terms_at?: string | null }).accepted_terms_at;
+  }
 
   if (!creator) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
@@ -57,6 +71,7 @@ export async function GET(req: NextRequest) {
     status: creator.status,
     totalReferrals: list.length,
     convertedReferrals: list.filter(r => r.converted).length,
+    acceptedTerms,
     referrals: list,
   });
 }

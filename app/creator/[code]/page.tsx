@@ -15,7 +15,7 @@ const Logo = () => (
 );
 
 type Referral = { name: string; city: string; converted: boolean; date: string };
-type Stats = { name: string; code: string; status: string; totalReferrals: number; convertedReferrals: number; referrals: Referral[] };
+type Stats = { name: string; code: string; status: string; totalReferrals: number; convertedReferrals: number; acceptedTerms: boolean | null; referrals: Referral[] };
 
 const fmtDate = (iso: string) => {
   try { return new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "short" }); }
@@ -27,6 +27,23 @@ export default function CreatorDashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [accepting, setAccepting] = useState(false);
+
+  const acceptTerms = async () => {
+    if (!code || accepting) return;
+    setAccepting(true);
+    try {
+      const r = await fetch("/api/creator-accept", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: String(code).toUpperCase() }),
+      });
+      const d = await r.json();
+      if (d.success) setStats(s => (s ? { ...s, acceptedTerms: true } : s));
+    } finally {
+      setAccepting(false);
+    }
+  };
 
   useEffect(() => {
     if (!code) return;
@@ -58,8 +75,16 @@ export default function CreatorDashboard() {
 
         {notFound && (
           <div style={{ textAlign: "center", paddingTop: 80 }}>
-            <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 12 }}>Creator link not found</h2>
-            <p style={{ color: "#8888aa" }}>This creator code doesn&apos;t exist or hasn&apos;t been activated yet.</p>
+            <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 12 }}>We couldn&apos;t find that dashboard</h2>
+            <p style={{ color: "#8888aa", marginBottom: 8, lineHeight: 1.7 }}>
+              Double-check the link from your invite — codes are case-insensitive, so a typo is the usual culprit.
+            </p>
+            <p style={{ color: "#8888aa", marginBottom: 32, lineHeight: 1.7 }}>
+              Still stuck? Write to <a href="mailto:support@getrentout.me" style={{ color: "#b090ff", fontWeight: 600 }}>support@getrentout.me</a> and we&apos;ll sort it out.
+            </p>
+            <a href="https://getrentout.me" style={{ display: "inline-block", background: "linear-gradient(135deg,#9B6DFF,#F28B82)", color: "#fff", fontWeight: 700, fontSize: 15, padding: "14px 32px", borderRadius: 12, textDecoration: "none" }}>
+              Back to RentOut →
+            </a>
           </div>
         )}
 
@@ -71,25 +96,50 @@ export default function CreatorDashboard() {
             <p style={{ textAlign: "center", fontSize: 22, fontWeight: 800, marginBottom: 4 }}>
               Welcome, {stats.name}
             </p>
-            <p style={{ textAlign: "center", fontSize: 13, color: "#8888aa", marginBottom: 30 }}>
-              You earn <span style={{ color: "#b090ff", fontWeight: 700 }}>5% of every booking</span> your referrals make, for 3 months.
+            <p style={{ textAlign: "center", fontSize: 13, color: "#8888aa", marginBottom: 6, lineHeight: 1.6 }}>
+              You earn <span style={{ color: "#b090ff", fontWeight: 700 }}>5% of every completed, paid booking</span> your referrals make, for 3 months.
             </p>
+            <p style={{ textAlign: "center", fontSize: 11.5, color: "#666688", marginBottom: 30 }}>
+              Earnings depend on real bookings — no income is guaranteed.
+            </p>
+
+            {stats.acceptedTerms === false && (
+              <div style={{ background: "rgba(155,109,255,0.08)", border: "1px solid rgba(155,109,255,0.3)", borderRadius: 16, padding: "20px 22px", marginBottom: 28 }}>
+                <p style={{ fontSize: 13.5, fontWeight: 700, color: "#e8e8f5", marginBottom: 6 }}>One step before you start sharing</p>
+                <p style={{ fontSize: 13, color: "#9090b8", lineHeight: 1.65, marginBottom: 14 }}>
+                  Please read the <a href="/creator-terms" target="_blank" rel="noopener" style={{ color: "#b090ff", fontWeight: 600 }}>Creator Program Terms</a> — they
+                  cover how you earn, when you&apos;re paid, and your responsibilities.
+                </p>
+                <button onClick={acceptTerms} disabled={accepting}
+                  style={{ background: "linear-gradient(135deg,#9B6DFF,#F28B82)", color: "#fff", fontWeight: 700, fontSize: 14, padding: "12px 24px", borderRadius: 11, border: "none", cursor: accepting ? "default" : "pointer", opacity: accepting ? 0.7 : 1 }}>
+                  {accepting ? "Saving…" : "I've read them — I agree"}
+                </button>
+              </div>
+            )}
+            {stats.acceptedTerms === true && (
+              <p style={{ textAlign: "center", fontSize: 12, color: "#5fd39a", marginBottom: 28 }}>
+                ✓ Program terms accepted
+              </p>
+            )}
 
             {/* Stat cards */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 28 }}>
               <div style={{ background: "rgba(155,109,255,0.07)", border: "1px solid rgba(155,109,255,0.2)", borderRadius: 18, padding: "24px 16px", textAlign: "center" }}>
                 <div style={{ fontSize: "clamp(40px,9vw,60px)", fontWeight: 900, letterSpacing: "-0.04em", background: "linear-gradient(135deg,#9B6DFF,#F28B82)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                  {stats.totalReferrals}
+                  {stats.totalReferrals.toLocaleString()}
                 </div>
                 <p style={{ fontSize: 12, color: "#9090b8", fontWeight: 600 }}>people signed up</p>
               </div>
               <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 18, padding: "24px 16px", textAlign: "center" }}>
                 <div style={{ fontSize: "clamp(40px,9vw,60px)", fontWeight: 900, letterSpacing: "-0.04em", color: "#f0f0fa" }}>
-                  {stats.convertedReferrals}
+                  {stats.convertedReferrals.toLocaleString()}
                 </div>
                 <p style={{ fontSize: 12, color: "#7070a0", fontWeight: 600 }}>started booking</p>
               </div>
             </div>
+            <p style={{ textAlign: "center", fontSize: 12, color: "#666688", marginBottom: 28, lineHeight: 1.6 }}>
+              Bookings and your earnings will appear here — and in the RentOut app — once RentOut launches in your referrals&apos; area.
+            </p>
 
             {/* Referral link */}
             <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.16em", color: "#555577", textTransform: "uppercase", marginBottom: 12, textAlign: "center" }}>
@@ -100,6 +150,21 @@ export default function CreatorDashboard() {
               <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
               {copied ? "Copied!" : `getrentout.me?ref=${stats.code}`}
             </button>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginTop: -20, marginBottom: 32 }}>
+              {[
+                { label: "WhatsApp", bg: "#25D366", href: `https://wa.me/?text=${encodeURIComponent(`I'm a creator on RentOut — join the early-access list with my link: ${shareUrl}`)}` },
+                { label: "Telegram", bg: "#229ED9", href: `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent("Join RentOut early access with my link")}` },
+                { label: "X", bg: "#000", border: "1px solid #2a2a2a", href: `https://twitter.com/intent/tweet?text=${encodeURIComponent(`Join RentOut early access with my link: ${shareUrl}`)}` },
+              ].map(({ label, bg, border, href }) => (
+                <a key={label} href={href} target="_blank" rel="noopener"
+                  style={{ display: "flex", alignItems: "center", justifyContent: "center", background: bg, border: border || "none", borderRadius: 12, padding: "12px 8px", textDecoration: "none", fontSize: 12.5, fontWeight: 700, color: "#fff", letterSpacing: "0.03em", transition: "opacity .15s" }}
+                  onMouseEnter={e => (e.currentTarget.style.opacity = "0.85")}
+                  onMouseLeave={e => (e.currentTarget.style.opacity = "1")}>
+                  {label}
+                </a>
+              ))}
+            </div>
 
             {/* Referred people list */}
             <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.16em", color: "#555577", textTransform: "uppercase", marginBottom: 14, textAlign: "center" }}>
@@ -129,28 +194,36 @@ export default function CreatorDashboard() {
               </div>
             )}
 
-            {/* Strict program terms — every creator is bound by these */}
+            {/* Key terms — condensed, with a link to the full program terms */}
             <div style={{ marginTop: 40, paddingTop: 24, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
               <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.16em", color: "#555577", textTransform: "uppercase", marginBottom: 14 }}>
-                Program terms
+                How it works
               </p>
               <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 10 }}>
                 {[
-                  "You earn 5% of a referred user's booking value, on completed and paid bookings only. Sign-ups alone earn nothing.",
-                  "You keep earning from each referred user for 3 months from their first booking.",
-                  "Referrals only apply within RentOut's first 100,000 early-access spots. Once the waitlist is full, no further referral credit is earned.",
-                  "A referral counts only if the person signs up using your link and provides a valid phone/WhatsApp number.",
-                  "Commission is reversed if a booking is refunded, cancelled, or disputed. Already-paid commission may be deducted from your next payout.",
-                  "Self-referrals and fake accounts are prohibited and result in forfeiture of all pending earnings and removal from the program.",
-                  "Payouts require identity (KYC) verification in the app and a minimum balance of ₹500.",
-                  "This is an invite-only program. RentOut may change rates or end it with 30 days' notice; earnings already locked in are honoured.",
+                  "You earn 5% of the service price on each completed, paid booking your referrals make — for 3 months from their first booking.",
+                  "Each commission is confirmed 14 days after the booking completes (to cover refunds), then paid out.",
+                  "Payouts are monthly by the 10th, via PayPal, in US dollars, once your confirmed balance is $10+. KYC required; you handle your own local taxes.",
+                  "Refer real people only — no spam or fake sign-ups — and disclose that you earn a commission when you promote RentOut.",
                 ].map((t, i) => (
-                  <li key={i} style={{ display: "flex", gap: 10, fontSize: 12.5, lineHeight: 1.6, color: "#8888aa" }}>
+                  <li key={i} style={{ display: "flex", gap: 10, fontSize: 12.5, lineHeight: 1.65, color: "#8888aa" }}>
                     <span style={{ color: "#9B6DFF", flexShrink: 0 }}>•</span>
                     <span>{t}</span>
                   </li>
                 ))}
               </ul>
+              <a href="/creator-terms" target="_blank" rel="noopener"
+                style={{ display: "inline-block", marginTop: 16, fontSize: 13, fontWeight: 700, color: "#b090ff", textDecoration: "none" }}>
+                Read the full program terms →
+              </a>
+            </div>
+
+            {/* Trust footer — who runs this + how to reach a human */}
+            <div style={{ marginTop: 28, paddingTop: 20, borderTop: "1px solid rgba(255,255,255,0.05)", textAlign: "center" }}>
+              <p style={{ fontSize: 12, color: "#666688", lineHeight: 1.7 }}>
+                The RentOut Creator Program is operated by RentOut. Questions about your earnings?<br />
+                Contact <a href="mailto:support@getrentout.me" style={{ color: "#9090b8", fontWeight: 600 }}>support@getrentout.me</a>.
+              </p>
             </div>
           </>
         )}
