@@ -475,6 +475,27 @@ export default function Page() {
   const [submitError, setSubmitError] = useState("");
   const honeypotRef = useRef<HTMLInputElement>(null);
   const [showRankModal, setShowRankModal] = useState(false);
+  const [showCreatorModal, setShowCreatorModal] = useState(false);
+  const [creatorEmail, setCreatorEmail] = useState("");
+  const [creatorMsg, setCreatorMsg] = useState<{ err?: string; ok?: string }>({});
+  const [creatorLoading, setCreatorLoading] = useState(false);
+
+  const creatorLookup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!creatorEmail.trim() || creatorLoading) return;
+    setCreatorLoading(true); setCreatorMsg({});
+    try {
+      const res = await fetch("/api/creator-lookup", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: creatorEmail.trim() }),
+      });
+      const d = await res.json();
+      if (d.registered && d.code) { window.location.href = `/creator/${d.code}`; return; }
+      if (d.interested) setCreatorMsg({ ok: "You're on the list — we'll email your personal invite link soon." });
+      else setCreatorMsg({ err: d.error || "Something went wrong. Try again." });
+    } catch { setCreatorMsg({ err: "Something went wrong. Try again." }); }
+    finally { setCreatorLoading(false); }
+  };
   const [rankEmail, setRankEmail] = useState("");
   const [rankLoading, setRankLoading] = useState(false);
   const [rankError, setRankError] = useState("");
@@ -957,6 +978,9 @@ export default function Page() {
             onMouseLeave={e => (e.currentTarget.style.color = "#8888aa")}>
             FAQ
           </a>
+          <button onClick={() => setShowCreatorModal(true)} className="nav-hide-mobile" style={{ fontSize: 13, fontWeight: 700, color: "#b090ff", background: "rgba(155,109,255,0.08)", border: "1px solid rgba(155,109,255,0.25)", borderRadius: 100, padding: "7px 14px", cursor: "pointer", transition: "all .2s" }}>
+            Creators
+          </button>
           <a href="/leaderboard" target="_blank" rel="noopener" className="nav-hide-mobile" style={{ fontSize: 13, fontWeight: 700, color: "#8888aa", textDecoration: "none", display: "flex", alignItems: "center", gap: 6, padding: "7px 14px", borderRadius: 100, border: "1px solid rgba(255,255,255,0.07)", background: "rgba(255,255,255,0.03)", transition: "all .2s" }}
             onMouseEnter={e => { e.currentTarget.style.color = "#b090ff"; e.currentTarget.style.borderColor = "rgba(155,109,255,0.3)"; }}
             onMouseLeave={e => { e.currentTarget.style.color = "#8888aa"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; }}>
@@ -975,6 +999,30 @@ export default function Page() {
       </nav>
 
       {/* Rank lookup modal */}
+      {showCreatorModal && (
+        <div onClick={() => setShowCreatorModal(false)} style={{ position: "fixed", inset: 0, zIndex: 999, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: "#111118", border: "1px solid rgba(155,109,255,0.25)", borderRadius: 24, padding: "40px 32px", width: "100%", maxWidth: 400, position: "relative" }}>
+            <button onClick={() => setShowCreatorModal(false)} style={{ position: "absolute", top: 16, right: 16, background: "none", border: "none", color: "#666688", fontSize: 20, cursor: "pointer", lineHeight: 1 }}>×</button>
+            <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.16em", color: "#9B6DFF", textTransform: "uppercase", marginBottom: 12 }}>Creator Program</p>
+            <h3 style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-0.03em", marginBottom: 8, color: "#f0f0fa" }}>Creators earn 5%</h3>
+            <p style={{ fontSize: 14, color: "#8888aa", marginBottom: 24, lineHeight: 1.6 }}>
+              Already a creator? Enter your email to open your dashboard. New here? We&apos;ll email you a personal invite link.{" "}
+              <a href="/creator-terms" target="_blank" rel="noopener" style={{ color: "#b090ff" }}>Program terms</a>
+            </p>
+            <form onSubmit={creatorLookup} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <input type="email" placeholder="you@email.com" value={creatorEmail}
+                onChange={e => { setCreatorEmail(e.target.value); setCreatorMsg({}); }}
+                className="field" style={{ borderColor: creatorMsg.err ? "#F28B82" : undefined }} />
+              {creatorMsg.err && <p style={{ fontSize: 12, color: "#F28B82", marginTop: -4 }}>{creatorMsg.err}</p>}
+              {creatorMsg.ok && <p style={{ fontSize: 13, color: "#5fd39a", marginTop: -4, lineHeight: 1.5 }}>{creatorMsg.ok}</p>}
+              <button type="submit" disabled={creatorLoading} className="btn-primary" style={{ width: "100%", fontSize: 15, padding: "15px", borderRadius: 12 }}>
+                {creatorLoading ? "Checking…" : "Continue →"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
       {showRankModal && (
         <div onClick={() => setShowRankModal(false)} style={{ position: "fixed", inset: 0, zIndex: 999, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
           <div onClick={e => e.stopPropagation()} style={{ background: "#111118", border: "1px solid rgba(155,109,255,0.25)", borderRadius: 24, padding: "40px 32px", width: "100%", maxWidth: 400, position: "relative" }}>

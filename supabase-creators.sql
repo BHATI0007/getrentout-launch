@@ -68,3 +68,10 @@ select c.code, c.name, c.status,
 from creators c
 left join creator_referrals r on r.creator_code = c.code
 group by c.code, c.name, c.status, c.created_at;
+
+-- Emails of creators who asked to be invited (via the "Creators" button).
+create table if not exists creator_interest (
+  id         uuid primary key default gen_random_uuid(),
+  email      text unique not null,
+  created_at timestamptz not null default now()
+);
