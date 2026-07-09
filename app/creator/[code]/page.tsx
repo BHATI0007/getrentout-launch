@@ -231,7 +231,7 @@ export default function CreatorDashboard() {
             {/* Trust footer — who runs this + how to reach a human */}
             <div style={{ marginTop: 28, paddingTop: 20, borderTop: "1px solid rgba(255,255,255,0.05)", textAlign: "center" }}>
               <p style={{ fontSize: 12, color: "#666688", lineHeight: 1.7 }}>
-                The RentOut Creator Program is operated by RentOut. Questions about your earnings?<br />
+                Questions about your earnings or the program?<br />
                 Contact <a href="mailto:support@getrentout.me" style={{ color: "#9090b8", fontWeight: 600 }}>support@getrentout.me</a>.
               </p>
             </div>

@@ -814,7 +814,7 @@ export default function Page() {
             )}
             <p style={{ fontSize: 16, color: "#b0b0cc", lineHeight: 1.75, marginBottom: 40 }}>
               {source === "creator_outreach"
-                ? "List what you do — photography, coaching, design, tutoring — and get booked directly by people who want to pay for it. Free to join, takes 60 seconds."
+                ? "List what you do — photography, coaching, design, tutoring — get booked directly, and earn a commission from every person who joins through you. Free to join, takes 60 seconds."
                 : "List a skill, get booked, get paid — on your own schedule. Signing up is free and takes 60 seconds."}
             </p>
 

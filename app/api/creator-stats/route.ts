@@ -7,7 +7,10 @@ const supabase = createClient(
 );
 
 // Only expose first names — referred people's full contact stays private.
-const firstName = (name: string | null) => (name ?? "").trim().split(/\s+/)[0] || "Someone";
+const firstName = (name: string | null) => {
+  const n = (name ?? "").trim().split(/\s+/)[0] || "Someone";
+  return n.charAt(0).toUpperCase() + n.slice(1);
+};
 
 // Rate limit code lookups to slow enumeration.
 const recent = new Map<string, number[]>();
