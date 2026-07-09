@@ -69,11 +69,13 @@ export async function GET(req: NextRequest) {
   }));
 
   // Confirmed + paid commission (USD). 0 until bookings start post-launch.
-  const totalEarnedUsd = (referrals ?? []).reduce((sum, r) => {
+  let totalEarnedUsd = 0, pendingUsd = 0;
+  for (const r of referrals ?? []) {
     const s = (r as { status?: string }).status;
     const c = Number((r as { commission_usd?: number }).commission_usd ?? 0);
-    return sum + ((s === "confirmed" || s === "paid") && c > 0 ? c : 0);
-  }, 0);
+    if (c > 0 && (s === "confirmed" || s === "paid")) totalEarnedUsd += c;
+    if (c > 0 && s === "booked_pending") pendingUsd += c;
+  }
 
   return NextResponse.json({
     name: firstName(creator.name),
@@ -83,6 +85,7 @@ export async function GET(req: NextRequest) {
     convertedReferrals: list.filter(r => r.converted).length,
     acceptedTerms,
     totalEarnedUsd,
+    pendingUsd,
     referrals: list,
   });
 }

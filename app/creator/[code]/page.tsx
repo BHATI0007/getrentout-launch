@@ -15,7 +15,7 @@ const Logo = () => (
 );
 
 type Referral = { name: string; city: string; converted: boolean; date: string };
-type Stats = { name: string; code: string; status: string; totalReferrals: number; convertedReferrals: number; acceptedTerms: boolean | null; totalEarnedUsd: number; referrals: Referral[] };
+type Stats = { name: string; code: string; status: string; totalReferrals: number; convertedReferrals: number; acceptedTerms: boolean | null; totalEarnedUsd: number; pendingUsd: number; referrals: Referral[] };
 
 const fmtDate = (iso: string) => {
   try { return new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "short" }); }
@@ -143,6 +143,10 @@ export default function CreatorDashboard() {
                 <p style={{ fontSize: 12, color: "#7070a0", fontWeight: 600 }}>started booking</p>
               </div>
             </div>
+            <p style={{ textAlign: "center", fontSize: 12.5, color: "#9090b8", marginBottom: 6, fontWeight: 600 }}>
+              ${(stats.pendingUsd ?? 0).toFixed(2)} pending · paid monthly by the 10th (min $10)
+              {(() => { const wk = stats.referrals.filter(r => Date.now() - new Date(r.date).getTime() < 7 * 864e5).length; return wk > 0 ? ` · ${wk} sign-up${wk === 1 ? "" : "s"} this week` : ""; })()}
+            </p>
             <p style={{ textAlign: "center", fontSize: 12, color: "#666688", marginBottom: 28, lineHeight: 1.6 }}>
               Bookings and your earnings will appear here — and in the RentOut app — once RentOut launches in your referrals&apos; area.
             </p>
