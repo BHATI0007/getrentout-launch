@@ -491,8 +491,13 @@ export default function Page() {
       });
       const d = await res.json();
       if (d.registered && d.code) { window.location.href = `/creator/${d.code}`; return; }
-      if (d.interested) setCreatorMsg({ ok: "You're on the list — we'll email your personal invite link soon." });
-      else setCreatorMsg({ err: d.error || "Something went wrong. Try again." });
+      if (d.interested) {
+        // Not registered yet — take them straight to creator sign-up. Fully automatic.
+        setCreatorMsg({ ok: "Taking you to creator sign-up…" });
+        window.location.href = "/?src=creator_outreach";
+        return;
+      }
+      setCreatorMsg({ err: d.error || "Something went wrong. Please try again." });
     } catch { setCreatorMsg({ err: "Something went wrong. Try again." }); }
     finally { setCreatorLoading(false); }
   };
@@ -1006,7 +1011,7 @@ export default function Page() {
             <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.16em", color: "#9B6DFF", textTransform: "uppercase", marginBottom: 12 }}>Creator Program</p>
             <h3 style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-0.03em", marginBottom: 8, color: "#f0f0fa" }}>Creators earn 5%</h3>
             <p style={{ fontSize: 14, color: "#8888aa", marginBottom: 24, lineHeight: 1.6 }}>
-              Already a creator? Enter your email to open your dashboard. New here? We&apos;ll email you a personal invite link.{" "}
+              Earn 5% commission on every booking from people you refer. Already a creator? Enter your email to open your dashboard. New? You&apos;ll go straight to sign-up.{" "}
               <a href="/creator-terms" target="_blank" rel="noopener" style={{ color: "#b090ff" }}>Program terms</a>
             </p>
             <form onSubmit={creatorLookup} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
