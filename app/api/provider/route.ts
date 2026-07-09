@@ -97,11 +97,14 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (existing) {
+      // If they're already a creator, hand back their dashboard code too.
+      const { data: c } = await supabase.from("creators").select("code").eq("email", email).maybeSingle();
       return NextResponse.json({
         success: true,
         duplicate: true,
         position: existing.position,
         referralCode: existing.referral_code,
+        creatorCode: c?.code ?? null,
       });
     }
 
@@ -198,7 +201,29 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({ success: true, position, referralCode });
+    // Creator-invite signups become creators AUTOMATICALLY — no manual approval.
+    // They get a personal code + dashboard the moment they join.
+    let creatorCode: string | null = null;
+    if (source === "creator_outreach") {
+      const base = cleanName.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 6) || "CREATOR";
+      for (let i = 0; i < 3 && !creatorCode; i++) {
+        const cand = i === 0 ? `${base}${Math.floor(10 + Math.random() * 90)}` : genCode();
+        // Must not collide with an existing creator code OR a waitlist referral code.
+        const [{ data: c1 }, { data: c2 }] = await Promise.all([
+          supabase.from("creators").select("code").eq("code", cand).maybeSingle(),
+          supabase.from("provider_applications").select("id").eq("referral_code", cand).maybeSingle(),
+        ]);
+        if (!c1 && !c2) {
+          const { error: cInsErr } = await supabase.from("creators").insert({
+            code: cand, name: cleanName, phone: phone || null, email,
+            status: "active", notes: "auto-created via creator_outreach signup",
+          });
+          if (!cInsErr) creatorCode = cand;
+        }
+      }
+    }
+
+    return NextResponse.json({ success: true, position, referralCode, creatorCode });
   } catch (err) {
     return NextResponse.json({ error: "Server error", detail: String(err) }, { status: 500 });
   }

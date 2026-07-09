@@ -467,6 +467,7 @@ export default function Page() {
   const [position, setPosition] = useState(0);
   const [copied, setCopied] = useState(false);
   const [myRefCode, setMyRefCode] = useState<string | null>(null);
+  const [creatorCode, setCreatorCode] = useState<string | null>(null);
   const [refCode, setRefCode] = useState<string | null>(null);
   const [source, setSource] = useState<string | null>(null);
   const [fields, setFields] = useState({ name: "", email: "", city: "", phone: "" });
@@ -584,6 +585,7 @@ export default function Page() {
       }
       setPosition(data.position ?? taken + 1);
       setMyRefCode(data.referralCode ?? null);
+      setCreatorCode(data.creatorCode ?? null);
       setView("done");
     } catch {
       setSubmitError("Network error. Please check your connection and try again.");
@@ -644,12 +646,30 @@ export default function Page() {
           </div>
         )}
         {source === "creator_outreach" && (
+          creatorCode ? (
+            <div style={{ marginTop: 24, maxWidth: 420, width: "100%", background: "rgba(155,109,255,0.07)", border: "1px solid rgba(155,109,255,0.25)", borderRadius: 18, padding: "24px 22px", textAlign: "center" }}>
+              <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.16em", color: "#9B6DFF", textTransform: "uppercase", marginBottom: 10 }}>Your creator dashboard is ready</p>
+              <a href={`/creator/${creatorCode}`} target="_blank" rel="noopener"
+                style={{ display: "block", background: "linear-gradient(135deg,#9B6DFF,#F28B82)", color: "#fff", fontWeight: 800, fontSize: 15, padding: "15px", borderRadius: 12, textDecoration: "none", marginBottom: 12 }}>
+                Open my dashboard →
+              </a>
+              <p style={{ fontSize: 12.5, color: "#9090b8", lineHeight: 1.7, marginBottom: 8 }}>
+                <strong style={{ color: "#c0c0e0" }}>Bookmark it — this link is your login.</strong><br />
+                getrentout.me/creator/{creatorCode}
+              </p>
+              <p style={{ fontSize: 12.5, color: "#9090b8", lineHeight: 1.7 }}>
+                Your referral link to share: <strong style={{ color: "#b090ff" }}>getrentout.me?ref={creatorCode}</strong><br />
+                You earn 5% of every booking your sign-ups make, for 3 months.
+              </p>
+            </div>
+          ) : (
           <p style={{ marginTop: 20, fontSize: 14, color: "#8888aa", textAlign: "center", maxWidth: 380, lineHeight: 1.7 }}>
             This invite is personal to you. We&apos;ll review your application and email you your
             <strong style={{ color: "#b090ff" }}> creator code, referral link, and personal dashboard</strong> —
             where you&apos;ll track your sign-ups and 5% commission. See the{" "}
             <a href="/creator-terms" target="_blank" rel="noopener" style={{ color: "#b090ff", textDecoration: "underline" }}>Creator Program Terms</a>.
           </p>
+          )
         )}
       </div>
 
