@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 
 const APK_URL =
-  "https://github.com/BHATI0007/getrentout-launch/releases/download/v1.1.2-android-b7/app-prod-release.apk";
+  "https://github.com/BHATI0007/getrentout-launch/releases/download/v1.1.2-android-b8/app-prod-release.apk";
 
 export const metadata: Metadata = {
   title: "Download RentOut — Android Beta",
@@ -66,7 +66,7 @@ export default function DownloadPage() {
           Download for Android →
         </a>
         <p style={{ fontSize: 12, color: "#555577", textAlign: "center", marginBottom: 40 }}>
-          v1.1.2 · Android 8.0+ · ~258MB
+          v1.1.2 · Android 8.0+ · ~113MB
         </p>
 
         <div style={{ background: "#0f0f14", border: "1px solid #1a1a24", borderRadius: 16, padding: "24px 22px", marginBottom: 28 }}>
