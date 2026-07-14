@@ -9,6 +9,12 @@ export const metadata: Metadata = {
   description: "Download the RentOut Android beta app.",
 };
 
+// Every APK swap needs this page to be re-fetched, never served stale from
+// a browser or CDN cache — a phone with this tab already open from a prior
+// test would otherwise silently keep pointing at the old build.
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const Logo = () => (
   <a href="https://getrentout.me" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
     <div style={{ width: 32, height: 32, borderRadius: 9, overflow: "hidden", flexShrink: 0, background: "linear-gradient(135deg, #1a1228, #120d1e)", border: "1px solid rgba(155,109,255,0.25)" }}>
