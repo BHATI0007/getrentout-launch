@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 
 const APK_URL =
-  "https://github.com/BHATI0007/getrentout-launch/releases/download/v1.1.2-android-b9/app-prod-release.apk";
+  "https://github.com/BHATI0007/getrentout-launch/releases/download/v1.1.3-android-b7/app-prod-release.apk";
 
 export const metadata: Metadata = {
   title: "Download RentOut — Android Beta",
@@ -25,11 +25,10 @@ const Logo = () => (
 );
 
 const steps = [
-  { n: 1, text: "If you already installed RentOut before, uninstall it first — this build won't install over the old one." },
-  { n: 2, text: "Tap Download below. The app file (.apk) saves to your phone." },
-  { n: 3, text: "Open the downloaded file from your notifications or Downloads folder." },
-  { n: 4, text: "Android will warn about installing outside the Play Store — tap Settings, then allow \"Install unknown apps\" for this app just once." },
-  { n: 5, text: "Go back and tap Install. Open RentOut and sign in with the email you used to join the waitlist." },
+  { n: 1, text: "Tap Download below. The app file (.apk) saves to your phone." },
+  { n: 2, text: "Open the downloaded file from your notifications or Downloads folder." },
+  { n: 3, text: "Android will warn about installing outside the Play Store — tap Settings, then allow \"Install unknown apps\" for this app just once." },
+  { n: 4, text: "Go back and tap Install. Open RentOut and sign in with the email you used to join the waitlist." },
 ];
 
 export default function DownloadPage() {
@@ -66,7 +65,7 @@ export default function DownloadPage() {
           Download for Android →
         </a>
         <p style={{ fontSize: 12, color: "#555577", textAlign: "center", marginBottom: 40 }}>
-          v1.1.2 · Android 8.0+ · ~113MB
+          v1.1.3 · Android 8.0+ · ~113MB
         </p>
 
         <div style={{ background: "#0f0f14", border: "1px solid #1a1a24", borderRadius: 16, padding: "24px 22px", marginBottom: 28 }}>
