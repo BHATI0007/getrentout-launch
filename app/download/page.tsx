@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 
 const APK_URL =
-  "https://github.com/BHATI0007/getrentout-launch/releases/download/v1.1.3-android-b7/app-prod-release.apk";
+  "https://github.com/BHATI0007/getrentout-launch/releases/download/v1.1.3-android-b8/app-prod-release.apk";
 
 export const metadata: Metadata = {
   title: "Download RentOut — Android Beta",
